@@ -28,8 +28,8 @@ export default async function handler(req, res) {
     "Accept": "application/json"
   };
 
-  // ✅ FIXED URL — ab galat append nahi hoga
-  const url = `https://sbsakib.eu.cc/apis/vehicle_besic?key=Demo&vehicle=${encodeURIComponent(vehicle)}`;
+  // ✅ NEW API URL — replaced with rajfflivebot.onrender.com
+  const url = `http://rajfflivebot.onrender.com/pub/rajfflive/vnum?vnum=${encodeURIComponent(vehicle)}`;
 
   try {
     const r = await fetch(url, { headers });

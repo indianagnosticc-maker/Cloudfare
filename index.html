@@ -682,28 +682,12 @@ class ApiService {
   }
 
   static async tgosint(query) {
-    try {
-      return await this.json(ENDPOINTS.tgosint + '?q=' + encodeURIComponent(query));
-    } catch {
-      // Mock fallback if API endpoint is not yet mounted on server
-      await sleep(650);
-      const isId = /^\d+$/.test(query);
-      return {
-        success: true,
-        user_id: isId ? query : '749204918',
-        username: isId ? 'operator_null' : query.replace('@',''),
-        first_name: 'Target Profile',
-        last_name: 'Shards',
-        bio: 'Public telemetry node indexed. Zero-retention session verified.',
-        verified: false,
-        premium: false,
-        dc_id: 4,
-        bot: false,
-        status: 'Recently Active',
-        lookup_type: isId ? 'ID' : 'USERNAME'
-      };
-    }
+  try {
+    return await this.json(ENDPOINTS.tgosint + '?q=' + encodeURIComponent(query));
+  } catch (err) {
+    throw new Error('Network error or API unavailable');
   }
+}
 
   static async smsb(number) {
     try {
@@ -894,45 +878,53 @@ class Renderer {
     return html;
   }
 
-  static telegramHtml(payload) {
-    if (!payload || typeof payload !== 'object') {
-      return `<div class="card"><div class="body"><div class="vrow"><div class="vk">RESULT</div><div class="fill"></div><div class="vv na">Target not found</div></div></div></div>`;
-    }
-    let data = payload;
-    for (const w of ['data','result','user','profile']) {
-      const v = data[w];
-      if (v && typeof v === 'object' && !Array.isArray(v)) { data = v; break; }
-    }
-    if (Array.isArray(data) && data.length) data = data[0];
-
-    const rows = [];
-    let found = 0;
-    for (const { label, keys } of TELEGRAM_FIELDS) {
-      let val = null;
-      for (const k of keys) {
-        const v = data[k];
-        if (v === null || v === undefined) continue;
-        const s = String(v).trim();
-        if (s && s !== 'null' && s !== 'NA' && s !== 'N/A') { val = s; break; }
-      }
-      if (val !== null) {
-        found++;
-        const hi = ['user id','username','first name','phone'].includes(label);
-        rows.push(`<div class="vrow"><div class="vk">${esc(label)}</div><div class="fill"></div><div class="vv${hi ? ' hi' : ''}">${esc(val)}</div></div>`);
-      }
-    }
-
-    if (!found) {
-      return `<div class="card"><div class="head"><span>TELEGRAM DATA</span><span class="badge">RECORD</span></div><div class="body">${this.renderObject(data)}</div></div>`;
-    }
-
-    let html = `<div class="card">
-      <div class="head"><span>TELEGRAM PROFILE</span><span class="badge">RESOLVED</span></div>
-      <div class="body">${rows.join('')}</div>
-    </div>`;
-    html += `<details><summary>RAW TELEMETRY</summary><pre class="raw">${esc(JSON.stringify(payload, null, 2))}</pre></details>`;
-    return html;
+static telegramHtml(payload) {
+  if (!payload || typeof payload !== 'object') {
+    return `<div class="card"><div class="body"><div class="vrow"><div class="vk">RESULT</div><div class="fill"></div><div class="vv na">Target not found</div></div></div></div>`;
   }
+
+  if (payload.success === false || payload.error) {
+    const msg = payload.error || 'No data found';
+    return `<div class="card"><div class="body"><div class="vrow"><div class="vk">STATUS</div><div class="fill"></div><div class="vv na">${esc(msg)}</div></div></div></div>`;
+  }
+
+  let data = payload;
+  for (const w of ['data','result','user','profile']) {
+    if (data[w] && typeof data[w] === 'object' && !Array.isArray(data[w])) {
+      data = data[w];
+      break;
+    }
+  }
+  if (Array.isArray(data) && data.length) data = data[0];
+
+  const rows = [];
+  let found = 0;
+  for (const { label, keys } of TELEGRAM_FIELDS) {
+    let val = null;
+    for (const k of keys) {
+      const v = data[k];
+      if (v === null || v === undefined) continue;
+      const s = String(v).trim();
+      if (s && s !== 'null' && s !== 'NA' && s !== 'N/A') { val = s; break; }
+    }
+    if (val !== null) {
+      found++;
+      const hi = ['user id','username','first name','phone'].includes(label);
+      rows.push(`<div class="vrow"><div class="vk">${esc(label)}</div><div class="fill"></div><div class="vv${hi ? ' hi' : ''}">${esc(val)}</div></div>`);
+    }
+  }
+
+  if (!found) {
+    return `<div class="card"><div class="body"><div class="vrow"><div class="vk">STATUS</div><div class="fill"></div><div class="vv na">Target profile data not found</div></div></div></div>`;
+  }
+
+  let html = `<div class="card">
+    <div class="head"><span>TELEGRAM PROFILE</span><span class="badge">RESOLVED</span></div>
+    <div class="body">${rows.join('')}</div>
+  </div>`;
+  html += `<details><summary>RAW TELEMETRY</summary><pre class="raw">${esc(JSON.stringify(payload, null, 2))}</pre></details>`;
+  return html;
+}
 }
 
 /* ============================================================

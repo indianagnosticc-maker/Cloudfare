@@ -403,7 +403,7 @@ input:not(:checked) + .slider:before{box-shadow:0 0 0 rgba(255,255,255,0);}
 <nav class="tabs" id="tabs" style="overflow-x: auto; scrollbar-width: none; -ms-overflow-style: none; flex-wrap: nowrap;">
 <div class="tab-indicator" id="tab-indicator"></div>
 <button class="tab-btn active" data-tab="osint">OSINT</button>
-<button class="tab-btn" data-tab="vosint">GAADI</button>
+<button class="tab-btn" data-tab="vosint">V-OSINT</button>
 <button class="tab-btn" data-tab="tgosint">TELEGRAM</button>
 <button class="tab-btn" data-tab="smsb">SMS-B</button>
 <button class="tab-btn" data-tab="yuki">YUKI</button>
@@ -1297,7 +1297,7 @@ class UIController {
         this.audio.play('error');
         return;
       }
-      this.addHistory?.('GAADI', raw);
+      this.addHistory?.('V-OSINT', raw);
       this.setOutput('out-vosint', '');
       this.loading('status-vosint', `QUERYING REGISTRY FOR ${raw}`);
       const btn = form.querySelector('button');

@@ -11,30 +11,56 @@ export default async function handler(req, res) {
     return res.status(400).json({ success: false, error: 'Query required' });
   }
 
-  try {
-    const cleanQuery = query.replace('@', '').trim();
-    const isNumericId = /^\d+$/.test(cleanQuery);
+  const cleanQuery = String(query).replace('@', '').trim();
+  const BASE = 'https://rtf-api-server.onrender.com/api?types=telegram&key=RTFSERVER&spell=rtfgamming';
 
-    // ID ho ya username, dono ke liye same URL
-    const API_URL = `https://rtf-api-server.onrender.com/api?types=telegram&key=RTFSERVER&spell=rtfgamming&q=${encodeURIComponent(cleanQuery)}`;
+  // Server metadata keys — inhe real data nahi maanenge
+  const SERVER_KEYS = new Set([
+    'spell', 'used_count', 'server_time_ist', 'server_time',
+    'dm_for_buy', 'developer', 'number', 'country', 'country_code',
+    'success', 'status', 'message', 'error', 'credit', 'credits'
+  ]);
 
-    const response = await fetch(API_URL, {
-      headers: { 'Accept': 'application/json' }
-    });
+  const paramsToTry = ['username', 'user', 'id', 'query', 'q', 'tg', 'userid', 'telegram'];
 
-    if (!response.ok) {
-      throw new Error(`API error: ${response.status}`);
+  for (const param of paramsToTry) {
+    try {
+      const url = `${BASE}&${param}=${encodeURIComponent(cleanQuery)}`;
+      const response = await fetch(url, {
+        headers: { 'Accept': 'application/json' }
+      });
+
+      if (!response.ok) continue;
+
+      const data = await response.json();
+
+      if (!data || typeof data !== 'object') continue;
+
+      // Real data hai ya sirf server metadata?
+      const keys = Object.keys(data);
+      const realKeys = keys.filter(k => !SERVER_KEYS.has(k));
+
+      // Agar real keys mile aur unme actual user info hai
+      const hasRealData = realKeys.length > 0 && realKeys.some(k => {
+        const v = data[k];
+        return v !== null && v !== undefined && String(v).trim() !== '';
+      });
+
+      if (hasRealData) {
+        // Ek clean response bhej, metadata strip kar
+        const cleaned = {};
+        for (const k of realKeys) cleaned[k] = data[k];
+        return res.status(200).json(cleaned);
+      }
+    } catch (err) {
+      // next param try karo
     }
-
-    const data = await response.json();
-
-    // Response log kar (debugging ke liye Vercel logs me dikhega)
-    console.log('[TG-OSINT] Query:', cleanQuery, '| Type:', isNumericId ? 'ID' : 'USERNAME');
-    console.log('[TG-OSINT] Response:', JSON.stringify(data).slice(0, 500));
-
-    return res.status(200).json(data);
-
-  } catch (err) {
-    return res.status(500).json({ success: false, error: err.message });
   }
+
+  // Sab params try kiye, koi real data nahi mila
+  return res.status(200).json({
+    success: false,
+    error: 'No Telegram data returned by API for this query',
+    query: cleanQuery
+  });
 }

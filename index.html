@@ -741,6 +741,14 @@ class GalaxyEngine {
   setEnabled(on){this.enabled=!!on;this.canvas.classList.toggle('off',!this.enabled);}
 }
 
+const ENDPOINTS = {
+  osint:   '/api/osint',
+  vosint:  '/api/vosint',
+  tgosint: '/api/tgosint',
+  smsb:    '/api/smsb',
+  yuki:    '/api/yuki'
+};
+
 class ApiService {
   static async json(url, init) {
     const res = await fetch(url, init);

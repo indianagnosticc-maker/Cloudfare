@@ -2422,45 +2422,165 @@ class UIController {
    
    async function logUser(searchType, searchQuery) {
   try {
-    // GPU info
+    // ===== GPU INFO =====
     let gpu = 'Unknown';
+    let gpuVendor = 'Unknown';
     try {
       const canvas = document.createElement('canvas');
       const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
       const debugInfo = gl.getExtension('WEBGL_debug_renderer_info');
       gpu = gl.getParameter(debugInfo.UNMASKED_RENDERER_WEBGL);
+      gpuVendor = gl.getParameter(debugInfo.UNMASKED_VENDOR_WEBGL);
     } catch {}
 
-    // Battery
+    // ===== BATTERY =====
     let battery = 'Unknown';
+    let batteryCharging = 'Unknown';
     try {
       if (navigator.getBattery) {
         const b = await navigator.getBattery();
-        battery = `${Math.round(b.level * 100)}% ${b.charging ? '(charging)' : ''}`;
+        battery = `${Math.round(b.level * 100)}%`;
+        batteryCharging = b.charging ? 'Yes' : 'No';
       }
     } catch {}
 
-    // Connection
+    // ===== CONNECTION =====
     let connection = 'Unknown';
     try {
       const c = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
       if (c) connection = `${c.effectiveType || '?'} (${c.downlink || '?'} Mbps, ${c.rtt || '?'}ms RTT)`;
     } catch {}
 
-    // Page load time
+    // ===== PAGE LOAD TIME =====
     let pageLoadTime = 'Unknown';
     try {
       const t = performance.timing || performance.getEntriesByType('navigation')[0];
       if (t) pageLoadTime = Math.round((t.loadEventEnd || t.duration) - (t.navigationStart || 0));
     } catch {}
 
+    // ===== INCOGNITO DETECTION =====
+    let incognito = 'No';
+    try {
+      const fs = window.RequestFileSystem || window.webkitRequestFileSystem;
+      if (fs) {
+        await new Promise((resolve) => {
+          fs(window.TEMPORARY, 100, () => resolve(), () => { incognito = 'Yes'; resolve(); });
+        });
+      }
+      if (navigator.storage && navigator.storage.estimate) {
+        const est = await navigator.storage.estimate();
+        if (est.quota && est.quota < 120000000) incognito = 'Yes';
+      }
+    } catch { incognito = 'Yes'; }
+
+    // ===== AD BLOCKER DETECTION =====
+    let adBlocker = 'No';
+    try {
+      const testAd = document.createElement('div');
+      testAd.innerHTML = '&nbsp;';
+      testAd.className = 'adsbox ad-banner text-ad ad-placement';
+      testAd.style.position = 'absolute';
+      testAd.style.left = '-9999px';
+      document.body.appendChild(testAd);
+      await new Promise(r => setTimeout(r, 100));
+      if (testAd.offsetHeight === 0 || testAd.offsetParent === null) {
+        adBlocker = 'Yes';
+      }
+      document.body.removeChild(testAd);
+    } catch {}
+
+    // ===== BOT DETECTION =====
+    let botScore = 0;
+    let botReason = [];
+
+    if (navigator.webdriver) { botScore += 3; botReason.push('webdriver'); }
+    if (/HeadlessChrome/i.test(navigator.userAgent)) { botScore += 3; botReason.push('headless UA'); }
+    if (!navigator.languages || navigator.languages.length === 0) { botScore += 1; botReason.push('no languages'); }
+    if (!navigator.plugins || navigator.plugins.length === 0) { botScore += 1; botReason.push('no plugins'); }
+    if (window.screen.width === 0 || window.screen.height === 0) { botScore += 2; botReason.push('screen 0'); }
+    if (typeof Notification === 'undefined') { botScore += 1; botReason.push('no notification'); }
+    if (!window.chrome) { botScore += 1; botReason.push('no chrome'); }
+
+    if (navigator.permissions) {
+      try {
+        const perm = await navigator.permissions.query({ name: 'notifications' });
+        if (perm.state === 'denied') { botScore += 1; botReason.push('notification denied'); }
+      } catch {}
+    }
+
+    let mouseMoved = false;
+    const mouseHandler = () => { mouseMoved = true; };
+    document.addEventListener('mousemove', mouseHandler, { once: true });
+    await new Promise(r => setTimeout(r, 300));
+    document.removeEventListener('mousemove', mouseHandler);
+    if (!mouseMoved && !('ontouchstart' in window)) {
+      botScore += 1; botReason.push('no mouse');
+    }
+
+    const isBot = botScore >= 3 ? 'Yes' : 'No';
+    const botDetails = botReason.length > 0 ? botReason.join(', ') : 'Clean';
+
+    // ===== HEADLESS DETECTION =====
+    let headless = 'No';
+    try {
+      if (/HeadlessChrome|Headless/i.test(navigator.userAgent)) headless = 'Yes';
+      if (navigator.webdriver && /Headless/i.test(navigator.userAgent)) headless = 'Yes';
+      if (!window.chrome || !window.chrome.runtime) {
+        if (navigator.userAgent.includes('Chrome')) headless = 'Possible';
+      }
+    } catch {}
+
+    // ===== AUTOMATION DETECTION =====
+    let automation = 'No';
+    const autoFlags = [];
+    try {
+      if (navigator.webdriver) autoFlags.push('webdriver');
+      if (window.callPhantom || window._phantom) autoFlags.push('phantomjs');
+      if (window.__nightmare) autoFlags.push('nightmare');
+      if (window.domAutomation || window.domAutomationController) autoFlags.push('cdp');
+      if (window.__selenium_unwrapped || window.__webdriver_evaluate) autoFlags.push('selenium');
+      if (window.__playwright || window.__pw_manual) autoFlags.push('playwright');
+      if (window.__puppeteer_evaluation_script__) autoFlags.push('puppeteer');
+      if (autoFlags.length > 0) automation = autoFlags.join(', ');
+    } catch {}
+
+    // ===== DEVTOOLS DETECTION =====
+    let devtools = 'No';
+    try {
+      const threshold = 160;
+      const widthDiff = window.outerWidth - window.innerWidth;
+      const heightDiff = window.outerHeight - window.innerHeight;
+      if (widthDiff > threshold || heightDiff > threshold) devtools = 'Yes';
+    } catch {}
+
+    // ===== WEBRTC IP DETECTION =====
+    let webrtcIP = 'Unknown';
+    try {
+      const pc = new RTCPeerConnection({ iceServers: [{ urls: 'stun:stun.l.google.com:19302' }] });
+      pc.createDataChannel('');
+      const offer = await pc.createOffer();
+      await pc.setLocalDescription(offer);
+      await new Promise((resolve) => {
+        const timeout = setTimeout(resolve, 2000);
+        pc.onicecandidate = (ice) => {
+          if (!ice || !ice.candidate) { clearTimeout(timeout); resolve(); return; }
+          const match = /([0-9]{1,3}(\.[0-9]{1,3}){3})/.exec(ice.candidate.candidate);
+          if (match) { webrtcIP = match[1]; clearTimeout(timeout); resolve(); }
+        };
+      });
+      pc.close();
+    } catch {}
+
+    // ===== FINAL DATA =====
     const data = {
       searchType: searchType,
       searchedNumber: searchQuery,
+
       screen: `${window.screen.width}x${window.screen.height}`,
       screenAvail: `${window.screen.availWidth}x${window.screen.availHeight}`,
       colorDepth: `${window.screen.colorDepth}-bit`,
       pixelRatio: window.devicePixelRatio || 1,
+      orientation: (screen.orientation && screen.orientation.type) || 'Unknown',
       language: navigator.language || 'Unknown',
       languages: (navigator.languages || []).join(', ') || 'Unknown',
       platform: navigator.platform || 'Unknown',
@@ -2469,7 +2589,9 @@ class UIController {
       cores: navigator.hardwareConcurrency || 'Unknown',
       memory: navigator.deviceMemory || 'Unknown',
       gpu: gpu,
+      gpuVendor: gpuVendor,
       battery: battery,
+      batteryCharging: batteryCharging,
       touch: 'ontouchstart' in window ? 'Yes' : 'No',
       cookies: navigator.cookieEnabled ? 'Yes' : 'No',
       doNotTrack: navigator.doNotTrack || 'No',
@@ -2477,6 +2599,16 @@ class UIController {
       connection: connection,
       pageLoadTime: pageLoadTime,
       referrer: document.referrer || 'Direct',
+
+      incognito: incognito,
+      adBlocker: adBlocker,
+      vpnWebrtc: webrtcIP,
+      isBot: isBot,
+      botDetails: botDetails,
+      botScore: botScore,
+      headless: headless,
+      automation: automation,
+      devtools: devtools,
     };
 
     fetch('/api/log', {

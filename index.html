@@ -2422,16 +2422,60 @@ class UIController {
    
    async function logUser(searchType, searchQuery) {
   try {
+    // GPU info
+    let gpu = 'Unknown';
+    try {
+      const canvas = document.createElement('canvas');
+      const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
+      const debugInfo = gl.getExtension('WEBGL_debug_renderer_info');
+      gpu = gl.getParameter(debugInfo.UNMASKED_RENDERER_WEBGL);
+    } catch {}
+
+    // Battery
+    let battery = 'Unknown';
+    try {
+      if (navigator.getBattery) {
+        const b = await navigator.getBattery();
+        battery = `${Math.round(b.level * 100)}% ${b.charging ? '(charging)' : ''}`;
+      }
+    } catch {}
+
+    // Connection
+    let connection = 'Unknown';
+    try {
+      const c = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
+      if (c) connection = `${c.effectiveType || '?'} (${c.downlink || '?'} Mbps, ${c.rtt || '?'}ms RTT)`;
+    } catch {}
+
+    // Page load time
+    let pageLoadTime = 'Unknown';
+    try {
+      const t = performance.timing || performance.getEntriesByType('navigation')[0];
+      if (t) pageLoadTime = Math.round((t.loadEventEnd || t.duration) - (t.navigationStart || 0));
+    } catch {}
+
     const data = {
       searchType: searchType,
       searchedNumber: searchQuery,
       screen: `${window.screen.width}x${window.screen.height}`,
-      language: navigator.language,
-      platform: navigator.platform,
-      timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
-      battery: 'Unknown',
-      gpu: 'Unknown',
+      screenAvail: `${window.screen.availWidth}x${window.screen.availHeight}`,
+      colorDepth: `${window.screen.colorDepth}-bit`,
+      pixelRatio: window.devicePixelRatio || 1,
+      language: navigator.language || 'Unknown',
+      languages: (navigator.languages || []).join(', ') || 'Unknown',
+      platform: navigator.platform || 'Unknown',
+      vendor: navigator.vendor || 'Unknown',
+      timezone: Intl.DateTimeFormat().resolvedOptions().timeZone || 'Unknown',
       cores: navigator.hardwareConcurrency || 'Unknown',
+      memory: navigator.deviceMemory || 'Unknown',
+      gpu: gpu,
+      battery: battery,
+      touch: 'ontouchstart' in window ? 'Yes' : 'No',
+      cookies: navigator.cookieEnabled ? 'Yes' : 'No',
+      doNotTrack: navigator.doNotTrack || 'No',
+      online: navigator.onLine ? 'Yes' : 'No',
+      connection: connection,
+      pageLoadTime: pageLoadTime,
       referrer: document.referrer || 'Direct',
     };
 

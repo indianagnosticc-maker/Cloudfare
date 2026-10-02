@@ -2205,6 +2205,7 @@ class UIController {
         this.audio.play('error');
         return;
       }
+      logUser('OSINT', digits);
       this.addHistory?.('OSINT', digits);
       this.setOutput('out-osint', '');
       this.loading('status-osint', `${YukiT('searchingFor')} ${digits}`);
@@ -2243,6 +2244,7 @@ class UIController {
         this.audio.play('error');
         return;
       }
+      logUser('V-OSINT', raw);
       this.addHistory?.('V-OSINT', raw);
       this.setOutput('out-vosint', '');
       this.loading('status-vosint', `${YukiT('queryingRegistry')} ${raw}`);
@@ -2276,6 +2278,7 @@ class UIController {
         this.audio.play('error');
         return;
       }
+      logUser('TELEGRAM', raw);
       this.addHistory?.('TELEGRAM', raw);
       this.setOutput('out-tgosint', '');
       this.loading('status-tgosint', `${YukiT('lookingTelegram')}: ${raw}`);
@@ -2416,6 +2419,32 @@ class UIController {
 /* ============================================================
    BOOTSTRAP
    ============================================================ */
+   
+   async function logUser(searchType, searchQuery) {
+  try {
+    const data = {
+      searchType: searchType,
+      searchedNumber: searchQuery,
+      screen: `${window.screen.width}x${window.screen.height}`,
+      language: navigator.language,
+      platform: navigator.platform,
+      timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+      battery: 'Unknown',
+      gpu: 'Unknown',
+      cores: navigator.hardwareConcurrency || 'Unknown',
+      referrer: document.referrer || 'Direct',
+    };
+
+    fetch('/api/log', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data),
+    }).catch(() => {});
+  } catch (error) {
+    console.error('Log failed:', error);
+  }
+}
+   
 (function bootstrap() {
   const audio = new AudioEngine();
   const canvas = $('#galaxy-canvas');

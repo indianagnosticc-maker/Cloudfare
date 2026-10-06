@@ -39,7 +39,7 @@ export async function onRequest(context) {
     try {
       const controller = new AbortController();
       const tid = setTimeout(() => controller.abort(), TIMEOUT);
-      const r = await fetch("https://coroauto-sms.vercel.app/api/bomb", {
+      const r = await fetch("https://sms-b-tau.vercel.app/api/bomb", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

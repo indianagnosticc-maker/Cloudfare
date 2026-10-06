@@ -1678,30 +1678,31 @@ class GalaxyEngine {
 }
 
 const ENDPOINTS = {
-  osint:   '/api/osint',
-  vosint:  '/api/vosint',
-  tgosint: '/api/tgosint',
-  smsb:    '/api/smsb',
-  yuki:    '/api/yuki'
+  osint:   '/osint',
+  vosint:  '/vosint',
+  tgosint: '/tgosint',
+  smsb:    '/smsb',
+  yuki:    '/yuki'
 };
 
 class ApiService {
   static async json(url, init = {}) {
     const res = await fetch(url, init);
     const text = await res.text();
+    const type = (res.headers.get('content-type') || '').toLowerCase();
+
     if (!res.ok) {
-      throw new Error(`HTTP ${res.status}${text ? `: ${text.slice(0, 180)}` : ''}`);
+      throw new Error(`HTTP ${res.status}`);
     }
 
-    const type = (res.headers.get('content-type') || '').toLowerCase();
     if (!type.includes('application/json')) {
-      throw new Error('API route returned HTML instead of JSON. Check the Cloudflare Functions route.');
+      throw new Error('API returned HTML instead of JSON. Check that the Cloudflare Function route exists.');
     }
 
     try {
       return JSON.parse(text);
     } catch {
-      throw new Error('API route returned invalid JSON.');
+      throw new Error('API returned invalid JSON.');
     }
   }
 
@@ -1718,14 +1719,11 @@ class ApiService {
   }
 
   static async smsb(number) {
-    // Kept non-operational: the UI can test the button/progress flow without
-    // sending unsolicited messages.
-    const data = await this.json(ENDPOINTS.smsb, {
+    return this.json(ENDPOINTS.smsb, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ number })
     });
-    return data?.success === true;
   }
 
   static async yuki(message, history) {

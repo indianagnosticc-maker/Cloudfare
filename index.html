@@ -30,9 +30,10 @@
     background:#000;color:var(--text);
     font-family:'Inter',sans-serif;
     font-size:13.5px;line-height:1.5;min-height:100vh;
-    overflow-x:hidden;-webkit-font-smoothing:antialiased;
+    overflow-x:hidden;scrollbar-width:none;-ms-overflow-style:none;-webkit-font-smoothing:antialiased;
     text-rendering:optimizeLegibility;
   }
+  html::-webkit-scrollbar,body::-webkit-scrollbar{width:0;height:0;display:none;}
   #galaxy-canvas{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:1;opacity:.55;transition:opacity var(--slow) var(--ease);mix-blend-mode:screen;}
   #galaxy-canvas.off{opacity:0;}
   .app-header{position:sticky;top:0;z-index:50;width:100%;background:rgba(0,0,0,0.72);backdrop-filter:blur(24px) saturate(180%);-webkit-backdrop-filter:blur(24px) saturate(180%);border-bottom:1px solid var(--border-1);}
@@ -1253,6 +1254,21 @@ document.addEventListener('DOMContentLoaded', () => {
 /* The page itself stays transparent so the blurred background can breathe through the UI. */
 .console .page.active{background:transparent!important;}
 </style>
+
+<style id="telegram-unavailable-style">
+.telegram-unavailable-notice{color:#ff2b2b!important;background:rgba(255,43,43,.045);border:1px solid rgba(255,43,43,.24);border-radius:var(--r-sm);padding:12px 14px;line-height:1.65;font-size:12px;}
+</style>
+
+<style id="smooth-performance-final">
+@media (max-width:700px){
+  #galaxy-canvas{display:none!important;}
+  body::before,body::after{animation:none!important;}
+  .sanskrit-banner::before{animation:none!important;}
+  .btn::before{animation:none!important;}
+}
+.card,.msg,.log-row,.history-toolbar,.history-item,.secondary-body,.chev{will-change:auto;}
+.chat,.history-list,.log,pre.raw{scroll-behavior:auto;}
+</style>
 </head>
 <body>
 <canvas id="galaxy-canvas"></canvas>
@@ -1336,22 +1352,11 @@ document.addEventListener('DOMContentLoaded', () => {
 <nav class="tabs" id="tabs" style="overflow-x: auto; scrollbar-width: none; -ms-overflow-style: none; flex-wrap: nowrap;">
 <div class="tab-indicator" id="tab-indicator"></div>
 <button class="tab-btn active" data-i18n="osint" data-tab="osint">OSINT</button>
+<button class="tab-btn" data-i18n="smsb" data-tab="smsb">SMS-B</button>
 <button class="tab-btn" data-i18n="vosint" data-tab="vosint">V-OSINT</button>
 <button class="tab-btn" data-i18n="telegram" data-tab="tgosint">TELEGRAM</button>
-<button class="tab-btn" data-i18n="smsb" data-tab="smsb">SMS-B</button>
-<button class="tab-btn" data-i18n="yuki" data-tab="yuki">YUKI</button>
 </nav>
 <div class="console">
-<main class="page active" id="page-osint">
-<div class="info" data-i18n="osintInfo">Public telecom shards only. Enter 10-digit Indian mobile number without country code.</div>
-<form autocomplete="off" class="search" id="form-osint">
-<span class="prompt">❯</span>
-<input data-i18n-placeholder="osintPlaceholder" id="q-osint" inputmode="numeric" maxlength="14" placeholder="Enter 10-digit number"/>
-<button class="btn" data-i18n="search" type="submit">SEARCH</button>
-</form>
-<div class="status" id="status-osint"></div>
-<div class="out" id="out-osint"></div>
-</main>
 <main class="page" id="page-vosint">
 <div class="info" data-i18n="vosintInfo">Public registry shards only. Format: DL01AB1234</div>
 <form autocomplete="off" class="search" id="form-vosint">
@@ -1361,16 +1366,6 @@ document.addEventListener('DOMContentLoaded', () => {
 </form>
 <div class="status" id="status-vosint"></div>
 <div class="out" id="out-vosint"></div>
-</main>
-<main class="page" id="page-tgosint">
-<div class="info" data-i18n="telegramInfo">Direct Telegram identity shard query. Enter Telegram User ID (e.g. 123456789) or Username (with or without @).</div>
-<form autocomplete="off" class="search" id="form-tgosint">
-<span class="prompt">❯</span>
-<input data-i18n-placeholder="telegramPlaceholder" id="q-tgosint" maxlength="40" placeholder="Enter Telegram ID or @username"/>
-<button class="btn" data-i18n="lookup" type="submit">LOOKUP</button>
-</form>
-<div class="status" id="status-tgosint"></div>
-<div class="out" id="out-tgosint"></div>
 </main>
 <main class="page" id="page-smsb">
 <div class="info" data-i18n="smsbInfo">Authorized resilience verification only. Ensure recipient consent prior to tests.</div>
@@ -1391,17 +1386,25 @@ document.addEventListener('DOMContentLoaded', () => {
 <div class="status" id="status-smsb"></div>
 <div class="out" id="out-smsb"></div>
 </main>
-<main class="page" id="page-yuki">
-<div class="info" data-i18n="yukiInfo">Neural AI companion. Zero retention. Supports Hindi, Hinglish, English.</div>
-<div class="chat" id="chat">
-<div class="msg sys" data-i18n="sessionEstablished">SESSION ESTABLISHED · ZERO RETENTION</div>
-</div>
-<form autocomplete="off" class="search" id="form-yuki">
+<main class="page active" id="page-osint">
+<div class="info" data-i18n="osintInfo">Public telecom shards only. Enter 10-digit Indian mobile number without country code.</div>
+<form autocomplete="off" class="search" id="form-osint">
 <span class="prompt">❯</span>
-<input data-i18n-placeholder="askYuki" id="q-yuki" placeholder="Ask Yuki..."/>
-<button class="btn" data-i18n="send" type="submit">SEND</button>
+<input data-i18n-placeholder="osintPlaceholder" id="q-osint" inputmode="numeric" maxlength="14" placeholder="Enter 10-digit number"/>
+<button class="btn" data-i18n="search" type="submit">SEARCH</button>
 </form>
-<div class="status" id="status-yuki"></div>
+<div class="status" id="status-osint"></div>
+<div class="out" id="out-osint"></div>
+</main>
+<main class="page" id="page-tgosint">
+<div class="info" data-i18n="telegramInfo">Direct Telegram identity shard query. Enter Telegram User ID (e.g. 123456789) or Username (with or without @).</div>
+<form autocomplete="off" class="search" id="form-tgosint">
+<span class="prompt">❯</span>
+<input data-i18n-placeholder="telegramPlaceholder" id="q-tgosint" maxlength="40" placeholder="Enter Telegram ID or @username"/>
+<button class="btn" data-i18n="lookup" type="submit">LOOKUP</button>
+</form>
+<div class="status" id="status-tgosint"></div>
+<div class="out" id="out-tgosint"></div>
 </main>
 </div>
 <!-- Standalone HOME telemetry content -->
@@ -1485,7 +1488,7 @@ class AudioEngine {
   #ctx = null;
   soundOn = true;
   keysOn = true;
-  volume = 0.055;
+  volume = 0.77;
 
   #ensure() {
     if (!this.#ctx) {
@@ -1666,11 +1669,11 @@ class GalaxyEngine {
     const dt=Math.min(100,t-this.last); this.last=t;
     if(this.enabled&&!document.hidden){
       this.time+=dt;
-      // Cap background rendering to ~30 FPS to keep the rest of the UI responsive.
-      if(this.reduce || (this.time-this._lastDraw>=33)){
-        this._lastDraw=this.time;
-        this._draw(this.time);
-      }
+      // Let requestAnimationFrame follow the display refresh rate.
+      // This removes the old ~30 FPS background cap, so 60/90/120/144Hz
+      // displays can render the animated background at their native cadence.
+      this._lastDraw=this.time;
+      this._draw(this.time);
     }
     requestAnimationFrame(x=>this._frame(x));
   }
@@ -2065,7 +2068,7 @@ class UIController {
       const v = parseInt(e.target.value, 10);
       const label = $('#vol-val');
       if (label) label.textContent = v + '%';
-      this.audio.volume = (v / 100) * 0.09;
+      this.audio.volume = (v / 100) * 1.26;
     });
   }
 
@@ -2281,6 +2284,10 @@ class UIController {
       }
       logUser('TELEGRAM', raw);
       this.addHistory?.('TELEGRAM', raw);
+      this.setStatus('status-tgosint', 'Telegram search is currently not working.', 'err');
+      this.setOutput('out-tgosint', `<div class=\"telegram-unavailable-notice\"><strong>Telegram search is currently not working.</strong><br>This service is temporarily unavailable right now, so your search cannot be processed. Please try again later. Repeatedly refreshing or submitting the same search will not make the service available while it is offline.</div>`);
+      this.audio.play('error');
+      return;
       this.setOutput('out-tgosint', '');
       this.loading('status-tgosint', `${YukiT('lookingTelegram')}: ${raw}`);
       const btn = form.querySelector('button');
@@ -2907,3 +2914,18 @@ class UIController {
   box-shadow:none!important;
 }
 </style>
+
+<style id="high-refresh-performance-final">
+/* Performance-only override: keep the existing UI/design, but avoid unnecessary
+ * layer promotion and let browser compositing follow the display refresh rate. */
+.tab-indicator,.drawer,.page.active{will-change:transform,opacity;}
+.yuki-modal{will-change:transform,opacity,filter;}
+.card,.msg,.log-row,.history-toolbar,.history-item,.secondary-body,.chev{will-change:auto;}
+#galaxy-canvas{will-change:opacity;}
+
+/* Prefer compositor-friendly scrolling; do not force a fixed animation rate. */
+@media (hover:none) and (pointer:coarse){
+  .chat,.history-list,.log,pre.raw{-webkit-overflow-scrolling:touch;}
+}
+</style>
+

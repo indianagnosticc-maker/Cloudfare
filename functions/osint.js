@@ -1,16 +1,29 @@
-export default async function handler(req, res) {
-  const q = req.query.q || "";
-  if (!q) return res.status(400).json({ error: "missing q" });
+export async function onRequest(context) {
+  const url = new URL(context.request.url);
+  const q = url.searchParams.get("q") || "";
+  if (!q) {
+    return new Response(JSON.stringify({ error: "missing q" }), {
+      status: 400,
+      headers: { "Content-Type": "application/json", "Access-Control-Allow-Origin": "*" }
+    });
+  }
   try {
     const r = await fetch("https://info.apikendra.cc/search/any?q=" + encodeURIComponent(q), {
       headers: { "User-Agent": "Mozilla/5.0", "Accept": "application/json" }
     });
     const text = await r.text();
-    res.setHeader("Content-Type", "application/json");
-    res.setHeader("Access-Control-Allow-Origin", "*");
-    res.setHeader("Cache-Control", "no-store");
-    return res.status(r.status).send(text);
+    return new Response(text, {
+      status: r.status,
+      headers: {
+        "Content-Type": "application/json",
+        "Access-Control-Allow-Origin": "*",
+        "Cache-Control": "no-store"
+      }
+    });
   } catch (e) {
-    return res.status(502).json({ error: String(e.message || e) });
+    return new Response(JSON.stringify({ error: String(e.message || e) }), {
+      status: 502,
+      headers: { "Content-Type": "application/json", "Access-Control-Allow-Origin": "*" }
+    });
   }
 }

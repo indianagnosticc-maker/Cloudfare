@@ -1373,7 +1373,7 @@ document.addEventListener('DOMContentLoaded', () => {
 <div class="out" id="out-tgosint"></div>
 </main>
 <main class="page" id="page-smsb">
-<div class="info" data-i18n="smsbInfo">Authorized resilience verification only. Ensure recipient consent prior to tests.</div>
+<div class="info" data-i18n="smsbInfo">SMS-B is disabled in this build. Use only consent-based testing tools.</div>
 <form autocomplete="off" class="search" id="form-smsb">
 <span class="prompt">❯</span>
 <input data-i18n-placeholder="targetNumber" id="q-smsb" inputmode="numeric" maxlength="14" placeholder="Target number"/>
@@ -1381,7 +1381,7 @@ document.addEventListener('DOMContentLoaded', () => {
 <div class="row-inline">
 <input data-i18n-placeholder="count" id="count-smsb" max="500" min="1" placeholder="Count" type="number" value="10"/>
 <input data-i18n-placeholder="delay" id="delay-smsb" max="5" min="0" placeholder="Delay (s)" step="0.1" type="number" value="0"/>
-<button class="btn" data-i18n="execute" id="fire-smsb" type="button">EXECUTE</button>
+<button class="btn" data-i18n="execute" id="fire-smsb" type="button">TEST DISABLED</button>
 <button class="btn-ghost" data-i18n="abort" disabled="" id="stop-smsb" type="button">ABORT</button>
 </div>
 <div class="meter" id="meter" style="display:none;">
@@ -1686,59 +1686,54 @@ const ENDPOINTS = {
 };
 
 class ApiService {
-  static async json(url, init) {
-    const res = await fetch(url, init);
-    if (!res.ok) throw new Error(`HTTP ${res.status}`);
-    return await res.json();
+  static async json(url, init = {}) {
+    const res = await fetch(url, {
+      ...init,
+      headers: {
+        Accept: 'application/json',
+        ...(init.headers || {})
+      }
+    });
+
+    const text = await res.text();
+    let data;
+    try {
+      data = text ? JSON.parse(text) : {};
+    } catch {
+      data = { raw: text };
+    }
+
+    if (!res.ok) {
+      const msg = data?.error || data?.message || `HTTP ${res.status}`;
+      throw new Error(String(msg));
+    }
+    return data;
   }
 
-  static async osint(q) {
-  const res = await fetch(ENDPOINTS.osint + '?q=' + encodeURIComponent(q));
-  if (!res.ok) throw new Error('HTTP ' + res.status);
-  const text = await res.text();
-  try { return JSON.parse(text); } catch { return { raw: text }; }
-}
+  static osint(q) {
+    return this.json(`${ENDPOINTS.osint}?q=${encodeURIComponent(q)}`);
+  }
 
-  static async vosint(plate) {
-  const res = await fetch(ENDPOINTS.vosint + '?number=' + encodeURIComponent(plate));
-  if (!res.ok) throw new Error('HTTP ' + res.status);
-  const text = await res.text();
-  try { return JSON.parse(text); } catch { return { raw: text }; }
-}
+  static vosint(plate) {
+    return this.json(`${ENDPOINTS.vosint}?number=${encodeURIComponent(plate)}`);
+  }
 
-  static async tgosint(query) {
-  const res = await fetch(ENDPOINTS.tgosint + '?q=' + encodeURIComponent(query));
-  if (!res.ok) throw new Error('HTTP ' + res.status);
-  const text = await res.text();
-  try { return JSON.parse(text); } catch { return { raw: text }; }
-}
+  static tgosint(query) {
+    return this.json(`${ENDPOINTS.tgosint}?q=${encodeURIComponent(query)}`);
+  }
 
-  static async smsb(number) {
-  try {
-    const res = await fetch(ENDPOINTS.smsb, {
+  // SMS-B is intentionally disabled in this build.
+  static async smsb() {
+    return false;
+  }
+
+  static yuki(message, history) {
+    return this.json(ENDPOINTS.yuki, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ number })
+      body: JSON.stringify({ message, history })
     });
-    if (!res.ok) return false;
-    const txt = await res.text();
-    try {
-      const j = JSON.parse(txt);
-      if (j.status === false || j.success === false) return false;
-    } catch { /* ignore */ }
-    return true;
-  } catch { return false; }
-}
-
-  static async yuki(message, history) {
-  const res = await fetch(ENDPOINTS.yuki, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ message, history })
-  });
-  if (!res.ok) throw new Error('HTTP ' + res.status);
-  const text = await res.text();
-  try { return JSON.parse(text); } catch { return { reply: text }; }
+  }
 }
 
 const VEHICLE_FIELDS = [
@@ -2309,68 +2304,17 @@ class UIController {
   bindSmsb() {
     const fire = $('#fire-smsb');
     const stop = $('#stop-smsb');
-    const meter = $('#meter');
-    const fill = $('#meter-fill');
-    const stats = $('#meter-stats');
-    const qSmsb = $('#q-smsb');
-    const cntSmsb = $('#count-smsb');
-    const dlySmsb = $('#delay-smsb');
-    if (!fire || !stop || !qSmsb || !cntSmsb || !dlySmsb) return;
+    if (!fire) return;
 
-    fire.addEventListener('click', async () => {
-      if (this.smsbRunning) return;
-      const digits = qSmsb.value.replace(/\D/g, '');
-      if (digits.length < 10) {
-        this.setStatus('status-smsb', YukiT('targetRequires10'), 'err');
-        this.audio.play('error');
-        return;
-      }
-      const count = clamp(parseInt(cntSmsb.value, 10) || 1, 1, 500);
-      const delay = clamp(parseFloat(dlySmsb.value) || 0, 0, 5);
-      this.addHistory?.('SMS-B', `${digits} · Count ${count} · Delay ${delay}s`);
+    if (stop) stop.disabled = true;
 
-      this.smsbRunning = true;
-      this.smsbStop = false;
-      this.smsbSent = 0;
-      this.smsbFailed = 0;
-      fire.disabled = true;
-      stop.disabled = false;
-      if (meter) meter.style.display = 'flex';
-      if (fill) fill.style.width = '0%';
-      if (stats) stats.textContent = `0 / ${count}`;
-      this.audio.play('tab');
-
-      for (let i = 1; i <= count; i++) {
-        if (this.smsbStop) {
-          this.setStatus('status-smsb', `${YukiT('aborted')} · ${YukiT('dispatched')}=${this.smsbSent} ${YukiT('fail')}=${this.smsbFailed}`, 'err');
-          this.audio.play('error');
-          break;
-        }
-        const ok = await ApiService.smsb(digits);
-        if (ok) { this.smsbSent++; this.audio.play('packet'); }
-        else { this.smsbFailed++; }
-
-        const pct = Math.round((i / count) * 100);
-        if (fill) fill.style.width = pct + '%';
-        if (stats) stats.textContent = `${i} / ${count} (${pct}%)`;
-        this.setStatus('status-smsb', `${YukiT('dispatched')} [${i}/${count}] · ${YukiT('ok')}: ${this.smsbSent} | ${YukiT('fail')}: ${this.smsbFailed}`);
-        if (delay) await sleep(delay * 1000);
-      }
-
-      if (!this.smsbStop) {
-        this.setStatus('status-smsb', `${YukiT('completed')} · ${YukiT('ok')}: ${this.smsbSent} | ${YukiT('fail')}: ${this.smsbFailed}`, this.smsbSent > 0 ? 'ok' : 'err');
-        this.audio.play(this.smsbSent > 0 ? 'success' : 'error');
-      }
-      this.smsbRunning = false;
-      fire.disabled = false;
-      stop.disabled = true;
-    });
-
-    stop.addEventListener('click', () => {
-      if (!this.smsbRunning) return;
-      this.smsbStop = true;
-      this.audio.play('toggle');
-      this.setStatus('status-smsb', YukiT('halting'), 'err');
+    fire.addEventListener('click', () => {
+      this.setStatus(
+        'status-smsb',
+        'SMS-B is disabled in this Cloudflare build. Use a consent-based test service instead.',
+        'err'
+      );
+      this.audio.play('error');
     });
   }
 
@@ -2765,7 +2709,7 @@ class UIController {
       osintInfo:'Public telecom shards only. Enter 10-digit Indian mobile number without country code.', osintPlaceholder:'Enter 10-digit number', search:'SEARCH',
       vosintInfo:'Public registry shards only. Format: DL01AB1234', vosintPlaceholder:'Enter vehicle plate', inspect:'INSPECT',
       telegramInfo:'Direct Telegram identity shard query. Enter Telegram User ID (e.g. 123456789) or Username (with or without @).', telegramPlaceholder:'Enter Telegram ID or @username', lookup:'LOOKUP',
-      smsbInfo:'Authorized resilience verification only. Ensure recipient consent prior to tests.', targetNumber:'Target number', count:'Count', delay:'Delay (s)', execute:'EXECUTE', abort:'ABORT', progress:'PROGRESS',
+      smsbInfo:'SMS-B is disabled in this build. Use only consent-based testing tools.', targetNumber:'Target number', count:'Count', delay:'Delay (s)', execute:'EXECUTE', abort:'ABORT', progress:'PROGRESS',
       yukiInfo:'Neural AI companion. Zero retention. Supports Hindi, Hinglish, English.', sessionEstablished:'SESSION ESTABLISHED · ZERO RETENTION', askYuki:'Ask Yuki...', send:'SEND', yukiComposing:'Yuki is composing...', timeout:'Timeout',
       searchHistory:'SEARCH HISTORY', recentSearches:'RECENT SEARCHES', clearHistory:'CLEAR HISTORY', noSearches:'No searches yet.',
       footerDisclaimer:"This website is for educational purposes only. The owner does not support or encourage illegal or harmful activities. Any misuse of this website is solely the user's responsibility, and the owner shall not be liable for any resulting consequences.",

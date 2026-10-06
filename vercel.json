@@ -1,8 +1,0 @@
-{
-  "version": 2,
-  "rewrites": [
-    { "source": "/api/osint", "destination": "/api/osint" },
-    { "source": "/api/smsb", "destination": "/api/smsb" },
-    { "source": "/api/yuki", "destination": "/api/yuki" }
-  ]
-}

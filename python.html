@@ -186,16 +186,18 @@
   /* ============ Smart formatted view ============ */
   .formatted-view {
     font-family: 'Roboto Mono', monospace;
-    font-size: 12px;
-    line-height: 1.65;
+    font-size: 11.5px;
+    line-height: 1.35;
     white-space: pre-wrap;
     word-break: break-word;
   }
   .formatted-view .fv-row {
     display: grid;
-    grid-template-columns: 110px 1fr;
-    gap: 8px;
+    grid-template-columns: max-content 1fr;
+    gap: 6px;
     align-items: start;
+    margin: 0;
+    padding: 0;
   }
   .formatted-view .fv-key {
     color: var(--gh-key);
@@ -205,6 +207,7 @@
     color: var(--gh-string);
     word-break: break-word;
   }
+  .formatted-view .fv-val.str { color: var(--gh-string); }
   .formatted-view .fv-val.num { color: var(--gh-number); }
   .formatted-view .fv-val.bool { color: var(--gh-bool); }
   .formatted-view .fv-val.nul { color: var(--gh-null); }
@@ -212,11 +215,13 @@
   .formatted-view .fv-val.email { color: var(--gh-attr); }
   .formatted-view .fv-sub {
     color: var(--gh-punct);
-    padding-left: 2px;
+    padding-left: 1px;
+    margin: 0;
   }
   .formatted-view .fv-line {
     color: var(--gh-punct);
-    padding-left: 4px;
+    padding-left: 2px;
+    margin: 0;
   }
   .formatted-view .fv-empty {
     color: var(--dim);
@@ -376,7 +381,9 @@
     font-family: inherit;
   }
   .overlay-content .formatted-view {
-    font-size: 13px;
+    font-family: 'Roboto Mono', monospace;
+    font-size: 12px;
+    line-height: 1.35;
   }
 
   .toast {

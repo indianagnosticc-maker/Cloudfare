@@ -19,17 +19,6 @@
     --green: #7ec699;
     --red: #e06c75;
     --ease: cubic-bezier(.2, .8, .2, 1);
-
-    /* GitHub Dark syntax colors */
-    --gh-key: #79c0ff;
-    --gh-string: #a5d6ff;
-    --gh-number: #79c0ff;
-    --gh-bool: #ff7b72;
-    --gh-null: #ff7b72;
-    --gh-punct: #8b949e;
-    --gh-url: #7ee787;
-    --gh-email: #d2a8ff;
-    --gh-sensitive: #ff7b72;
   }
   * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
   button, input { font-family: inherit; }
@@ -171,26 +160,31 @@
   .l-err { color: var(--red); white-space: pre-wrap; }
   .l-warn { color: var(--yellow); white-space: pre-wrap; }
 
-  /* ============ GitHub JSON coloring ============ */
-  .json {
+  /* ============================================================
+     JSON COLORS — sirf 4: BLUE, WHITE, RED, GREEN
+     ============================================================ */
+  .json, .overlay-content pre {
     font-family: 'Roboto Mono', monospace;
     font-size: 11.5px;
     line-height: 1.6;
     white-space: pre-wrap;
     word-break: break-word;
   }
-  .json .k { color: var(--gh-key); }
-  .json .s { color: var(--gh-string); }
-  .json .n { color: var(--gh-number); }
-  .json .b { color: var(--gh-bool); }
-  .json .nl { color: var(--gh-null); }
-  .json .p { color: var(--gh-punct); }
-  .json .url { color: var(--gh-url); }
-  .json .email { color: var(--gh-email); }
-  .json .key-sensitive { color: var(--gh-sensitive); font-weight: 600; }
-  .json .key-string { color: var(--gh-string); font-weight: 600; }
+  .overlay-content pre {
+    font-size: 12.5px;
+    line-height: 1.7;
+  }
 
-  /* View full button */
+  /* Token colors — applied globally */
+  .k { color: #79c0ff; }                                 /* key — BLUE */
+  .s { color: #e6edf3; }                                 /* string value — WHITE */
+  .n { color: #79c0ff; }                                 /* number — BLUE */
+  .b { color: #ff7b72; }                                 /* true/false — RED */
+  .nl { color: #ff7b72; }                                /* null — RED */
+  .p { color: #8b949e; }                                 /* punctuation — dim white */
+  .url { color: #7ee787; }                               /* URL — GREEN */
+  .key-sensitive { color: #ff7b72; font-weight: 600; }   /* sensitive — RED BOLD */
+
   .view-full {
     display: none;
     width: 100%;
@@ -249,7 +243,6 @@
   .mini-field label { display: block; color: var(--dim); font-size: 9px; margin-bottom: 2px; font-family: 'Roboto Mono', monospace; }
   .mini-field input { width: 100%; box-sizing: border-box; padding: 2px 0; font-size: 11px; }
 
-  /* ============ FULLSCREEN OVERLAY ============ */
   .overlay {
     position: fixed;
     inset: 0;
@@ -311,11 +304,6 @@
     line-height: 1.6;
     scrollbar-width: thin;
     scrollbar-color: var(--line) transparent;
-  }
-  .overlay-content pre {
-    white-space: pre-wrap;
-    word-break: break-all;
-    font-family: inherit;
   }
 
   .toast {
@@ -402,7 +390,6 @@
   </div>
 </div>
 
-<!-- FULLSCREEN OVERLAY -->
 <div class="overlay" id="overlay">
   <div class="overlay-bar">
     <button class="back-btn" id="backBtn" aria-label="back">
@@ -441,62 +428,58 @@
       .replace(/</g, '&lt;')
       .replace(/>/g, '&gt;');
   }
-  function looksLikeUrl(s) { return /^https?:\/\//i.test(String(s)); }
-  function looksLikeEmail(s) { return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(s)); }
-  function isSensitiveKey(k) {
-    const kk = String(k).toLowerCase();
-    return ['password','pass','passwd','pwd','token','key','secret','auth','credit','cvv','aadhaar','aadhar','pan','otp','pin'].some(x => kk.includes(x));
-  }
 
-  /* ─────────── JSON COLORING — GitHub style ─────────── */
-  /* Yeh smart tokenizer hai — JSON.stringify ka output leta hai aur
-     har token ko alag color deta hai */
+  /* ─────────── JSON HIGHLIGHTER ─────────── */
   function highlightJson(json) {
     let text;
+
     if (typeof json === 'string') {
-      // Agar backend plain string bhej raha hai, toh try karo JSON parse
       try {
         const parsed = JSON.parse(json);
         text = JSON.stringify(parsed, null, 2);
       } catch (_) {
-        // JSON nahi hai, plain text hai — usko plain string color do
         text = json;
       }
     } else {
       text = JSON.stringify(json, null, 2);
     }
+
     if (!text) return '';
+
     text = escapeHtml(text);
 
-    // Tokenize: strings (with optional colon), numbers, bools, null, punctuation
-    return text.replace(
-      /("(\\u[a-fA-F0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false)\b|\bnull\b|-?\d+(?:\.\d*)?(?:[eE][+-]?\d+)?|[{}\[\],:])/g,
-      (match) => {
-        // STRING (with or without colon)
-        if (/^"/.test(match)) {
-          if (/:$/.test(match)) {
-            // It's a key
-            const keyName = match.replace(/:\s*$/, '').replace(/^"|"$/g, '');
-            const cls = isSensitiveKey(keyName) ? 'key-sensitive' : 'k';
-            return `<span class="${cls}">${match}</span>`;
-          }
-          // String value — detect content type
-          const raw = match.slice(1, -1);
-          let cls = 's';
-          if (looksLikeUrl(raw)) cls = 'url';
-          else if (looksLikeEmail(raw)) cls = 'email';
-          return `<span class="${cls}">${match}</span>`;
+    const regex = /("(?:\\u[a-fA-F0-9]{4}|\\[^u]|[^\\"])*"\s*:)|("(?:\\u[a-fA-F0-9]{4}|\\[^u]|[^\\"])*")|\b(true|false)\b|\bnull\b|([{}\[\],:])|(-?\d+(?:\.\d+)?(?:[eE][+-]?\d+)?)/g;
+
+    return text.replace(regex, function(match, keyPart, stringPart, boolPart, punctPart, numPart) {
+      // KEY
+      if (keyPart) {
+        const keyName = keyPart.replace(/:\s*$/, '').replace(/^"|"$/g, '');
+        const lower = keyName.toLowerCase();
+        const sensitiveWords = ['password','pass','passwd','pwd','token','key','secret','auth','credit','cvv','aadhaar','aadhar','pan','otp','pin'];
+        let isSensitive = false;
+        for (let i = 0; i < sensitiveWords.length; i++) {
+          if (lower.indexOf(sensitiveWords[i]) !== -1) { isSensitive = true; break; }
         }
-        // BOOLEANS
-        if (/^(true|false)$/.test(match)) return `<span class="b">${match}</span>`;
-        // NULL
-        if (/^null$/.test(match)) return `<span class="nl">${match}</span>`;
-        // PUNCTUATION
-        if (/^[{}\[\],:]$/.test(match)) return `<span class="p">${match}</span>`;
-        // NUMBER
-        return `<span class="n">${match}</span>`;
+        const cls = isSensitive ? 'key-sensitive' : 'k';
+        return '<span class="' + cls + '">' + keyPart + '</span>';
       }
-    );
+      // STRING VALUE
+      if (stringPart) {
+        const raw = stringPart.slice(1, -1);
+        let cls = 's';
+        if (/^https?:\/\//i.test(raw)) cls = 'url';
+        return '<span class="' + cls + '">' + stringPart + '</span>';
+      }
+      // BOOLEAN
+      if (boolPart) return '<span class="b">' + boolPart + '</span>';
+      // NULL
+      if (match === 'null') return '<span class="nl">' + match + '</span>';
+      // PUNCTUATION
+      if (punctPart) return '<span class="p">' + punctPart + '</span>';
+      // NUMBER
+      if (numPart) return '<span class="n">' + numPart + '</span>';
+      return match;
+    });
   }
 
   /* ─────────── PRINT ─────────── */
@@ -670,7 +653,7 @@
   function openOverlay(data, title, statusText) {
     overlayTitle.textContent = title || 'response.json';
     overlayBadge.textContent = statusText || '200 OK';
-    overlayContent.innerHTML = `<pre>${highlightJson(data)}</pre>`;
+    overlayContent.innerHTML = '<pre>' + highlightJson(data) + '</pre>';
     overlay.classList.add('show');
     document.body.style.overflow = 'hidden';
   }

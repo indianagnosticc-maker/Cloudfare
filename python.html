@@ -11,7 +11,6 @@
   :root {
     --bg: #0d0f12;
     --panel: #12151a;
-    --panel-inner: #181b21;
     --line: #232830;
     --text: #d7dae0;
     --dim: #6b7280;
@@ -21,18 +20,16 @@
     --red: #e06c75;
     --ease: cubic-bezier(.2, .8, .2, 1);
 
-    /* GitHub-style code colors */
+    /* GitHub colors */
     --gh-key: #79c0ff;
     --gh-string: #a5d6ff;
     --gh-number: #79c0ff;
     --gh-bool: #ff7b72;
     --gh-null: #ff7b72;
     --gh-punct: #8b949e;
-    --gh-keyword: #ff7b72;
-    --gh-tag: #7ee787;
-    --gh-attr: #d2a8ff;
-    --gh-const: #79c0ff;
-    --gh-comment: #8b949e;
+    --gh-url: #7ee787;
+    --gh-email: #d2a8ff;
+    --gh-sensitive: #ff7b72;
   }
   * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
   button, input { font-family: inherit; }
@@ -54,7 +51,7 @@
     max-width: 420px;
     background: var(--panel);
     border: 1px solid var(--line);
-    border-radius: 12px;
+    border-radius: 22px;                /* ← zyada curve */
     overflow: hidden;
   }
 
@@ -67,9 +64,9 @@
     color: var(--dim);
     font-size: 12px;
   }
-  .bar .name { color: var(--text); display: flex; align-items: center; gap: 8px; }
+  .bar .name { color: var(--text); display: flex; align-items: center; gap: 8px; font-family: 'Roboto Mono', monospace; }
   .bar svg { width: 14px; height: 14px; }
-  .bar .ver { color: var(--dim); }
+  .bar .ver { color: var(--dim); font-family: 'Roboto Mono', monospace; }
 
   .tabs {
     display: grid;
@@ -86,6 +83,7 @@
     padding: 11px 4px;
     cursor: pointer;
     transition: color .2s var(--ease);
+    font-family: 'Roboto Mono', monospace;
   }
   .tab:hover { color: var(--text); }
   .tab.on { color: var(--text); }
@@ -103,7 +101,7 @@
 
   .body { padding: 14px; display: flex; flex-direction: column; gap: 14px; }
 
-  .quota { font-size: 12px; color: var(--dim); display: flex; justify-content: space-between; margin-bottom: 6px; }
+  .quota { font-size: 12px; color: var(--dim); display: flex; justify-content: space-between; margin-bottom: 6px; font-family: 'Roboto Mono', monospace; }
   .quota b { color: var(--text); font-weight: 500; }
   .track { height: 3px; background: var(--line); border-radius: 2px; overflow: hidden; }
   .fill { height: 100%; width: 0; background: var(--blue); transition: width .35s var(--ease); }
@@ -114,13 +112,13 @@
     gap: 8px;
     background: var(--bg);
     border: 1px solid var(--line);
-    border-radius: 8px;
+    border-radius: 14px;
     padding: 4px 4px 4px 12px;
     transition: border-color .2s var(--ease);
   }
   form:focus-within { border-color: var(--blue); }
   form.err { border-color: var(--red); }
-  form .prompt { color: var(--yellow); user-select: none; }
+  form .prompt { color: var(--yellow); user-select: none; font-family: 'Roboto Mono', monospace; }
   input {
     flex: 1;
     min-width: 0;
@@ -131,21 +129,23 @@
     font: inherit;
     padding: 8px 0;
     caret-color: var(--yellow);
+    font-family: 'Roboto Mono', monospace;
   }
   input::placeholder { color: #444b57; }
-  .count { color: var(--dim); font-size: 11px; padding-right: 2px; }
+  .count { color: var(--dim); font-size: 11px; padding-right: 2px; font-family: 'Roboto Mono', monospace; }
   .count.full { color: var(--green); }
   button.run {
     background: var(--text);
     color: var(--bg);
     border: 0;
-    border-radius: 6px;
+    border-radius: 10px;
     font: inherit;
     font-weight: 600;
     font-size: 12px;
     padding: 8px 14px;
     cursor: pointer;
     transition: opacity .2s var(--ease), transform .1s var(--ease);
+    font-family: 'Roboto Mono', monospace;
   }
   button.run:hover { opacity: .85; }
   button.run:active { transform: scale(.97); }
@@ -154,79 +154,60 @@
   .log {
     background: var(--bg);
     border: 1px solid var(--line);
-    border-radius: 8px;
+    border-radius: 14px;
     padding: 10px 12px;
-    height: 150px;
+    height: 180px;
     overflow-y: auto;
     font-size: 12px;
     scrollbar-width: thin;
     scrollbar-color: var(--line) transparent;
   }
-  .log div { animation: in .2s var(--ease); white-space: pre-wrap; word-break: break-all; }
+  .log div { animation: in .2s var(--ease); word-break: break-all; }
   @keyframes in { from { opacity: 0; transform: translateY(3px); } to { opacity: 1; transform: none; } }
   .l-dim { color: var(--dim); }
-  .l-cmd { color: var(--text); }
+  .l-cmd { color: var(--text); white-space: pre-wrap; }
   .l-cmd::before { content: '>>> '; color: var(--yellow); }
-  .l-ok { color: var(--green); }
-  .l-err { color: var(--red); }
-  .l-warn { color: var(--yellow); }
+  .l-ok { color: var(--green); white-space: pre-wrap; }
+  .l-err { color: var(--red); white-space: pre-wrap; }
+  .l-warn { color: var(--yellow); white-space: pre-wrap; }
 
-  /* ============ GitHub-style JSON coloring ============ */
-  .json { font-family: 'Roboto Mono', monospace; font-size: 11.5px; line-height: 1.55; }
-  .json .k { color: var(--gh-key); }       /* keys → blue */
-  .json .s { color: var(--gh-string); }    /* strings → light blue */
-  .json .n { color: var(--gh-number); }    /* numbers → blue */
-  .json .b { color: var(--gh-bool); }      /* true/false → red */
-  .json .nl { color: var(--gh-null); }     /* null → red */
-  .json .p { color: var(--gh-punct); }     /* punctuation → grey */
-  .json .url { color: var(--gh-tag); }     /* urls → green */
-  .json .email { color: var(--gh-attr); }  /* emails → purple */
-  .json .key-important { color: var(--gh-keyword); font-weight: 600; }
+  /* ============ GitHub JSON coloring ============ */
+  .json {
+    font-family: 'Roboto Mono', monospace;
+    font-size: 11.5px;
+    line-height: 1.55;
+    white-space: pre-wrap;
+  }
+  .json .k { color: var(--gh-key); }
+  .json .s { color: var(--gh-string); }
+  .json .n { color: var(--gh-number); }
+  .json .b { color: var(--gh-bool); }
+  .json .nl { color: var(--gh-null); }
+  .json .p { color: var(--gh-punct); }
+  .json .url { color: var(--gh-url); }
+  .json .email { color: var(--gh-email); }
+  .json .key-sensitive { color: var(--gh-sensitive); font-weight: 600; }
 
-  /* ============ Smart formatted view ============ */
+  /* ============ Dashed aligned view ============ */
   .formatted-view {
     font-family: 'Roboto Mono', monospace;
     font-size: 11.5px;
-    line-height: 1.35;
-    white-space: pre-wrap;
-    word-break: break-word;
+    line-height: 1.7;
+    white-space: pre;
+    overflow-x: auto;
   }
-  .formatted-view .fv-row {
-    display: grid;
-    grid-template-columns: max-content 1fr;
-    gap: 6px;
-    align-items: start;
-    margin: 0;
-    padding: 0;
-  }
-  .formatted-view .fv-key {
-    color: var(--gh-key);
-    font-weight: 500;
-  }
-  .formatted-view .fv-val {
-    color: var(--gh-string);
-    word-break: break-word;
-  }
-  .formatted-view .fv-val.str { color: var(--gh-string); }
+  .formatted-view .fv-line { display: block; }
+  .formatted-view .fv-key { color: var(--gh-key); }
+  .formatted-view .fv-key.sensitive { color: var(--gh-sensitive); font-weight: 600; }
+  .formatted-view .fv-dash { color: var(--gh-punct); }
+  .formatted-view .fv-val { color: var(--gh-string); }
   .formatted-view .fv-val.num { color: var(--gh-number); }
   .formatted-view .fv-val.bool { color: var(--gh-bool); }
   .formatted-view .fv-val.nul { color: var(--gh-null); }
-  .formatted-view .fv-val.url { color: var(--gh-tag); }
-  .formatted-view .fv-val.email { color: var(--gh-attr); }
-  .formatted-view .fv-sub {
-    color: var(--gh-punct);
-    padding-left: 1px;
-    margin: 0;
-  }
-  .formatted-view .fv-line {
-    color: var(--gh-punct);
-    padding-left: 2px;
-    margin: 0;
-  }
-  .formatted-view .fv-empty {
-    color: var(--dim);
-    font-style: italic;
-  }
+  .formatted-view .fv-val.url { color: var(--gh-url); }
+  .formatted-view .fv-val.email { color: var(--gh-email); }
+  .formatted-view .fv-sub { color: var(--gh-punct); }
+  .formatted-view .fv-num { color: var(--dim); }
 
   /* View full button */
   .view-full {
@@ -236,13 +217,14 @@
     background: var(--bg);
     color: var(--text);
     border: 1px solid var(--line);
-    border-radius: 8px;
+    border-radius: 14px;
     padding: 10px;
     font: inherit;
     font-size: 12px;
     font-weight: 500;
     cursor: pointer;
     transition: border-color .2s var(--ease), background .2s var(--ease);
+    font-family: 'Roboto Mono', monospace;
   }
   .view-full:hover { border-color: var(--blue); }
   .view-full.show { display: block; }
@@ -256,16 +238,12 @@
     color: var(--dim);
     padding-top: 14px;
     border-top: 1px solid var(--line);
+    font-family: 'Roboto Mono', monospace;
   }
   .row .mod { color: var(--text); }
-  .sw {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-  }
+  .sw { display: flex; align-items: center; gap: 8px; }
   .toggle {
-    width: 30px;
-    height: 16px;
+    width: 30px; height: 16px;
     border-radius: 8px;
     background: var(--line);
     border: 0;
@@ -292,6 +270,7 @@
     border-top: 1px solid var(--line);
     font-size: 11px;
     color: var(--dim);
+    font-family: 'Roboto Mono', monospace;
   }
   .foot .ready::before {
     content: '';
@@ -306,8 +285,8 @@
 
   .sms-options { display: none; grid-template-columns: 110px 110px; gap: 8px; margin-top: 10px; }
   .sms-options.show { display: grid; }
-  .mini-field { background: var(--bg); border: 1px solid var(--line); border-radius: 8px; padding: 5px 8px; }
-  .mini-field label { display: block; color: var(--dim); font-size: 9px; margin-bottom: 2px; }
+  .mini-field { background: var(--bg); border: 1px solid var(--line); border-radius: 12px; padding: 5px 8px; }
+  .mini-field label { display: block; color: var(--dim); font-size: 9px; margin-bottom: 2px; font-family: 'Roboto Mono', monospace; }
   .mini-field input { width: 100%; box-sizing: border-box; padding: 2px 0; font-size: 11px; }
 
   /* ============ FULLSCREEN OVERLAY ============ */
@@ -340,9 +319,8 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 32px;
-    height: 32px;
-    border-radius: 6px;
+    width: 32px; height: 32px;
+    border-radius: 10px;
     transition: background .2s var(--ease);
   }
   .back-btn:hover { background: var(--line); }
@@ -361,10 +339,9 @@
     background: var(--panel);
     border: 1px solid var(--line);
     padding: 3px 8px;
-    border-radius: 4px;
+    border-radius: 8px;
     font-family: 'Roboto Mono', monospace;
   }
-
   .overlay-content {
     flex: 1;
     overflow-y: auto;
@@ -380,11 +357,6 @@
     word-break: break-all;
     font-family: inherit;
   }
-  .overlay-content .formatted-view {
-    font-family: 'Roboto Mono', monospace;
-    font-size: 12px;
-    line-height: 1.35;
-  }
 
   .toast {
     position: fixed;
@@ -396,11 +368,12 @@
     color: var(--text);
     font-size: 12px;
     padding: 8px 16px;
-    border-radius: 8px;
+    border-radius: 12px;
     opacity: 0;
     pointer-events: none;
     transition: all .3s var(--ease);
     z-index: 1000;
+    font-family: 'Roboto Mono', monospace;
   }
   .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
 </style>
@@ -510,129 +483,138 @@
       .replace(/</g, '&lt;')
       .replace(/>/g, '&gt;');
   }
-
-  function looksLikeUrl(s) {
-    return /^https?:\/\//i.test(String(s));
+  function looksLikeUrl(s) { return /^https?:\/\//i.test(String(s)); }
+  function looksLikeEmail(s) { return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(s)); }
+  function isSensitiveKey(k) {
+    const kk = String(k).toLowerCase();
+    return ['password','pass','passwd','pwd','token','key','secret','auth','credit','cvv','aadhaar','aadhar','pan','otp','pin'].some(x => kk.includes(x));
   }
-  function looksLikeEmail(s) {
-    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(s));
+  function valClass(v) {
+    if (v === null || v === undefined) return 'nul';
+    if (typeof v === 'boolean') return 'bool';
+    if (typeof v === 'number') return 'num';
+    if (looksLikeUrl(v)) return 'url';
+    if (looksLikeEmail(v)) return 'email';
+    return '';
   }
-  function looksLikePhone(s) {
-    return /^\+?\d{7,15}$/.test(String(s).replace(/[\s\-()]/g, ''));
-  }
-
-  /* ─────────── JSON MULTI-COLOR HIGHLIGHTER ─────────── */
-  function highlightJson(json) {
-    let text = typeof json === 'string' ? json : JSON.stringify(json, null, 2);
-    if (!text) return '';
-    text = escapeHtml(text);
-
-    return text.replace(
-      /("(\\u[a-fA-F0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false)\b|\bnull\b|-?\d+(?:\.\d*)?(?:[eE][+-]?\d+)?|[{}\[\],:])/g,
-      (match) => {
-        // String (key or value)
-        if (/^"/.test(match)) {
-          if (/:$/.test(match)) {
-            // It's a key
-            const keyName = match.replace(/:\s*$/, '').replace(/"/g, '').toLowerCase();
-            const importantKeys = ['password', 'pass', 'token', 'key', 'secret', 'auth', 'credit', 'cvv', 'aadhaar', 'pan'];
-            const cls = importantKeys.some(k => keyName.includes(k)) ? 'key-important' : 'k';
-            return `<span class="${cls}">${match}</span>`;
-          } else {
-            // String value — detect content type
-            const raw = match.slice(1, -1);
-            let cls = 's';
-            if (looksLikeUrl(raw)) cls = 'url';
-            else if (looksLikeEmail(raw)) cls = 'email';
-            return `<span class="${cls}">${match}</span>`;
-          }
-        }
-        // Booleans
-        if (/true|false/.test(match)) return `<span class="b">${match}</span>`;
-        // Null
-        if (/null/.test(match)) return `<span class="nl">${match}</span>`;
-        // Punctuation
-        if (/[{}\[\],:]/.test(match)) return `<span class="p">${match}</span>`;
-        // Numbers
-        return `<span class="n">${match}</span>`;
-      }
-    );
-  }
-
-  /* ─────────── SMART FORMATTED VIEW ─────────── */
-  /* Takes a JSON object and produces clean key-value lines with no extra gaps */
-  function formatSmart(obj, indentLevel = 0) {
-    const lines = [];
-    const indent = '  '.repeat(indentLevel);
-
-    if (obj === null || obj === undefined) {
-      return `<span class="fv-empty">${indent}—</span>`;
-    }
-
-    if (Array.isArray(obj)) {
-      if (obj.length === 0) return `<span class="fv-empty">${indent}[] (empty)</span>`;
-      obj.forEach((item, i) => {
-        if (typeof item === 'object' && item !== null) {
-          lines.push(formatSmart(item, indentLevel));
-        } else {
-          lines.push(`${indent}<span class="fv-line">${escapeHtml(formatValue(item))}</span>`);
-        }
-      });
-      return lines.join('\n');
-    }
-
-    if (typeof obj === 'object') {
-      const keys = Object.keys(obj);
-      if (keys.length === 0) return `<span class="fv-empty">${indent}{} (empty)</span>`;
-
-      keys.forEach(k => {
-        const v = obj[k];
-        const keyHtml = `<span class="fv-key">${escapeHtml(k)}</span>`;
-
-        if (v === null || v === undefined) {
-          lines.push(`${indent}<span class="fv-row">${keyHtml}<span class="fv-val nul">null</span></span>`);
-        } else if (Array.isArray(v)) {
-          if (v.length === 0) {
-            lines.push(`${indent}<span class="fv-row">${keyHtml}<span class="fv-empty">[]</span></span>`);
-          } else if (v.every(x => typeof x !== 'object' || x === null)) {
-            // Simple array — show all on same row separated by comma
-            const vals = v.map(x => `<span class="fv-val ${classForValue(x)}">${escapeHtml(formatValue(x))}</span>`).join('<span class="fv-sub">, </span>');
-            lines.push(`${indent}<span class="fv-row">${keyHtml}<span>${vals}</span></span>`);
-          } else {
-            // Array of objects — one row per item
-            lines.push(`${indent}<span class="fv-row">${keyHtml}<span class="fv-sub">[${v.length}]</span></span>`);
-            v.forEach((item, i) => {
-              const inner = formatSmart(item, indentLevel + 1);
-              lines.push(`${indent}<span class="fv-sub">  ${i + 1}.</span>`);
-              lines.push(inner);
-            });
-          }
-        } else if (typeof v === 'object') {
-          lines.push(`${indent}<span class="fv-row">${keyHtml}<span class="fv-sub">{...}</span></span>`);
-          lines.push(formatSmart(v, indentLevel + 1));
-        } else {
-          lines.push(`${indent}<span class="fv-row">${keyHtml}<span class="fv-val ${classForValue(v)}">${escapeHtml(formatValue(v))}</span></span>`);
-        }
-      });
-      return lines.join('\n');
-    }
-
-    return `${indent}${escapeHtml(formatValue(obj))}`;
-  }
-
   function formatValue(v) {
     if (v === null || v === undefined) return 'null';
     if (typeof v === 'boolean') return v ? 'true' : 'false';
     return String(v);
   }
 
-  function classForValue(v) {
-    if (v === null || v === undefined) return 'nul';
-    if (typeof v === 'boolean') return 'bool';
-    if (typeof v === 'number') return 'num';
-    if (looksLikeUrl(v)) return 'url';
-    if (looksLikeEmail(v)) return 'email';
-    return 'str';
+  /* ─────────── JSON COLORING (for OFF mode) ─────────── */
+  function highlightJson(json) {
+    let text = typeof json === 'string' ? json : JSON.stringify(json, null, 2);
+    if (!text) return '';
+    text = escapeHtml(text);
+    return text.replace(
+      /("(\\u[a-fA-F0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false)\b|\bnull\b|-?\d+(?:\.\d*)?(?:[eE][+-]?\d+)?|[{}\[\],:])/g,
+      (match) => {
+        if (/^"/.test(match)) {
+          if (/:$/.test(match)) {
+            const keyName = match.replace(/:\s*$/, '').replace(/"/g, '');
+            const cls = isSensitiveKey(keyName) ? 'key-sensitive' : 'k';
+            return `<span class="${cls}">${match}</span>`;
+          }
+          const raw = match.slice(1, -1);
+          let cls = 's';
+          if (looksLikeUrl(raw)) cls = 'url';
+          else if (looksLikeEmail(raw)) cls = 'email';
+          return `<span class="${cls}">${match}</span>`;
+        }
+        if (/true|false/.test(match)) return `<span class="b">${match}</span>`;
+        if (/null/.test(match)) return `<span class="nl">${match}</span>`;
+        if (/[{}\[\],:]/.test(match)) return `<span class="p">${match}</span>`;
+        return `<span class="n">${match}</span>`;
+      }
+    );
+  }
+
+  /* ─────────── DASHED ALIGNED VIEW (for ON mode) ─────────── */
+  /* Fixed key column = 14 chars. Remaining filled with '-' */
+  const KEY_COL = 14;
+
+  function dashRow(key, valueHtml, indent) {
+    indent = indent || '';
+    const keyStr = String(key);
+    const visibleKey = indent + keyStr;
+    // Visible length without HTML — indent uses spaces
+    const visibleLen = visibleKey.length;
+    const dashes = Math.max(1, KEY_COL - visibleLen + 1);
+    const dashStr = '-'.repeat(dashes);
+
+    const keyCls = isSensitiveKey(keyStr) ? 'fv-key sensitive' : 'fv-key';
+    return `<span class="fv-line">` +
+      `<span class="${keyCls}">${escapeHtml(indent + keyStr)}</span>` +
+      `<span class="fv-dash"> ${dashStr} </span>` +
+      `<span class="fv-val ${valClassRaw(valueHtml)}">${valueHtml}</span>` +
+    `</span>`;
+  }
+
+  // crude helper to detect class based on raw text
+  function valClassRaw(html) {
+    const txt = String(html).replace(/<[^>]+>/g, '');
+    if (txt === 'null') return 'nul';
+    if (txt === 'true' || txt === 'false') return 'bool';
+    if (looksLikeUrl(txt)) return 'url';
+    if (looksLikeEmail(txt)) return 'email';
+    if (/^-?\d+(\.\d+)?$/.test(txt)) return 'num';
+    return '';
+  }
+
+  function renderValueHtml(v) {
+    if (v === null || v === undefined) return 'null';
+    if (typeof v === 'boolean') return v ? 'true' : 'false';
+    return escapeHtml(String(v));
+  }
+
+  /* Renders object as dashed aligned rows — only keys that EXIST */
+  function renderDashed(obj) {
+    if (obj === null || obj === undefined) return '';
+    if (typeof obj !== 'object') return `<span class="fv-line">${escapeHtml(String(obj))}</span>`;
+
+    let html = '';
+    if (Array.isArray(obj)) {
+      obj.forEach((item, i) => {
+        if (typeof item === 'object' && item !== null) {
+          html += renderDashed(item);
+        } else {
+          html += dashRow(String(i + 1), renderValueHtml(item), '');
+        }
+      });
+      return html;
+    }
+
+    const keys = Object.keys(obj);
+    keys.forEach(k => {
+      const v = obj[k];
+      // Skip null/undefined/empty — "jo nahi aayega wo mat show kar"
+      if (v === null || v === undefined || v === '') return;
+      if (Array.isArray(v)) {
+        if (v.length === 0) return;
+        if (v.every(x => typeof x !== 'object' || x === null)) {
+          // Simple array — comma separated
+          const joined = v.map(x => renderValueHtml(x)).join(', ');
+          html += dashRow(k, joined, '');
+        } else {
+          // Array of objects
+          html += dashRow(k, `[${v.length}]`, '');
+          v.forEach((item, i) => {
+            const sub = renderDashed(item).replace(/<span class="fv-line">/g, `<span class="fv-line">  ${i + 1}. `);
+            html += sub;
+          });
+        }
+      } else if (typeof v === 'object') {
+        html += dashRow(k, '{…}', '');
+        // Indented nested
+        const sub = renderDashed(v);
+        html += sub.replace(/<span class="fv-line">/g, '<span class="fv-line">  ');
+      } else {
+        html += dashRow(k, renderValueHtml(v), '');
+      }
+    });
+    return html;
   }
 
   /* ─────────── PRINT ─────────── */
@@ -649,7 +631,7 @@
     const d = document.createElement('div');
     if (autoSyncOn) {
       d.className = 'formatted-view';
-      d.innerHTML = formatSmart(data, 0);
+      d.innerHTML = renderDashed(data);
     } else {
       d.className = 'json';
       d.innerHTML = highlightJson(data);
@@ -666,7 +648,6 @@
     $('q-pct').textContent = pct + '%';
     $('q-fill').style.width = pct + '%';
   }
-
   function setStatus(text, busyDot) {
     status.textContent = text;
     status.classList.toggle('busy', !!busyDot);
@@ -734,10 +715,8 @@
     autoSyncOn = e.currentTarget.classList.toggle('on');
     e.currentTarget.setAttribute('aria-checked', autoSyncOn);
     print('# auto_sync = ' + (autoSyncOn ? 'True' : 'False'), 'l-dim');
-
-    // Re-render last response if exists
     if (lastResponse) {
-      print('# re-rendering in ' + (autoSyncOn ? 'smart' : 'json') + ' view', 'l-dim');
+      print('# re-rendering…', 'l-dim');
       printJson(lastResponse.data);
     }
   });
@@ -822,17 +801,15 @@
     return data;
   }
 
-  /* ─────────── FULLSCREEN VIEW ─────────── */
+  /* ─────────── FULLSCREEN ─────────── */
   function openOverlay(data, title, statusText) {
     overlayTitle.textContent = title || 'response.json';
     overlayBadge.textContent = statusText || '200 OK';
-
     if (autoSyncOn) {
-      overlayContent.innerHTML = `<div class="formatted-view">${formatSmart(data, 0)}</div>`;
+      overlayContent.innerHTML = `<div class="formatted-view">${renderDashed(data)}</div>`;
     } else {
       overlayContent.innerHTML = `<pre>${highlightJson(data)}</pre>`;
     }
-
     overlay.classList.add('show');
     document.body.style.overflow = 'hidden';
   }

@@ -405,27 +405,37 @@
   }
 
   async function callBackend(currentMod, value) {
-    let url;
+    let url, options;
 
     if (currentMod === 'osint') {
       url = endpointUrl(ENDPOINTS.osint, value);
+      options = { method: 'GET' };
     } else if (currentMod === 't_osint') {
       url = endpointUrl(ENDPOINTS.t_osint, value);
+      options = { method: 'GET' };
     } else if (currentMod === 'sms_b') {
       const qty = Number($('quantity').value);
       const time = Number($('timeSet').value);
-      const u = new URL(ENDPOINTS.sms_b, window.location.origin);
-      u.searchParams.set('q', value);
-      u.searchParams.set('quantity', qty);
-      u.searchParams.set('time', time);
-      url = u.href;
+      url = new URL(ENDPOINTS.sms_b, window.location.origin).href;
+      options = {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          q: value,
+          quantity: qty,
+          time: time
+        })
+      };
     } else {
       throw new Error('This module is not connected yet');
     }
 
     const response = await fetch(url, {
-      method: 'GET',
-      headers: { 'Accept': 'application/json, text/plain, */*' },
+      ...options,
+      headers: {
+        'Accept': 'application/json, text/plain, */*',
+        ...(options.headers || {})
+      },
       cache: 'no-store',
       credentials: 'same-origin'
     });

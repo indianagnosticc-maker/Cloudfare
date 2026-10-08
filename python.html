@@ -524,10 +524,9 @@
     if (mod === 'v_osint') {
       inp.inputMode = 'text';
       inp.maxLength = 12;
-      inp.placeholder = 'currently under development';
-      inp.disabled = true;
-      run.disabled = true;
-      print('# V-OSINT is currently under development.', 'l-warn');
+      inp.placeholder = 'vehicle number (e.g., UP33BH4112)';
+      inp.disabled = false;
+      run.disabled = false;
     } else if (mod === 't_osint') {
       inp.inputMode = 'text';
       inp.maxLength = 32;
@@ -559,9 +558,9 @@
       count.textContent = inp.value.length + '/10';
       count.classList.toggle('full', inp.value.length === 10);
     } else if (mod === 'v_osint') {
-      inp.value = inp.value.toUpperCase().replace(/[^A-Z0-9 -]/g, '').slice(0, 12);
+      inp.value = inp.value.toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 12);
       count.textContent = inp.value.length + '/12';
-      count.classList.toggle('full', inp.value.length > 0);
+      count.classList.toggle('full', inp.value.length >= 8 && inp.value.length <= 12);
     } else {
       inp.value = inp.value.replace(/\s+/g, '').slice(0, 32);
       count.textContent = inp.value.length + '/32';
@@ -588,6 +587,7 @@
   /* ─────────── ENDPOINTS ─────────── */
   const ENDPOINTS = {
     osint: '/osint',
+    v_osint: '/vosint',
     t_osint: '/tgosint',
     sms_b: '/smsb'
   };
@@ -603,6 +603,9 @@
 
     if (currentMod === 'osint') {
       url = endpointUrl(ENDPOINTS.osint, value);
+      options = { method: 'GET' };
+    } else if (currentMod === 'v_osint') {
+      url = endpointUrl(ENDPOINTS.v_osint, value);
       options = { method: 'GET' };
     } else if (currentMod === 't_osint') {
       url = endpointUrl(ENDPOINTS.t_osint, value);
@@ -693,7 +696,7 @@
     const val = inp.value.trim();
     let valid = false;
     if (mod === 'osint') valid = /^\d{10}$/.test(val);
-    else if (mod === 'v_osint') valid = /^[A-Z0-9 -]{2,12}$/.test(val);
+    else if (mod === 'v_osint') valid = /^[A-Z0-9]{8,12}$/.test(val);
     else if (mod === 't_osint') valid = val.length > 0;
     else if (mod === 'sms_b') {
       const qty = Number($('quantity').value);
@@ -704,7 +707,7 @@
     if (!valid) {
       form.classList.add('err');
       const msg = mod === 'osint' ? 'ValueError: 10-digit target required' :
-                  mod === 'v_osint' ? 'ValueError: vehicle number required' :
+                  mod === 'v_osint' ? 'ValueError: 8-12 character vehicle number required (e.g., UP33BH4112)' :
                   mod === 't_osint' ? 'ValueError: username / user id required' :
                   'ValueError: 10-digit target, quantity and time set required';
       print(msg, 'l-err');

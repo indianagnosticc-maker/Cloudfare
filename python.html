@@ -397,22 +397,28 @@
     t_osint: '/tgosint'
   };
 
+  function endpointUrl(path, q) {
+    const u = new URL(path, window.location.origin);
+    u.searchParams.set('q', q);
+    return u.href;
+  }
+
   async function callBackend(currentMod, value) {
     let url;
 
     if (currentMod === 'osint') {
-      // functions/osint.js expects GET ?q=...
-      url = ENDPOINTS.osint + '?q=' + encodeURIComponent(value);
+      url = endpointUrl(ENDPOINTS.osint, value);
     } else if (currentMod === 't_osint') {
-      // functions/tgosint.js expects GET ?q=...
-      url = ENDPOINTS.t_osint + '?q=' + encodeURIComponent(value);
+      url = endpointUrl(ENDPOINTS.t_osint, value);
     } else {
       throw new Error('This module is not connected yet');
     }
 
     const response = await fetch(url, {
       method: 'GET',
-      headers: { 'Accept': 'application/json, text/plain, */*' }
+      headers: { 'Accept': 'application/json, text/plain, */*' },
+      cache: 'no-store',
+      credentials: 'same-origin'
     });
 
     const text = await response.text();
@@ -423,7 +429,7 @@
       const message = typeof data === 'object' && data !== null
         ? (data.error || data.message || JSON.stringify(data))
         : (text || ('HTTP ' + response.status));
-      throw new Error(message);
+      throw new Error('HTTP ' + response.status + ': ' + message);
     }
 
     return data;

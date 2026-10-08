@@ -11,6 +11,7 @@
   :root {
     --bg: #0d0f12;
     --panel: #12151a;
+    --panel-inner: #181b21;
     --line: #232830;
     --text: #d7dae0;
     --dim: #6b7280;
@@ -20,13 +21,18 @@
     --red: #e06c75;
     --ease: cubic-bezier(.2, .8, .2, 1);
 
-    /* GitHub code colors */
+    /* GitHub-style code colors */
     --gh-key: #79c0ff;
     --gh-string: #a5d6ff;
     --gh-number: #79c0ff;
     --gh-bool: #ff7b72;
     --gh-null: #ff7b72;
     --gh-punct: #8b949e;
+    --gh-keyword: #ff7b72;
+    --gh-tag: #7ee787;
+    --gh-attr: #d2a8ff;
+    --gh-const: #79c0ff;
+    --gh-comment: #8b949e;
   }
   * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
   button, input { font-family: inherit; }
@@ -165,14 +171,57 @@
   .l-err { color: var(--red); }
   .l-warn { color: var(--yellow); }
 
-  /* GitHub-style JSON syntax highlighting */
+  /* ============ GitHub-style JSON coloring ============ */
   .json { font-family: 'Roboto Mono', monospace; font-size: 11.5px; line-height: 1.55; }
-  .json .k { color: var(--gh-key); }
-  .json .s { color: var(--gh-string); }
-  .json .n { color: var(--gh-number); }
-  .json .b { color: var(--gh-bool); }
-  .json .nl { color: var(--gh-null); }
-  .json .p { color: var(--gh-punct); }
+  .json .k { color: var(--gh-key); }       /* keys → blue */
+  .json .s { color: var(--gh-string); }    /* strings → light blue */
+  .json .n { color: var(--gh-number); }    /* numbers → blue */
+  .json .b { color: var(--gh-bool); }      /* true/false → red */
+  .json .nl { color: var(--gh-null); }     /* null → red */
+  .json .p { color: var(--gh-punct); }     /* punctuation → grey */
+  .json .url { color: var(--gh-tag); }     /* urls → green */
+  .json .email { color: var(--gh-attr); }  /* emails → purple */
+  .json .key-important { color: var(--gh-keyword); font-weight: 600; }
+
+  /* ============ Smart formatted view ============ */
+  .formatted-view {
+    font-family: 'Roboto Mono', monospace;
+    font-size: 12px;
+    line-height: 1.65;
+    white-space: pre-wrap;
+    word-break: break-word;
+  }
+  .formatted-view .fv-row {
+    display: grid;
+    grid-template-columns: 110px 1fr;
+    gap: 8px;
+    align-items: start;
+  }
+  .formatted-view .fv-key {
+    color: var(--gh-key);
+    font-weight: 500;
+  }
+  .formatted-view .fv-val {
+    color: var(--gh-string);
+    word-break: break-word;
+  }
+  .formatted-view .fv-val.num { color: var(--gh-number); }
+  .formatted-view .fv-val.bool { color: var(--gh-bool); }
+  .formatted-view .fv-val.nul { color: var(--gh-null); }
+  .formatted-view .fv-val.url { color: var(--gh-tag); }
+  .formatted-view .fv-val.email { color: var(--gh-attr); }
+  .formatted-view .fv-sub {
+    color: var(--gh-punct);
+    padding-left: 2px;
+  }
+  .formatted-view .fv-line {
+    color: var(--gh-punct);
+    padding-left: 4px;
+  }
+  .formatted-view .fv-empty {
+    color: var(--dim);
+    font-style: italic;
+  }
 
   /* View full button */
   .view-full {
@@ -326,6 +375,9 @@
     word-break: break-all;
     font-family: inherit;
   }
+  .overlay-content .formatted-view {
+    font-size: 13px;
+  }
 
   .toast {
     position: fixed;
@@ -441,9 +493,10 @@
 
   const MAX = 10, COOLDOWN = 5 * 60 * 1000;
   let mod = 'osint', used = 0, busy = false, cooldownEnd = 0, timer = null;
-  let lastResponse = null; // stores last response for fullscreen
+  let lastResponse = null;
+  let autoSyncOn = false;
 
-  /* ─────────── JSON SYNTAX HIGHLIGHTER (GitHub-style) ─────────── */
+  /* ─────────── HELPERS ─────────── */
   function escapeHtml(str) {
     return String(str)
       .replace(/&/g, '&amp;')
@@ -451,36 +504,128 @@
       .replace(/>/g, '&gt;');
   }
 
+  function looksLikeUrl(s) {
+    return /^https?:\/\//i.test(String(s));
+  }
+  function looksLikeEmail(s) {
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(s));
+  }
+  function looksLikePhone(s) {
+    return /^\+?\d{7,15}$/.test(String(s).replace(/[\s\-()]/g, ''));
+  }
+
+  /* ─────────── JSON MULTI-COLOR HIGHLIGHTER ─────────── */
   function highlightJson(json) {
-    // Convert to pretty string if it's an object
     let text = typeof json === 'string' ? json : JSON.stringify(json, null, 2);
     if (!text) return '';
-
-    // Escape HTML first
     text = escapeHtml(text);
 
-    // Regex to match JSON tokens
-    // Order matters: strings (with optional key), numbers, booleans, null, punctuation
     return text.replace(
       /("(\\u[a-fA-F0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false)\b|\bnull\b|-?\d+(?:\.\d*)?(?:[eE][+-]?\d+)?|[{}\[\],:])/g,
       (match) => {
-        let cls = 'n'; // number
+        // String (key or value)
         if (/^"/.test(match)) {
           if (/:$/.test(match)) {
-            cls = 'k'; // key
+            // It's a key
+            const keyName = match.replace(/:\s*$/, '').replace(/"/g, '').toLowerCase();
+            const importantKeys = ['password', 'pass', 'token', 'key', 'secret', 'auth', 'credit', 'cvv', 'aadhaar', 'pan'];
+            const cls = importantKeys.some(k => keyName.includes(k)) ? 'key-important' : 'k';
+            return `<span class="${cls}">${match}</span>`;
           } else {
-            cls = 's'; // string
+            // String value — detect content type
+            const raw = match.slice(1, -1);
+            let cls = 's';
+            if (looksLikeUrl(raw)) cls = 'url';
+            else if (looksLikeEmail(raw)) cls = 'email';
+            return `<span class="${cls}">${match}</span>`;
           }
-        } else if (/true|false/.test(match)) {
-          cls = 'b';
-        } else if (/null/.test(match)) {
-          cls = 'nl';
-        } else if (/[{}\[\],:]/.test(match)) {
-          cls = 'p';
         }
-        return `<span class="${cls}">${match}</span>`;
+        // Booleans
+        if (/true|false/.test(match)) return `<span class="b">${match}</span>`;
+        // Null
+        if (/null/.test(match)) return `<span class="nl">${match}</span>`;
+        // Punctuation
+        if (/[{}\[\],:]/.test(match)) return `<span class="p">${match}</span>`;
+        // Numbers
+        return `<span class="n">${match}</span>`;
       }
     );
+  }
+
+  /* ─────────── SMART FORMATTED VIEW ─────────── */
+  /* Takes a JSON object and produces clean key-value lines with no extra gaps */
+  function formatSmart(obj, indentLevel = 0) {
+    const lines = [];
+    const indent = '  '.repeat(indentLevel);
+
+    if (obj === null || obj === undefined) {
+      return `<span class="fv-empty">${indent}—</span>`;
+    }
+
+    if (Array.isArray(obj)) {
+      if (obj.length === 0) return `<span class="fv-empty">${indent}[] (empty)</span>`;
+      obj.forEach((item, i) => {
+        if (typeof item === 'object' && item !== null) {
+          lines.push(formatSmart(item, indentLevel));
+        } else {
+          lines.push(`${indent}<span class="fv-line">${escapeHtml(formatValue(item))}</span>`);
+        }
+      });
+      return lines.join('\n');
+    }
+
+    if (typeof obj === 'object') {
+      const keys = Object.keys(obj);
+      if (keys.length === 0) return `<span class="fv-empty">${indent}{} (empty)</span>`;
+
+      keys.forEach(k => {
+        const v = obj[k];
+        const keyHtml = `<span class="fv-key">${escapeHtml(k)}</span>`;
+
+        if (v === null || v === undefined) {
+          lines.push(`${indent}<span class="fv-row">${keyHtml}<span class="fv-val nul">null</span></span>`);
+        } else if (Array.isArray(v)) {
+          if (v.length === 0) {
+            lines.push(`${indent}<span class="fv-row">${keyHtml}<span class="fv-empty">[]</span></span>`);
+          } else if (v.every(x => typeof x !== 'object' || x === null)) {
+            // Simple array — show all on same row separated by comma
+            const vals = v.map(x => `<span class="fv-val ${classForValue(x)}">${escapeHtml(formatValue(x))}</span>`).join('<span class="fv-sub">, </span>');
+            lines.push(`${indent}<span class="fv-row">${keyHtml}<span>${vals}</span></span>`);
+          } else {
+            // Array of objects — one row per item
+            lines.push(`${indent}<span class="fv-row">${keyHtml}<span class="fv-sub">[${v.length}]</span></span>`);
+            v.forEach((item, i) => {
+              const inner = formatSmart(item, indentLevel + 1);
+              lines.push(`${indent}<span class="fv-sub">  ${i + 1}.</span>`);
+              lines.push(inner);
+            });
+          }
+        } else if (typeof v === 'object') {
+          lines.push(`${indent}<span class="fv-row">${keyHtml}<span class="fv-sub">{...}</span></span>`);
+          lines.push(formatSmart(v, indentLevel + 1));
+        } else {
+          lines.push(`${indent}<span class="fv-row">${keyHtml}<span class="fv-val ${classForValue(v)}">${escapeHtml(formatValue(v))}</span></span>`);
+        }
+      });
+      return lines.join('\n');
+    }
+
+    return `${indent}${escapeHtml(formatValue(obj))}`;
+  }
+
+  function formatValue(v) {
+    if (v === null || v === undefined) return 'null';
+    if (typeof v === 'boolean') return v ? 'true' : 'false';
+    return String(v);
+  }
+
+  function classForValue(v) {
+    if (v === null || v === undefined) return 'nul';
+    if (typeof v === 'boolean') return 'bool';
+    if (typeof v === 'number') return 'num';
+    if (looksLikeUrl(v)) return 'url';
+    if (looksLikeEmail(v)) return 'email';
+    return 'str';
   }
 
   /* ─────────── PRINT ─────────── */
@@ -495,8 +640,13 @@
 
   function printJson(data) {
     const d = document.createElement('div');
-    d.className = 'json';
-    d.innerHTML = highlightJson(data);
+    if (autoSyncOn) {
+      d.className = 'formatted-view';
+      d.innerHTML = formatSmart(data, 0);
+    } else {
+      d.className = 'json';
+      d.innerHTML = highlightJson(data);
+    }
     log.appendChild(d);
     while (log.children.length > 60) log.removeChild(log.firstChild);
     log.scrollTop = log.scrollHeight;
@@ -572,11 +722,17 @@
     form.classList.remove('err');
   });
 
-  /* ─────────── AUTO-SYNC ─────────── */
+  /* ─────────── AUTO-SYNC TOGGLE ─────────── */
   $('sync').addEventListener('click', e => {
-    const on = e.currentTarget.classList.toggle('on');
-    e.currentTarget.setAttribute('aria-checked', on);
-    print('# auto_sync = ' + (on ? 'True' : 'False'), 'l-dim');
+    autoSyncOn = e.currentTarget.classList.toggle('on');
+    e.currentTarget.setAttribute('aria-checked', autoSyncOn);
+    print('# auto_sync = ' + (autoSyncOn ? 'True' : 'False'), 'l-dim');
+
+    // Re-render last response if exists
+    if (lastResponse) {
+      print('# re-rendering in ' + (autoSyncOn ? 'smart' : 'json') + ' view', 'l-dim');
+      printJson(lastResponse.data);
+    }
   });
 
   /* ─────────── COOLDOWN ─────────── */
@@ -663,7 +819,13 @@
   function openOverlay(data, title, statusText) {
     overlayTitle.textContent = title || 'response.json';
     overlayBadge.textContent = statusText || '200 OK';
-    overlayContent.innerHTML = `<pre>${highlightJson(data)}</pre>`;
+
+    if (autoSyncOn) {
+      overlayContent.innerHTML = `<div class="formatted-view">${formatSmart(data, 0)}</div>`;
+    } else {
+      overlayContent.innerHTML = `<pre>${highlightJson(data)}</pre>`;
+    }
+
     overlay.classList.add('show');
     document.body.style.overflow = 'hidden';
   }
@@ -675,7 +837,6 @@
 
   $('backBtn').addEventListener('click', closeOverlay);
 
-  // Escape key closes overlay too
   document.addEventListener('keydown', e => {
     if (e.key === 'Escape' && overlay.classList.contains('show')) closeOverlay();
   });
@@ -735,14 +896,8 @@
       print('<Response [200]> OK', 'l-ok');
       printJson(data);
 
-      // Save for fullscreen view
-      lastResponse = {
-        module: mod,
-        query: val,
-        data: data
-      };
+      lastResponse = { module: mod, query: val, data: data };
       viewFull.classList.add('show');
-
       showToast('Response received');
     } catch (err) {
       print('BackendError: ' + (err.message || String(err)), 'l-err');

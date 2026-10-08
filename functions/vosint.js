@@ -1,51 +1,73 @@
-const PARAM_NAMES = [
-  "number","vehicle","reg","rc","regno","registration",
-  "vno","vehicle_number","vehicleNumber","vehicle_no",
-  "reg_number","regNumber","plate","plate_number",
-  "car","carno","car_number","q","query","search",
-  "vehical","vehicalno"
-];
+// functions/vosint.js  →  route: /vosint
+// Upstream: apihub-livid.vercel.app
 
-export default async function handler(req, res) {
-  // CORS
-  res.setHeader("Access-Control-Allow-Origin", "*");
-  res.setHeader("Access-Control-Allow-Methods", "GET, OPTIONS");
-  res.setHeader("Access-Control-Allow-Headers", "Content-Type");
+const API_KEY = "naxupdate_49447fc17415907058";
+const UPSTREAM = "https://apihub-livid.vercel.app/api/vehicle";
 
-  if (req.method === "OPTIONS") {
-    return res.status(204).end();
+export async function onRequest(context) {
+  const { request } = context;
+
+  // CORS preflight
+  if (request.method === "OPTIONS") {
+    return new Response(null, {
+      status: 204,
+      headers: {
+        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Allow-Methods": "GET, OPTIONS",
+        "Access-Control-Allow-Headers": "Content-Type",
+      },
+    });
   }
 
-  const raw = req.query.number || req.query.q || req.query.vehicle || "";
+  const url = new URL(request.url);
+  const raw = url.searchParams.get("q")
+           || url.searchParams.get("number")
+           || url.searchParams.get("vehicle")
+           || url.searchParams.get("veh")
+           || "";
+
   const vehicle = String(raw).toUpperCase().replace(/[^A-Z0-9]/g, "");
 
   if (vehicle.length < 8 || vehicle.length > 12) {
-    return res.status(400).json({ error: "invalid vehicle number" });
+    return new Response(JSON.stringify({ error: "invalid vehicle number" }), {
+      status: 400,
+      headers: {
+        "Content-Type": "application/json",
+        "Access-Control-Allow-Origin": "*",
+      },
+    });
   }
 
-  const headers = {
-    "User-Agent": "Mozilla/5.0 (Linux; Android 13) AppleWebKit/537.36",
-    "Accept": "application/json"
-  };
-
-  // ✅ NEW API URL — replaced with rajfflivebot.onrender.com
-  const url = `http://rajfflivebot.onrender.com/pub/rajfflive/vnum?vnum=${encodeURIComponent(vehicle)}`;
+  const target = `${UPSTREAM}?key=${encodeURIComponent(API_KEY)}&veh=${encodeURIComponent(vehicle)}`;
 
   try {
-    const r = await fetch(url, { headers });
+    const r = await fetch(target, {
+      headers: {
+        "User-Agent": "Mozilla/5.0 (Linux; Android 13) AppleWebKit/537.36",
+        "Accept": "application/json",
+      },
+    });
+
     const txt = await r.text();
 
-    res.setHeader("Content-Type", "application/json");
-    res.setHeader("Cache-Control", "no-store");
-
-    if (r.status === 200) {
-      return res.status(200).send(txt);
-    }
-    return res.status(r.status).send(txt);
+    return new Response(txt, {
+      status: r.status,
+      headers: {
+        "Content-Type": "application/json",
+        "Cache-Control": "no-store",
+        "Access-Control-Allow-Origin": "*",
+      },
+    });
   } catch (e) {
-    return res.status(500).json({
+    return new Response(JSON.stringify({
       error: "upstream failed",
-      message: String(e.message || e)
+      message: String(e.message || e),
+    }), {
+      status: 500,
+      headers: {
+        "Content-Type": "application/json",
+        "Access-Control-Allow-Origin": "*",
+      },
     });
   }
 }

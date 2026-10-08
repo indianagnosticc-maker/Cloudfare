@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>Yuki /OSINT - Develop Investigate Deploy</title>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', '-apple-system', 'BlinkMacSystemFont', 'sans-serif'],
+            mono: ['JetBrains Mono', 'monospace'],
+          },
+          colors: {
+            brandDark: '#000000',
+            brandSurface: '#08090d',
+            subtleCard: '#0d0f14',
+            cardBorder: '#1c1f26',
+            subtleBorder: '#161920',
+            vBlue: '#0070f3',
+            vCyan: '#00dfd8',
+            accentGreen: '#7ee787',
+            accentYellow: '#ffd43b',
+            accentRed: '#ff7b72'
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    :root {
+      --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    
+    * {
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    html, body {
+      width: 100%;
+      max-width: 100%;
+      margin: 0;
+    }
+
+    body {
+      background-color: #000000;
+      color: #ededed;
+      font-family: 'Inter', sans-serif;
+      overflow-x: clip;
+      letter-spacing: -0.012em;
+    }
+
+    main {
+      width: 100%;
+      max-width: 100%;
+    }
+
+    /* Ambient Glow Behind Hero */
+    .hero-glow {
+      position: absolute;
+      top: -150px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: min(900px, 100vw);
+      height: 520px;
+      background: radial-gradient(
+        ellipse at center,
+        rgba(0, 112, 243, 0.14) 0%,
+        rgba(0, 112, 243, 0.08) 24%,
+        rgba(0, 223, 216, 0.035) 45%,
+        rgba(0, 0, 0, 0) 72%
+      );
+      filter: blur(22px);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .text-gradient-hero {
+      background: linear-gradient(180deg, #2eb9ff 0%, #0070f3 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .text-gradient-white {
+      background: linear-gradient(180deg, #ffffff 30%, #888888 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .text-gradient-brand {
+      background: linear-gradient(135deg, #ffffff 0%, #a5b4fc 50%, #38bdf8 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    /* Initial Entrance Keyframe Animations */
+    @keyframes heroFadeUp {
+      0% {
+        opacity: 0;
+        transform: translateY(32px);
+      }
+      100% {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .animate-hero-1 {
+      opacity: 0;
+      animation: heroFadeUp 0.85s var(--ease-out-expo) 0.1s forwards;
+    }
+    .animate-hero-2 {
+      opacity: 0;
+      animation: heroFadeUp 0.85s var(--ease-out-expo) 0.25s forwards;
+    }
+    .animate-hero-3 {
+      opacity: 0;
+      animation: heroFadeUp 0.85s var(--ease-out-expo) 0.4s forwards;
+    }
+    .animate-hero-cta {
+      opacity: 0;
+      animation: heroFadeUp 0.85s var(--ease-out-expo) 0.55s forwards;
+    }
+    .animate-hero-sub {
+      opacity: 0;
+      animation: heroFadeUp 0.85s var(--ease-out-expo) 0.7s forwards;
+    }
+
+    /* Scroll Reveal Transition (Both In and Out) */
+    .scroll-reveal {
+      opacity: 0;
+      transform: translateY(28px);
+      transition: opacity 0.65s var(--ease-out-expo), transform 0.65s var(--ease-out-expo);
+      will-change: opacity, transform;
+    }
+    .scroll-reveal.revealed {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* Button sheen shimmer */
+    .sheen-btn {
+      position: relative;
+      overflow: hidden;
+      transition: all 0.22s var(--ease-out-expo);
+    }
+
+    .sheen-btn::after {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -60%;
+      width: 40%;
+      height: 200%;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.45), transparent);
+      transform: rotate(25deg);
+      animation: sheenPass 4.2s infinite;
+      pointer-events: none;
+    }
+
+    @keyframes sheenPass {
+      0%, 80% { transform: translateX(-120%) rotate(25deg); }
+      100% { transform: translateX(450%) rotate(25deg); }
+    }
+
+    .sheen-btn:hover {
+      transform: translateY(-1.5px);
+      box-shadow: 0 10px 28px -6px rgba(255, 255, 255, 0.22);
+    }
+
+    .tap-active:active {
+      transform: scale(0.97);
+    }
+
+    /* Code scroll styling */
+    .code-scroll::-webkit-scrollbar {
+      height: 5px;
+      width: 5px;
+    }
+    .code-scroll::-webkit-scrollbar-track {
+      background: #0a0c10;
+    }
+    .code-scroll::-webkit-scrollbar-thumb {
+      background: #252833;
+      border-radius: 99px;
+    }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col justify-between selection:bg-blue-600 selection:text-white">
+
+  <!-- Ambient Glow -->
+  <div class="hero-glow"></div>
+<!-- Main Content Wrap -->
+  <main class="relative z-10 flex-1">
+
+    <!-- HERO SECTION WITH LOAD ANIMATIONS -->
+    <section class="pt-12 sm:pt-20 md:pt-24 pb-12 sm:pb-16 text-center px-4 max-w-4xl mx-auto">
+      
+      <!-- Headline with Staggered Fade Up Animations -->
+      <div class="space-y-0.5 sm:space-y-1 mb-8 sm:mb-10 tracking-tighter font-extrabold text-5xl sm:text-7xl md:text-8xl leading-[1.08] overflow-visible">
+        <h1 class="text-gradient-hero animate-hero-1">DEVELOP</h1>
+        <h2 class="text-white animate-hero-2">INVESTIGATE</h2>
+        <h2 class="text-gradient-white animate-hero-3">DEPLOY</h2>
+      </div>
+
+      <!-- Hero CTAs -->
+      <div class="animate-hero-cta flex flex-col sm:flex-row items-stretch sm:items-center justify-center gap-3 sm:gap-4 max-w-sm sm:max-w-none mx-auto mb-8 sm:mb-10">
+        <a href="u.html" class="sheen-btn tap-active px-7 py-3.5 bg-white text-black text-sm font-semibold rounded-full hover:bg-neutral-100 transition-all shadow-md flex items-center justify-center gap-2">
+          <span>Launch Osint Terminal</span>
+          <svg class="w-4 h-4 text-black" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+            <polyline points="9 18 15 12 9 6"></polyline>
+          </svg>
+        </a>
+        <a href="#capabilities" class="tap-active px-7 py-3.5 bg-[#0e1015] hover:bg-[#161820] text-neutral-300 hover:text-white border border-subtleBorder text-sm font-medium rounded-full transition-all flex items-center justify-center">
+          Explore Osint Modules
+        </a>
+      </div>
+
+      <!-- High-Context Subtitle -->
+      <p class="animate-hero-sub max-w-xl mx-auto text-neutral-400 text-sm sm:text-base md:text-lg font-normal leading-relaxed px-2">
+        Yuki Terminal combines high-throughput Python 3.12 OSINT runtimes with instant telemetry, vehicle tracking, and automated network reconnaissance.
+      </p>
+
+    </section>
+
+    <!-- SECTION 1: CODE RUNTIME & CAPABILITIES -->
+    <section id="capabilities" class="scroll-reveal py-8 sm:py-12 px-4 max-w-6xl mx-auto">
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-5 sm:gap-6 items-center">
+        <!-- Terminal Preview (Left) -->
+        <div class="lg:col-span-7 bg-[#090b10] border border-cardBorder rounded-2xl overflow-hidden shadow-2xl">
+          <div class="bg-[#101218] px-4 py-3 border-b border-cardBorder flex items-center justify-between">
+            <div class="flex items-center gap-2">
+              <span class="w-3 h-3 rounded-full bg-[#ff5f56]/90 inline-block"></span>
+              <span class="w-3 h-3 rounded-full bg-[#ffbd2e]/90 inline-block"></span>
+              <span class="w-3 h-3 rounded-full bg-[#27c93f]/90 inline-block"></span>
+              <span class="ml-2 font-mono text-xs text-neutral-400 font-medium">yuki_osint</span>
+            </div>
+            <span class="text-[10px] font-mono px-2 py-0.5 bg-blue-500/10 text-blue-400 border border-blue-500/20 rounded">
+              ACTIVE
+            </span>
+          </div>
+          <div class="p-4 sm:p-5 font-mono text-xs sm:text-[13px] leading-relaxed code-scroll overflow-x-auto text-neutral-300">
+            <p class="text-neutral-500 mb-2">// Initialize Yuki Engine v9.3 runtime</p>
+            <p><span class="text-accentRed font-semibold">import</span> asyncio</p>
+            <p><span class="text-accentRed font-semibold">from</span> yuki.core <span class="text-accentRed font-semibold">import</span> TerminalEngine, Telemetry</p>
+            <p class="mt-2">engine = TerminalEngine(mode=<span class="text-accentYellow">"STEALTH_DEEP"</span>)</p>
+            <p><span class="text-accentRed font-semibold">await</span> engine.init_multiprocess(threads=<span class="text-accentCyan text-blue-400">16</span>)</p>
+            <p class="text-neutral-500 my-2">// Vehicle VIN & plate intelligence scan</p>
+            <p>target_recon = <span class="text-accentRed font-semibold">await</span> engine.lookup_vehicle(</p>
+            <p class="pl-4">query=<span class="text-accentYellow">"DL01AB1234"</span>,</p>
+            <p class="pl-4">include_chassis=<span class="text-blue-400 font-semibold">True</span></p>
+            <p>)</p>
+            
+          </div>
+        </div>
+
+        <!-- Micro Feature Cards (Right) -->
+        <div class="lg:col-span-5 space-y-3.5">
+          <div class="bg-[#0b0d13] border border-cardBorder p-4 sm:p-5 rounded-2xl hover:border-neutral-700 transition-colors">
+            <div class="flex items-center gap-2 mb-1.5">
+              <span class="w-2 h-2 rounded-full bg-blue-500"></span>
+              <h4 class="font-semibold text-sm sm:text-base text-white">Zero-Latency Runtimes</h4>
+            </div>
+            <p class="text-xs sm:text-sm text-neutral-400 leading-normal">
+              Engineered with Python 3.12 and async event pumps, achieving microsecond loop dispatch across complex investigative chains.
+            </p>
+          </div>
+
+          <div class="bg-[#0b0d13] border border-cardBorder p-4 sm:p-5 rounded-2xl hover:border-neutral-700 transition-colors">
+            <div class="flex items-center gap-2 mb-1.5">
+              <span class="w-2 h-2 rounded-full bg-cyan-400"></span>
+              <h4 class="font-semibold text-sm sm:text-base text-white">Flexible Endpoint Querying</h4>
+            </div>
+            <p class="text-xs sm:text-sm text-neutral-400 leading-normal">
+              Interact effortlessly via the single-window Web TUI or integrate headless Python microservices via unified JSON-RPC sockets.
+            </p>
+          </div>
+
+          <div class="bg-[#0b0d13] border border-cardBorder p-4 sm:p-5 rounded-2xl hover:border-neutral-700 transition-colors">
+            <div class="flex items-center gap-2 mb-1.5">
+              <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
+              <h4 class="font-semibold text-sm sm:text-base text-white">Isolated OSINT Sandboxes</h4>
+            </div>
+            <p class="text-xs sm:text-sm text-neutral-400 leading-normal">
+              Multiprocess memory fencing isolates host runtimes while querying untrusted endpoints and telecom registries.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+
+    <section class="px-4 pb-8 sm:pb-10 max-w-4xl mx-auto text-center">
+      <p class="text-[10px] sm:text-xs text-neutral-600 leading-relaxed">
+        Disclaimer: This website is for educational and demonstration purposes only.
+        It does not provide real-world access to private, restricted, or unauthorized information.
+      </p>
+    </section>
+
+  </main>
+
+  <script>
+    // Smooth In & Out scroll reveal animations (both directions)
+    document.addEventListener('DOMContentLoaded', () => {
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          // Toggles class 'revealed' whenever entering or leaving viewport
+          entry.target.classList.toggle('revealed', entry.isIntersecting);
+        });
+      }, {
+        threshold: 0.12,
+        rootMargin: '0px 0px -30px 0px'
+      });
+
+      document.querySelectorAll('.scroll-reveal').forEach(el => observer.observe(el));
+    });
+  </script>
+</body>
+</html>

@@ -20,7 +20,7 @@
     --red: #e06c75;
     --ease: cubic-bezier(.2, .8, .2, 1);
 
-    /* GitHub colors */
+    /* GitHub Dark syntax colors */
     --gh-key: #79c0ff;
     --gh-string: #a5d6ff;
     --gh-number: #79c0ff;
@@ -51,7 +51,7 @@
     max-width: 420px;
     background: var(--panel);
     border: 1px solid var(--line);
-    border-radius: 22px;                /* ← zyada curve */
+    border-radius: 22px;
     overflow: hidden;
   }
 
@@ -156,7 +156,7 @@
     border: 1px solid var(--line);
     border-radius: 14px;
     padding: 10px 12px;
-    height: 180px;
+    height: 200px;
     overflow-y: auto;
     font-size: 12px;
     scrollbar-width: thin;
@@ -175,8 +175,9 @@
   .json {
     font-family: 'Roboto Mono', monospace;
     font-size: 11.5px;
-    line-height: 1.55;
+    line-height: 1.6;
     white-space: pre-wrap;
+    word-break: break-word;
   }
   .json .k { color: var(--gh-key); }
   .json .s { color: var(--gh-string); }
@@ -187,27 +188,7 @@
   .json .url { color: var(--gh-url); }
   .json .email { color: var(--gh-email); }
   .json .key-sensitive { color: var(--gh-sensitive); font-weight: 600; }
-
-  /* ============ Dashed aligned view ============ */
-  .formatted-view {
-    font-family: 'Roboto Mono', monospace;
-    font-size: 11.5px;
-    line-height: 1.7;
-    white-space: pre;
-    overflow-x: auto;
-  }
-  .formatted-view .fv-line { display: block; }
-  .formatted-view .fv-key { color: var(--gh-key); }
-  .formatted-view .fv-key.sensitive { color: var(--gh-sensitive); font-weight: 600; }
-  .formatted-view .fv-dash { color: var(--gh-punct); }
-  .formatted-view .fv-val { color: var(--gh-string); }
-  .formatted-view .fv-val.num { color: var(--gh-number); }
-  .formatted-view .fv-val.bool { color: var(--gh-bool); }
-  .formatted-view .fv-val.nul { color: var(--gh-null); }
-  .formatted-view .fv-val.url { color: var(--gh-url); }
-  .formatted-view .fv-val.email { color: var(--gh-email); }
-  .formatted-view .fv-sub { color: var(--gh-punct); }
-  .formatted-view .fv-num { color: var(--dim); }
+  .json .key-string { color: var(--gh-string); font-weight: 600; }
 
   /* View full button */
   .view-full {
@@ -241,27 +222,6 @@
     font-family: 'Roboto Mono', monospace;
   }
   .row .mod { color: var(--text); }
-  .sw { display: flex; align-items: center; gap: 8px; }
-  .toggle {
-    width: 30px; height: 16px;
-    border-radius: 8px;
-    background: var(--line);
-    border: 0;
-    position: relative;
-    cursor: pointer;
-    transition: background .25s var(--ease);
-  }
-  .toggle::after {
-    content: '';
-    position: absolute;
-    top: 2px; left: 2px;
-    width: 12px; height: 12px;
-    border-radius: 50%;
-    background: var(--dim);
-    transition: transform .25s var(--ease), background .25s var(--ease);
-  }
-  .toggle.on { background: var(--blue); }
-  .toggle.on::after { transform: translateX(14px); background: #fff; }
 
   .foot {
     display: flex;
@@ -433,7 +393,6 @@
 
     <div class="row">
       <span>module: <span class="mod" id="mod">osint</span></span>
-      <span class="sw">auto-sync <button class="toggle" id="sync" type="button" role="switch" aria-checked="false"></button></span>
     </div>
   </div>
 
@@ -474,7 +433,6 @@
   const MAX = 10, COOLDOWN = 5 * 60 * 1000;
   let mod = 'osint', used = 0, busy = false, cooldownEnd = 0, timer = null;
   let lastResponse = null;
-  let autoSyncOn = false;
 
   /* ─────────── HELPERS ─────────── */
   function escapeHtml(str) {
@@ -489,132 +447,56 @@
     const kk = String(k).toLowerCase();
     return ['password','pass','passwd','pwd','token','key','secret','auth','credit','cvv','aadhaar','aadhar','pan','otp','pin'].some(x => kk.includes(x));
   }
-  function valClass(v) {
-    if (v === null || v === undefined) return 'nul';
-    if (typeof v === 'boolean') return 'bool';
-    if (typeof v === 'number') return 'num';
-    if (looksLikeUrl(v)) return 'url';
-    if (looksLikeEmail(v)) return 'email';
-    return '';
-  }
-  function formatValue(v) {
-    if (v === null || v === undefined) return 'null';
-    if (typeof v === 'boolean') return v ? 'true' : 'false';
-    return String(v);
-  }
 
-  /* ─────────── JSON COLORING (for OFF mode) ─────────── */
+  /* ─────────── JSON COLORING — GitHub style ─────────── */
+  /* Yeh smart tokenizer hai — JSON.stringify ka output leta hai aur
+     har token ko alag color deta hai */
   function highlightJson(json) {
-    let text = typeof json === 'string' ? json : JSON.stringify(json, null, 2);
+    let text;
+    if (typeof json === 'string') {
+      // Agar backend plain string bhej raha hai, toh try karo JSON parse
+      try {
+        const parsed = JSON.parse(json);
+        text = JSON.stringify(parsed, null, 2);
+      } catch (_) {
+        // JSON nahi hai, plain text hai — usko plain string color do
+        text = json;
+      }
+    } else {
+      text = JSON.stringify(json, null, 2);
+    }
     if (!text) return '';
     text = escapeHtml(text);
+
+    // Tokenize: strings (with optional colon), numbers, bools, null, punctuation
     return text.replace(
       /("(\\u[a-fA-F0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false)\b|\bnull\b|-?\d+(?:\.\d*)?(?:[eE][+-]?\d+)?|[{}\[\],:])/g,
       (match) => {
+        // STRING (with or without colon)
         if (/^"/.test(match)) {
           if (/:$/.test(match)) {
-            const keyName = match.replace(/:\s*$/, '').replace(/"/g, '');
+            // It's a key
+            const keyName = match.replace(/:\s*$/, '').replace(/^"|"$/g, '');
             const cls = isSensitiveKey(keyName) ? 'key-sensitive' : 'k';
             return `<span class="${cls}">${match}</span>`;
           }
+          // String value — detect content type
           const raw = match.slice(1, -1);
           let cls = 's';
           if (looksLikeUrl(raw)) cls = 'url';
           else if (looksLikeEmail(raw)) cls = 'email';
           return `<span class="${cls}">${match}</span>`;
         }
-        if (/true|false/.test(match)) return `<span class="b">${match}</span>`;
-        if (/null/.test(match)) return `<span class="nl">${match}</span>`;
-        if (/[{}\[\],:]/.test(match)) return `<span class="p">${match}</span>`;
+        // BOOLEANS
+        if (/^(true|false)$/.test(match)) return `<span class="b">${match}</span>`;
+        // NULL
+        if (/^null$/.test(match)) return `<span class="nl">${match}</span>`;
+        // PUNCTUATION
+        if (/^[{}\[\],:]$/.test(match)) return `<span class="p">${match}</span>`;
+        // NUMBER
         return `<span class="n">${match}</span>`;
       }
     );
-  }
-
-  /* ─────────── DASHED ALIGNED VIEW (for ON mode) ─────────── */
-  /* Fixed key column = 14 chars. Remaining filled with '-' */
-  const KEY_COL = 14;
-
-  function dashRow(key, valueHtml, indent) {
-    indent = indent || '';
-    const keyStr = String(key);
-    const visibleKey = indent + keyStr;
-    // Visible length without HTML — indent uses spaces
-    const visibleLen = visibleKey.length;
-    const dashes = Math.max(1, KEY_COL - visibleLen + 1);
-    const dashStr = '-'.repeat(dashes);
-
-    const keyCls = isSensitiveKey(keyStr) ? 'fv-key sensitive' : 'fv-key';
-    return `<span class="fv-line">` +
-      `<span class="${keyCls}">${escapeHtml(indent + keyStr)}</span>` +
-      `<span class="fv-dash"> ${dashStr} </span>` +
-      `<span class="fv-val ${valClassRaw(valueHtml)}">${valueHtml}</span>` +
-    `</span>`;
-  }
-
-  // crude helper to detect class based on raw text
-  function valClassRaw(html) {
-    const txt = String(html).replace(/<[^>]+>/g, '');
-    if (txt === 'null') return 'nul';
-    if (txt === 'true' || txt === 'false') return 'bool';
-    if (looksLikeUrl(txt)) return 'url';
-    if (looksLikeEmail(txt)) return 'email';
-    if (/^-?\d+(\.\d+)?$/.test(txt)) return 'num';
-    return '';
-  }
-
-  function renderValueHtml(v) {
-    if (v === null || v === undefined) return 'null';
-    if (typeof v === 'boolean') return v ? 'true' : 'false';
-    return escapeHtml(String(v));
-  }
-
-  /* Renders object as dashed aligned rows — only keys that EXIST */
-  function renderDashed(obj) {
-    if (obj === null || obj === undefined) return '';
-    if (typeof obj !== 'object') return `<span class="fv-line">${escapeHtml(String(obj))}</span>`;
-
-    let html = '';
-    if (Array.isArray(obj)) {
-      obj.forEach((item, i) => {
-        if (typeof item === 'object' && item !== null) {
-          html += renderDashed(item);
-        } else {
-          html += dashRow(String(i + 1), renderValueHtml(item), '');
-        }
-      });
-      return html;
-    }
-
-    const keys = Object.keys(obj);
-    keys.forEach(k => {
-      const v = obj[k];
-      // Skip null/undefined/empty — "jo nahi aayega wo mat show kar"
-      if (v === null || v === undefined || v === '') return;
-      if (Array.isArray(v)) {
-        if (v.length === 0) return;
-        if (v.every(x => typeof x !== 'object' || x === null)) {
-          // Simple array — comma separated
-          const joined = v.map(x => renderValueHtml(x)).join(', ');
-          html += dashRow(k, joined, '');
-        } else {
-          // Array of objects
-          html += dashRow(k, `[${v.length}]`, '');
-          v.forEach((item, i) => {
-            const sub = renderDashed(item).replace(/<span class="fv-line">/g, `<span class="fv-line">  ${i + 1}. `);
-            html += sub;
-          });
-        }
-      } else if (typeof v === 'object') {
-        html += dashRow(k, '{…}', '');
-        // Indented nested
-        const sub = renderDashed(v);
-        html += sub.replace(/<span class="fv-line">/g, '<span class="fv-line">  ');
-      } else {
-        html += dashRow(k, renderValueHtml(v), '');
-      }
-    });
-    return html;
   }
 
   /* ─────────── PRINT ─────────── */
@@ -629,13 +511,8 @@
 
   function printJson(data) {
     const d = document.createElement('div');
-    if (autoSyncOn) {
-      d.className = 'formatted-view';
-      d.innerHTML = renderDashed(data);
-    } else {
-      d.className = 'json';
-      d.innerHTML = highlightJson(data);
-    }
+    d.className = 'json';
+    d.innerHTML = highlightJson(data);
     log.appendChild(d);
     while (log.children.length > 60) log.removeChild(log.firstChild);
     log.scrollTop = log.scrollHeight;
@@ -710,17 +587,6 @@
     form.classList.remove('err');
   });
 
-  /* ─────────── AUTO-SYNC TOGGLE ─────────── */
-  $('sync').addEventListener('click', e => {
-    autoSyncOn = e.currentTarget.classList.toggle('on');
-    e.currentTarget.setAttribute('aria-checked', autoSyncOn);
-    print('# auto_sync = ' + (autoSyncOn ? 'True' : 'False'), 'l-dim');
-    if (lastResponse) {
-      print('# re-rendering…', 'l-dim');
-      printJson(lastResponse.data);
-    }
-  });
-
   /* ─────────── COOLDOWN ─────────── */
   function tick() {
     const left = cooldownEnd - Date.now();
@@ -783,8 +649,7 @@
         'Accept': 'application/json, text/plain, */*',
         ...(options.headers || {})
       },
-      cache: 'no-store',
-      credentials: 'same-origin'
+      cache: 'no-store'
     });
 
     const text = await response.text();
@@ -805,11 +670,7 @@
   function openOverlay(data, title, statusText) {
     overlayTitle.textContent = title || 'response.json';
     overlayBadge.textContent = statusText || '200 OK';
-    if (autoSyncOn) {
-      overlayContent.innerHTML = `<div class="formatted-view">${renderDashed(data)}</div>`;
-    } else {
-      overlayContent.innerHTML = `<pre>${highlightJson(data)}</pre>`;
-    }
+    overlayContent.innerHTML = `<pre>${highlightJson(data)}</pre>`;
     overlay.classList.add('show');
     document.body.style.overflow = 'hidden';
   }

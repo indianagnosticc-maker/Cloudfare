@@ -504,9 +504,9 @@
   </div>
 
   <div class="tabs" id="tabs">
-    <button class="tab on" data-mod="osint"></i>N-OSINT</button>
-    <button class="tab" data-mod="v_osint"></i>V-OSINT</button>
-    <button class="tab" data-mod="t_osint"></i>T-OSINT</button>
+    <button class="tab on" data-mod="number information osint"></i>N-OSINT</button>
+    <button class="tab" data-mod="vehicle information osint"></i>V-OSINT</button>
+    <button class="tab" data-mod="telegram information osint"></i>T-OSINT</button>
     <button class="tab" data-mod="sms_b"></i>S-BOMB</button>
     <div class="ind" id="ind"></div>
   </div>
@@ -558,7 +558,7 @@
       </svg>
     </button>
     <span class="overlay-title" id="overlayTitle">data.json</span>
-    <span class="overlay-badge" id="overlayBadge">200 OK</span>
+    <span class="overlay-badge" id="overlayBadge"></span>
   </div>
   <div class="overlay-content" id="overlayContent"></div>
 </div>
@@ -802,7 +802,7 @@
 
   function openOverlay(data, title, statusText) {
     overlayTitle.textContent = title || 'response.json';
-    overlayBadge.textContent = statusText || '200 OK';
+    overlayBadge.textContent = statusText || '';
     overlayContent.innerHTML = '<pre>' + highlightJson(data) + '</pre>';
     overlay.classList.add('show');
     document.body.style.overflow = 'hidden';
@@ -823,7 +823,7 @@
     if (!lastResponse) return;
     const title = (lastResponse.module || 'response') + '_' +
                   (lastResponse.query || 'data') + '.json';
-    openOverlay(lastResponse.data, title, '200 OK');
+    openOverlay(lastResponse.data, title, '');
   });
 
   function showToast(msg) {

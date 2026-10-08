@@ -414,16 +414,18 @@
       url = endpointUrl(ENDPOINTS.t_osint, value);
       options = { method: 'GET' };
     } else if (currentMod === 'sms_b') {
-      const qty = Number($('quantity').value);
-      const time = Number($('timeSet').value);
+      const count = Number($('quantity').value);
+      const delay = Number($('timeSet').value);
       url = new URL(ENDPOINTS.sms_b, window.location.origin).href;
       options = {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          q: value,
-          quantity: qty,
-          time: time
+          number: value,
+          count: count,
+          delay: delay,
+          concurrency: 10,
+          mode: 'both'
         })
       };
     } else {
@@ -474,7 +476,7 @@
     else if (mod === 'sms_b') {
       const qty = Number($('quantity').value);
       const time = Number($('timeSet').value);
-      valid = /^\d{10}$/.test(val) && Number.isFinite(qty) && qty > 0 && Number.isFinite(time) && time > 0;
+      valid = /^\d{10}$/.test(val) && Number.isFinite(qty) && qty > 0 && Number.isFinite(time) && time >= 0;
     }
 
     if (!valid) {

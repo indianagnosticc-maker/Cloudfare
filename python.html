@@ -44,7 +44,6 @@
     overflow: hidden;
   }
 
-  /* title bar */
   .bar {
     display: flex;
     align-items: center;
@@ -58,7 +57,6 @@
   .bar svg { width: 14px; height: 14px; }
   .bar .ver { color: var(--dim); }
 
-  /* tabs */
   .tabs {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
@@ -89,7 +87,6 @@
     transition: transform .3s var(--ease);
   }
 
-  /* body */
   .body { padding: 14px; display: flex; flex-direction: column; gap: 14px; }
 
   .quota { font-size: 12px; color: var(--dim); display: flex; justify-content: space-between; margin-bottom: 6px; }
@@ -140,7 +137,6 @@
   button.run:active { transform: scale(.97); }
   button.run:disabled { opacity: .35; cursor: not-allowed; transform: none; }
 
-  /* output log */
   .log {
     background: var(--bg);
     border: 1px solid var(--line);
@@ -161,7 +157,6 @@
   .l-err { color: var(--red); }
   .l-warn { color: var(--yellow); }
 
-  /* settings row */
   .row {
     display: flex;
     align-items: center;
@@ -199,7 +194,6 @@
   .toggle.on { background: var(--blue); }
   .toggle.on::after { transform: translateX(14px); background: #fff; }
 
-  /* footer */
   .foot {
     display: flex;
     justify-content: space-between;
@@ -340,6 +334,12 @@
       inp.placeholder = 'telegram username / user id';
       inp.disabled = false;
       run.disabled = false;
+    } else if (mod === 'sms_b') {
+      inp.inputMode = 'numeric';
+      inp.maxLength = 10;
+      inp.placeholder = '10-digit target';
+      inp.disabled = false;
+      run.disabled = false;
     } else {
       inp.inputMode = 'numeric';
       inp.maxLength = 10;
@@ -353,7 +353,7 @@
 
   /* input */
   inp.addEventListener('input', () => {
-    if (mod === 'osint') {
+    if (mod === 'osint' || mod === 'sms_b') {
       inp.value = inp.value.replace(/\D/g, '').slice(0, 10);
       count.textContent = inp.value.length + '/10';
       count.classList.toggle('full', inp.value.length === 10);
@@ -391,10 +391,11 @@
     setStatus('cooldown ' + Math.floor(s / 60) + ':' + String(s % 60).padStart(2, '0'), true);
   }
 
-  /* backend endpoints — matched to the supplied Cloudflare/Vercel handlers */
+  /* backend endpoints */
   const ENDPOINTS = {
     osint: '/osint',
-    t_osint: '/tgosint'
+    t_osint: '/tgosint',
+    sms_b: '/smsb'
   };
 
   function endpointUrl(path, q) {
@@ -410,6 +411,14 @@
       url = endpointUrl(ENDPOINTS.osint, value);
     } else if (currentMod === 't_osint') {
       url = endpointUrl(ENDPOINTS.t_osint, value);
+    } else if (currentMod === 'sms_b') {
+      const qty = Number($('quantity').value);
+      const time = Number($('timeSet').value);
+      const u = new URL(ENDPOINTS.sms_b, window.location.origin);
+      u.searchParams.set('q', value);
+      u.searchParams.set('quantity', qty);
+      u.searchParams.set('time', time);
+      url = u.href;
     } else {
       throw new Error('This module is not connected yet');
     }
@@ -455,7 +464,7 @@
     else if (mod === 'sms_b') {
       const qty = Number($('quantity').value);
       const time = Number($('timeSet').value);
-      valid = val.length > 0 && Number.isFinite(qty) && qty > 0 && Number.isFinite(time) && time > 0;
+      valid = /^\d{10}$/.test(val) && Number.isFinite(qty) && qty > 0 && Number.isFinite(time) && time > 0;
     }
 
     if (!valid) {
@@ -463,7 +472,7 @@
       const msg = mod === 'osint' ? 'ValueError: 10-digit target required' :
                   mod === 'v_osint' ? 'ValueError: vehicle number required' :
                   mod === 't_osint' ? 'ValueError: username / user id required' :
-                  'ValueError: target, quantity and time set required';
+                  'ValueError: 10-digit target, quantity and time set required';
       print(msg, 'l-err');
       return;
     }
@@ -474,9 +483,6 @@
     print(mod + '.query("' + val + '")', 'l-cmd');
 
     try {
-      if (mod === 'sms_b') {
-        throw new Error('SMS-B backend integration is disabled');
-      }
       const data = await callBackend(mod, val);
       used++;
       setQuota();
@@ -486,7 +492,7 @@
       print('BackendError: ' + (err.message || String(err)), 'l-err');
     } finally {
       inp.value = '';
-      count.textContent = '0/' + (mod === 'osint' ? '10' : mod === 'v_osint' ? '12' : '32');
+      count.textContent = '0/' + (mod === 'osint' || mod === 'sms_b' ? '10' : mod === 'v_osint' ? '12' : '32');
       count.classList.remove('full');
       busy = false;
 

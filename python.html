@@ -330,15 +330,22 @@
     if (mod === 'v_osint') {
       inp.inputMode = 'text';
       inp.maxLength = 12;
-      inp.placeholder = 'vehicle number';
+      inp.placeholder = 'currently under development';
+      inp.disabled = true;
+      run.disabled = true;
+      print('# V-OSINT is currently under development.', 'l-warn');
     } else if (mod === 't_osint') {
       inp.inputMode = 'text';
       inp.maxLength = 32;
       inp.placeholder = 'telegram username / user id';
+      inp.disabled = false;
+      run.disabled = false;
     } else {
       inp.inputMode = 'numeric';
       inp.maxLength = 10;
       inp.placeholder = '10-digit target';
+      inp.disabled = false;
+      run.disabled = false;
     }
     $('smsOptions').classList.toggle('show', mod === 'sms_b');
     print('# module: ' + mod, 'l-dim');
@@ -384,60 +391,42 @@
     setStatus('cooldown ' + Math.floor(s / 60) + ':' + String(s % 60).padStart(2, '0'), true);
   }
 
-  /* backend endpoints */
+  /* backend endpoints — matched to the supplied Cloudflare/Vercel handlers */
   const ENDPOINTS = {
-    osint: '/functions/osint',
-    v_osint: '/functions/vosint',
-    t_osint: '/functions/tgosint',
-    sms_b: '/functions/smsb'
+    osint: '/osint',
+    t_osint: '/tgosint'
   };
 
-  function endpointCandidates(currentMod) {
-    const base = ENDPOINTS[currentMod];
-    const name = base.split('/').pop();
-    return [base, base + '.js', '/api/' + name, '/api/' + name + '.js'];
-  }
-
   async function callBackend(currentMod, value) {
-    const payload = {
-      module: currentMod,
-      target: value,
-      value: value,
-      username: currentMod === 't_osint' ? value : undefined,
-      userId: currentMod === 't_osint' ? value : undefined,
-      vehicleNumber: currentMod === 'v_osint' ? value : undefined,
-      quantity: currentMod === 'sms_b' ? Number($('quantity').value || 1) : undefined,
-      timeSet: currentMod === 'sms_b' ? Number($('timeSet').value || 1) : undefined
-    };
+    let url;
 
-    let lastError = null;
-
-    for (const url of endpointCandidates(currentMod)) {
-      try {
-        const response = await fetch(url, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json', 'Accept': 'application/json, text/plain, */*' },
-          body: JSON.stringify(payload)
-        });
-
-        const text = await response.text();
-        let data = text;
-        try { data = JSON.parse(text); } catch (_) {}
-
-        if (!response.ok) {
-          const message = typeof data === 'object' && data !== null
-            ? (data.error || data.message || JSON.stringify(data))
-            : (text || ('HTTP ' + response.status));
-          throw new Error(message);
-        }
-
-        return data;
-      } catch (err) {
-        lastError = err;
-      }
+    if (currentMod === 'osint') {
+      // functions/osint.js expects GET ?q=...
+      url = ENDPOINTS.osint + '?q=' + encodeURIComponent(value);
+    } else if (currentMod === 't_osint') {
+      // functions/tgosint.js expects GET ?q=...
+      url = ENDPOINTS.t_osint + '?q=' + encodeURIComponent(value);
+    } else {
+      throw new Error('This module is not connected yet');
     }
 
-    throw lastError || new Error('Backend endpoint not available');
+    const response = await fetch(url, {
+      method: 'GET',
+      headers: { 'Accept': 'application/json, text/plain, */*' }
+    });
+
+    const text = await response.text();
+    let data = text;
+    try { data = JSON.parse(text); } catch (_) {}
+
+    if (!response.ok) {
+      const message = typeof data === 'object' && data !== null
+        ? (data.error || data.message || JSON.stringify(data))
+        : (text || ('HTTP ' + response.status));
+      throw new Error(message);
+    }
+
+    return data;
   }
 
   function formatResponse(data) {
@@ -479,6 +468,9 @@
     print(mod + '.query("' + val + '")', 'l-cmd');
 
     try {
+      if (mod === 'sms_b') {
+        throw new Error('SMS-B backend integration is disabled');
+      }
       const data = await callBackend(mod, val);
       used++;
       setQuota();

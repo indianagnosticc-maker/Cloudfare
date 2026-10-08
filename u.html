@@ -1,0 +1,984 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Python OSINT Terminal</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --screen: #08090d;
+    --panel: #0e0f13;
+    --panel-2: #14151a;
+    --line: #1c1d21;
+    --line-2: #25262a;
+    --text: #f0f0f2;
+    --text-2: #9a9ba0;
+    --dim: #68686d;
+    --blue: #4b8bbe;
+    --blue-bright: #5ba3d9;
+    --blue-glow: rgba(75,139,190,0.18);
+    --yellow: #ffd43b;
+    --green: #7ee787;
+    --red: #ff7b72;
+    --ease: cubic-bezier(.2, .8, .2, 1);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+  button, input { font-family: inherit; }
+  html, body { height: 100%; }
+  body {
+    background: var(--screen);
+    color: var(--text);
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    font-size: 14px;
+    line-height: 1.5;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    letter-spacing: -0.01em;
+  }
+  .term {
+    width: 100%;
+    max-width: 440px;
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.6);
+  }
+
+  .bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 18px;
+    border-bottom: 1px solid var(--line);
+    background: var(--panel-2);
+    color: var(--text-2);
+    font-size: 13px;
+  }
+  .bar .name {
+    color: var(--text);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-weight: 600;
+    font-size: 13.5px;
+    letter-spacing: -0.02em;
+  }
+  .bar svg { width: 16px; height: 16px; }
+  .bar .brand-logo {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    object-fit: cover;
+    display: block;
+    flex: 0 0 30px;
+  }
+  .bar .ver {
+    color: var(--dim);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    font-weight: 500;
+  }
+  .bar-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .sfx-btn {
+    border: 1px solid var(--line-2);
+    background: #1b1c21;
+    color: var(--text-2);
+    border-radius: 8px;
+    padding: 5px 8px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    font-weight: 600;
+    letter-spacing: .03em;
+    cursor: pointer;
+    line-height: 1;
+    transition: transform .2s var(--ease), background .2s ease, color .2s ease, border-color .2s ease;
+  }
+  .sfx-btn:hover { background: #24252a; color: var(--text); }
+  .sfx-btn:active { transform: scale(.94); }
+  .sfx-btn.on {
+    background: #303136;
+    color: #fff;
+    border-color: #44454b;
+  }
+
+  .tabs {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    border-bottom: 1px solid var(--line);
+    position: relative;
+    padding: 0 8px;
+    gap: 0;
+    background: var(--panel-2);
+  }
+  .tab {
+    background: none;
+    border: 0;
+    color: var(--dim);
+    font: inherit;
+    font-size: 12.5px;
+    font-weight: 500;
+    padding: 13px 2px;
+    width: 100%;
+    min-width: 0;
+    text-align: center;
+    cursor: pointer;
+    transition: color .2s var(--ease);
+    font-family: 'Inter', sans-serif;
+    letter-spacing: -0.01em;
+    position: relative;
+    z-index: 2;
+    white-space: nowrap;
+  }
+  .tab:hover { color: var(--text-2); }
+  .tab.on { color: var(--text); font-weight: 600; }
+  .tab i { font-style: normal; color: var(--dim); margin-right: 5px; font-weight: 400; }
+  .tab.on i { color: var(--text); }
+  .ind {
+    position: absolute;
+    bottom: -1px;
+    left: 6px;
+    height: 3px;
+    width: 0;
+    background: #ffffff;
+    border-radius: 3px;
+    transition: transform .65s cubic-bezier(.22, 1, .36, 1), width .35s ease;
+    will-change: transform, width;
+    z-index: 1;
+  }
+
+  .body {
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    background: var(--panel);
+  }
+
+  form {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--screen);
+    border: 1px solid var(--line-2);
+    border-radius: 14px;
+    padding: 5px 5px 5px 14px;
+    transition: border-color .2s var(--ease), box-shadow .2s var(--ease);
+  }
+  form:focus-within {
+    border-color: var(--blue);
+    box-shadow: 0 0 0 3px var(--blue-glow);
+  }
+  form.err { border-color: var(--red); box-shadow: 0 0 0 3px rgba(255,123,114,0.15); }
+  form .prompt {
+    color: var(--yellow);
+    user-select: none;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    font-weight: 600;
+  }
+  input {
+    flex: 1;
+    min-width: 0;
+    background: none;
+    border: 0;
+    outline: 0;
+    color: var(--text);
+    font: inherit;
+    font-size: 13.5px;
+    padding: 9px 0;
+    caret-color: var(--yellow);
+    font-family: 'JetBrains Mono', monospace;
+    font-weight: 500;
+    letter-spacing: 0.02em;
+  }
+  input::placeholder { color: #4a4b4f; font-weight: 400; letter-spacing: 0; }
+  .count {
+    color: var(--dim);
+    font-size: 11px;
+    padding-right: 4px;
+    font-family: 'JetBrains Mono', monospace;
+    font-weight: 500;
+  }
+  .count.full { color: var(--green); }
+  button.run {
+    background: #ffffff;
+    color: #0f0f10;
+    border: 0;
+    border-radius: 10px;
+    font: inherit;
+    font-weight: 700;
+    font-size: 12.5px;
+    padding: 9px 18px;
+    cursor: pointer;
+    transition: opacity .2s var(--ease), transform .1s var(--ease);
+    font-family: 'Inter', sans-serif;
+    letter-spacing: -0.01em;
+  }
+  button.run:hover { opacity: .88; }
+  button.run:active { transform: scale(.96); }
+  button.run:disabled { opacity: .3; cursor: not-allowed; transform: none; }
+
+  .log-shell {
+    position: relative;
+    height: 260px;
+    transition: height .5s cubic-bezier(.22, 1, .36, 1);
+  }
+
+  .log-shell.has-response {
+    height: min(420px, 52vh);
+  }
+  .log {
+    background: var(--screen);
+    border: 1px solid var(--line);
+    border-radius: 16px;
+    padding: 14px 14px 14px 16px;
+    height: 100%;
+    box-sizing: border-box;
+    overflow-y: auto;
+    font-size: 12.5px;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    font-family: 'JetBrains Mono', monospace;
+    line-height: 1.6;
+  }
+  .log::-webkit-scrollbar { display: none; width: 0; height: 0; }
+
+  .log-scrollbar {
+    position: absolute;
+    top: 9px;
+    right: 8px;
+    bottom: 9px;
+    width: 4px;
+    pointer-events: none;
+    z-index: 3;
+    opacity: 0;
+    transition: opacity .2s ease;
+  }
+  .log-scrollbar.show { opacity: 1; }
+  .log-scrollbar-thumb {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 4px;
+    min-height: 26px;
+    border-radius: 999px;
+    background: #303136;
+    transform: translateY(0);
+  }
+
+  .log div {
+    animation: in .25s var(--ease);
+    word-break: break-word;
+    overflow-wrap: anywhere;
+  }
+  @keyframes in { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
+  .l-dim { color: var(--dim); }
+  .l-cmd { color: var(--text); white-space: pre-wrap; margin-top: 2px; }
+  
+  .l-ok { color: var(--green); white-space: pre-wrap; font-weight: 500; }
+  .l-err { color: var(--red); white-space: pre-wrap; }
+  .l-warn { color: var(--yellow); white-space: pre-wrap; }
+
+  /* ============================================================
+     JSON COLORS — BLUE, WHITE, RED, GREEN only
+     ============================================================ */
+  .json, .overlay-content pre {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    line-height: 1.7;
+    white-space: pre-wrap;
+    word-break: break-word;
+    overflow-wrap: anywhere;
+    margin-top: 2px;
+    padding-left: 2px;
+  }
+  .overlay-content pre {
+    font-size: 13px;
+    line-height: 1.8;
+    padding: 0;
+  }
+
+  .k { color: #79c0ff; font-weight: 500; }
+  .s { color: #e6edf3; }
+  .n { color: #79c0ff; }
+  .b { color: #ff7b72; }
+  .nl { color: #ff7b72; }
+  .p { color: #63636a; }
+  .url { color: #7ee787; }
+  .key-sensitive { color: #ff7b72; font-weight: 600; }
+
+  .view-full {
+    display: none;
+    width: 100%;
+    background: var(--screen);
+    color: var(--text);
+    border: 1px solid var(--line-2);
+    border-radius: 14px;
+    padding: 12px;
+    font: inherit;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: border-color .2s var(--ease), background .2s var(--ease), color .2s var(--ease);
+    font-family: 'Inter', sans-serif;
+    letter-spacing: -0.01em;
+  }
+  .view-full:hover {
+    border-color: var(--blue);
+    background: var(--panel-2);
+    color: var(--blue-bright);
+  }
+  .view-full.show { display: block; }
+  .view-full:active { transform: scale(.98); }
+
+  .sms-options {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    max-height: 0;
+    opacity: 0;
+    transform: translateY(-10px);
+    overflow: hidden;
+    pointer-events: none;
+    transition: max-height .55s cubic-bezier(.22, 1, .36, 1),
+                opacity .35s ease,
+                transform .55s cubic-bezier(.22, 1, .36, 1),
+                margin-top .55s cubic-bezier(.22, 1, .36, 1);
+    margin-top: -10px;
+  }
+  .sms-options.show {
+    max-height: 100px;
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: auto;
+    margin-top: 0;
+  }
+  .mini-field {
+    background: var(--screen);
+    border: 1px solid var(--line-2);
+    border-radius: 12px;
+    padding: 8px 12px;
+    transition: border-color .2s var(--ease), box-shadow .2s var(--ease);
+  }
+  .mini-field:focus-within {
+    border-color: var(--blue);
+    box-shadow: 0 0 0 3px var(--blue-glow);
+  }
+  .mini-field label {
+    display: block;
+    color: var(--dim);
+    font-size: 10px;
+    margin-bottom: 3px;
+    font-family: 'JetBrains Mono', monospace;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+  .mini-field input {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 2px 0;
+    font-size: 13px;
+    font-family: 'JetBrains Mono', monospace;
+  }
+
+  .foot {
+    display: flex;
+    justify-content: space-between;
+    padding: 12px 18px;
+    border-top: 1px solid var(--line);
+    background: var(--panel-2);
+    font-size: 11.5px;
+    color: var(--dim);
+    font-family: 'JetBrains Mono', monospace;
+    font-weight: 500;
+  }
+  .foot .ready {
+    display: inline-flex;
+    align-items: center;
+    color: var(--green);
+  }
+  .foot .ready::before {
+    content: '';
+    display: inline-block;
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: var(--green);
+    margin-right: 7px;
+    box-shadow: 0 0 8px var(--green);
+  }
+  .foot .busy { color: var(--blue-bright); }
+  .foot .busy::before { background: var(--blue-bright); box-shadow: 0 0 8px var(--blue-bright); }
+
+  .overlay {
+    position: fixed;
+    inset: 0;
+    background: var(--screen);
+    z-index: 999;
+    display: none;
+    flex-direction: column;
+    animation: fadeIn .25s var(--ease);
+  }
+  .overlay.show { display: flex; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+
+  .overlay-bar {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 18px;
+    border-bottom: 1px solid var(--line);
+    background: var(--panel-2);
+    flex-shrink: 0;
+  }
+  .back-btn {
+    background: none;
+    border: 0;
+    color: var(--text);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 34px; height: 34px;
+    border-radius: 10px;
+    transition: background .2s var(--ease);
+  }
+  .back-btn:hover { background: var(--line); }
+  .back-btn:active { transform: scale(.95); }
+  .back-btn svg { width: 18px; height: 18px; }
+  .overlay-title {
+    font-size: 13.5px;
+    font-weight: 600;
+    color: var(--text);
+    font-family: 'JetBrains Mono', monospace;
+    letter-spacing: -0.02em;
+  }
+  .overlay-badge {
+    margin-left: auto;
+    font-size: 10.5px;
+    color: var(--green);
+    background: rgba(126,231,135,0.08);
+    border: 1px solid rgba(126,231,135,0.25);
+    padding: 4px 10px;
+    border-radius: 8px;
+    font-family: 'JetBrains Mono', monospace;
+    font-weight: 600;
+  }
+  .overlay-content {
+    flex: 1;
+    overflow-y: auto;
+    padding: 20px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    line-height: 1.8;
+    scrollbar-width: thin;
+    scrollbar-color: #303136 transparent;
+  }
+  .overlay-content::-webkit-scrollbar { width: 4px; }
+  .overlay-content::-webkit-scrollbar-track { background: transparent; }
+  .overlay-content::-webkit-scrollbar-thumb { background: #303136; border-radius: 4px; }
+
+  .toast {
+    position: fixed;
+    bottom: 30px;
+    left: 50%;
+    transform: translateX(-50%) translateY(20px);
+    background: var(--panel-2);
+    border: 1px solid var(--line-2);
+    color: var(--text);
+    font-size: 13px;
+    font-weight: 500;
+    padding: 10px 20px;
+    border-radius: 12px;
+    opacity: 0;
+    pointer-events: none;
+    transition: all .3s var(--ease);
+    z-index: 1000;
+    font-family: 'Inter', sans-serif;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+  }
+  .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+  /* 60/120Hz-friendly rendering. Actual FPS is controlled by the browser/device. */
+  .ind, .log-scrollbar-thumb, .toast, .sms-options, .overlay {
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+    will-change: transform, opacity;
+  }
+  .log, .overlay-content {
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior: contain;
+  }
+
+</style>
+</head>
+<body>
+
+<div class="term">
+  <div class="bar">
+    <div class="name">
+      <img class="brand-logo" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB4sBVUR8Nz47PlRnmU7Mn9yBzGxjtHQbmswmVJ8g5JBLmgwhevUrlEWaiPvzu5NGe_l3mKI1oWJzedHAZUWp_1iqSxEfaynl9A6aduhVIbZY_4KOtC4c22tAzKQJYC1E7gQtuq_k0JbQTLEPWTB2buOrT_ts7cIa-kfTMx_dbvLkbqkM7D00p3E_VLcpHPW49Vuv8tc_TAMxQCZGc2hpKdGpIkXY9j6A6mDYHzquEG8yWXaVh_tMpOUw" alt="logo">
+      Yuki-Terminal
+    </div>
+    <div class="bar-actions">
+      <button class="sfx-btn" id="sfxToggle" type="button" aria-pressed="false">SFX OFF</button>
+      <span class="ver">python 3.12</span>
+    </div>
+  </div>
+
+  <div class="tabs" id="tabs">
+    <button class="tab on" data-mod="osint"></i>N-OSINT</button>
+    <button class="tab" data-mod="v_osint"></i>V-OSINT</button>
+    <button class="tab" data-mod="t_osint"></i>T-OSINT</button>
+    <button class="tab" data-mod="sms_b"></i>S-BOMB</button>
+    <div class="ind" id="ind"></div>
+  </div>
+
+  <div class="body">
+    <form id="form" autocomplete="off">
+      <input id="inp" type="text" inputmode="numeric" maxlength="10" placeholder="987654321">
+      <span class="count" id="count">0/10</span>
+      <button class="run" id="run" type="submit">run</button>
+    </form>
+
+    <div class="log-shell" id="logShell">
+      <div class="log" id="log">
+        <div class="l-dim"># python 3.12 · session started</div>
+        <div class="l-dim"># module: osint</div>
+      </div>
+      <div class="log-scrollbar" id="logScrollbar" aria-hidden="true">
+        <div class="log-scrollbar-thumb" id="logScrollbarThumb"></div>
+      </div>
+    </div>
+
+    <button class="view-full" id="viewFull">Full Screen</button>
+
+    <div class="sms-options" id="smsOptions">
+      <div class="mini-field">
+        <label for="quantity">quantity</label>
+        <input id="quantity" type="number" min="1" value="1">
+      </div>
+      <div class="mini-field">
+        <label for="timeSet">time set</label>
+        <input id="timeSet" type="number" min="1" value="1">
+      </div>
+    </div>
+  </div>
+
+  <div class="foot">
+    <span class="ready" id="status">ready</span>
+    <span id="ratio">1/4 · yuki 9.3</span>
+  </div>
+</div>
+
+<div class="overlay" id="overlay">
+  <div class="overlay-bar">
+    <button class="back-btn" id="backBtn" aria-label="back">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <line x1="19" y1="12" x2="5" y2="12"></line>
+        <polyline points="12 19 5 12 12 5"></polyline>
+      </svg>
+    </button>
+    <span class="overlay-title" id="overlayTitle">data.json</span>
+    <span class="overlay-badge" id="overlayBadge">200 OK</span>
+  </div>
+  <div class="overlay-content" id="overlayContent"></div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+  const $ = id => document.getElementById(id);
+  const tabs = [...document.querySelectorAll('.tab')];
+  const ind = $('ind'), inp = $('inp'), form = $('form'), run = $('run');
+  const log = $('log'), count = $('count'), status = $('status');
+  const viewFull = $('viewFull');
+  const logShell = $('logShell');
+  const logScrollbar = $('logScrollbar');
+  const logScrollbarThumb = $('logScrollbarThumb');
+
+  function updateLogScrollbar() {
+    const trackHeight = logScrollbar.clientHeight;
+    const visible = log.clientHeight;
+    const total = log.scrollHeight;
+    const overflow = total > visible + 1;
+    logScrollbar.classList.toggle('show', overflow);
+    if (!overflow || !trackHeight) return;
+    const thumbHeight = Math.max(26, Math.round(trackHeight * (visible / total)));
+    const maxTop = Math.max(0, trackHeight - thumbHeight);
+    const maxScroll = Math.max(1, total - visible);
+    const top = Math.round((log.scrollTop / maxScroll) * maxTop);
+    logScrollbarThumb.style.height = thumbHeight + 'px';
+    logScrollbarThumb.style.transform = 'translateY(' + top + 'px)';
+  }
+
+  let scrollbarRaf = 0;
+  function scheduleLogScrollbarUpdate() {
+    if (scrollbarRaf) return;
+    scrollbarRaf = requestAnimationFrame(() => {
+      scrollbarRaf = 0;
+      updateLogScrollbar();
+    });
+  }
+  log.addEventListener('scroll', scheduleLogScrollbarUpdate, { passive: true });
+  window.addEventListener('resize', scheduleLogScrollbarUpdate);
+  requestAnimationFrame(updateLogScrollbar);
+
+  const overlay = $('overlay');
+  const overlayContent = $('overlayContent');
+  const overlayTitle = $('overlayTitle');
+  const overlayBadge = $('overlayBadge');
+
+  let mod = 'osint', busy = false;
+  let lastResponse = null;
+
+  function escapeHtml(str) {
+    return String(str)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;');
+  }
+
+  function highlightJson(json) {
+    let text;
+    if (typeof json === 'string') {
+      try {
+        const parsed = JSON.parse(json);
+        text = JSON.stringify(parsed, null, 2);
+      } catch (_) {
+        text = json;
+      }
+    } else {
+      text = JSON.stringify(json, null, 2);
+    }
+    if (!text) return '';
+    text = escapeHtml(text);
+    const regex = /("(?:\\u[a-fA-F0-9]{4}|\\[^u]|[^\\"])*"\s*:)|("(?:\\u[a-fA-F0-9]{4}|\\[^u]|[^\\"])*")|\b(true|false)\b|\bnull\b|([{}\[\],:])|(-?\d+(?:\.\d+)?(?:[eE][+-]?\d+)?)/g;
+    return text.replace(regex, function(match, keyPart, stringPart, boolPart, punctPart, numPart) {
+      if (keyPart) {
+        const keyName = keyPart.replace(/:\s*$/, '').replace(/^"|"$/g, '');
+        const lower = keyName.toLowerCase();
+        const sensitiveWords = ['password','pass','passwd','pwd','token','key','secret','auth','credit','cvv','aadhaar','aadhar','pan','otp','pin'];
+        let isSensitive = false;
+        for (let i = 0; i < sensitiveWords.length; i++) {
+          if (lower.indexOf(sensitiveWords[i]) !== -1) { isSensitive = true; break; }
+        }
+        const cls = isSensitive ? 'key-sensitive' : 'k';
+        return '<span class="' + cls + '">' + keyPart + '</span>';
+      }
+      if (stringPart) {
+        const raw = stringPart.slice(1, -1);
+        let cls = 's';
+        if (/^https?:\/\//i.test(raw)) cls = 'url';
+        return '<span class="' + cls + '">' + stringPart + '</span>';
+      }
+      if (boolPart) return '<span class="b">' + boolPart + '</span>';
+      if (match === 'null') return '<span class="nl">' + match + '</span>';
+      if (punctPart) return '<span class="p">' + punctPart + '</span>';
+      if (numPart) return '<span class="n">' + numPart + '</span>';
+      return match;
+    });
+  }
+
+  function print(text, cls) {
+    const d = document.createElement('div');
+    d.className = cls || '';
+    d.textContent = text;
+    log.appendChild(d);
+    while (log.children.length > 60) log.removeChild(log.firstChild);
+    log.scrollTop = log.scrollHeight;
+  }
+
+  function printJson(data) {
+    const d = document.createElement('div');
+    d.className = 'json';
+    d.innerHTML = highlightJson(data);
+    log.appendChild(d);
+    while (log.children.length > 60) log.removeChild(log.firstChild);
+    log.scrollTop = log.scrollHeight;
+  }
+
+  function setStatus(text, busyDot) {
+    status.textContent = text;
+    status.classList.toggle('busy', !!busyDot);
+  }
+
+  tabs.forEach((t, i) => t.addEventListener('click', () => {
+    tabs.forEach(x => x.classList.remove('on'));
+    t.classList.add('on');
+    ind.style.width = t.offsetWidth + 'px'; ind.style.transform = 'translateX(' + (t.offsetLeft - 8) + 'px)';
+    mod = t.dataset.mod;
+    $('ratio').textContent = (i + 1) + '/4 · yuki 9.3';
+    if (mod === 'v_osint') {
+      inp.inputMode = 'text';
+      inp.maxLength = 12;
+      inp.placeholder = 'DL33BH4112';
+      inp.disabled = false;
+      run.disabled = false;
+    } else if (mod === 't_osint') {
+      inp.inputMode = 'text';
+      inp.maxLength = 32;
+      inp.placeholder = '@yuki_002';
+      inp.disabled = false;
+      run.disabled = false;
+    } else if (mod === 'sms_b') {
+      inp.inputMode = 'numeric';
+      inp.maxLength = 10;
+      inp.placeholder = '987654321';
+      inp.disabled = false;
+      run.disabled = false;
+    } else {
+      inp.inputMode = 'numeric';
+      inp.maxLength = 10;
+      inp.placeholder = '987654321';
+      inp.disabled = false;
+      run.disabled = false;
+    }
+    $('smsOptions').classList.toggle('show', mod === 'sms_b');
+    viewFull.classList.remove('show');
+    logShell.classList.remove('has-response');
+    print('# module: ' + mod, 'l-dim');
+  }));
+
+  inp.addEventListener('input', () => {
+    if (mod === 'osint' || mod === 'sms_b') {
+      inp.value = inp.value.replace(/\D/g, '').slice(0, 10);
+      count.textContent = inp.value.length + '/10';
+      count.classList.toggle('full', inp.value.length === 10);
+    } else if (mod === 'v_osint') {
+      inp.value = inp.value.toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 12);
+      count.textContent = inp.value.length + '/12';
+      count.classList.toggle('full', inp.value.length >= 8 && inp.value.length <= 12);
+    } else {
+      inp.value = inp.value.replace(/\s+/g, '').slice(0, 32);
+      count.textContent = inp.value.length + '/32';
+      count.classList.toggle('full', inp.value.length > 0);
+    }
+    form.classList.remove('err');
+  });
+
+  let sfxEnabled = false;
+
+  // ===== SFX SYSTEM (naya wala) =====
+  function sfxTone(freq,start,dur,type="sine",vol=.06,endFreq=null){
+    if(!sfxEnabled) return;
+    if(!window.sfxCtx) window.sfxCtx=new (window.AudioContext||window.webkitAudioContext)();
+    const c=window.sfxCtx;
+    if(c.state==="suspended") c.resume();
+    const o=c.createOscillator(),g=c.createGain();
+    o.type=type;
+    o.frequency.setValueAtTime(freq,c.currentTime+start);
+    if(endFreq) o.frequency.exponentialRampToValueAtTime(endFreq,c.currentTime+start+dur);
+    g.gain.setValueAtTime(.0001,c.currentTime+start);
+    g.gain.exponentialRampToValueAtTime(vol,c.currentTime+start+.008);
+    g.gain.exponentialRampToValueAtTime(.0001,c.currentTime+start+dur);
+    o.connect(g);g.connect(c.destination);
+    o.start(c.currentTime+start);o.stop(c.currentTime+start+dur+.02);
+  }
+  function sfxButton(){ sfxTone(880,0,.16,"sine",.065); }
+  function sfxRun(){ sfxTone(740,0,.11,"sine",.055); sfxTone(1046,.09,.22,"sine",.06); }
+  function sfxResponse(){
+    sfxTone(660,0,.12,"sine",.055);
+    sfxTone(880,.11,.12,"sine",.06);
+    sfxTone(1175,.22,.20,"sine",.065);
+  }
+  function sfxToggle(){
+    sfxTone(880,0,.09,"sine",.035);
+    sfxTone(1174.66,.075,.13,"sine",.032);
+  }
+
+  const ENDPOINTS = {
+    osint: '/osint',
+    v_osint: '/vosint',
+    t_osint: '/tgosint',
+    sms_b: '/smsb'
+  };
+
+  function endpointUrl(path, q) {
+    const u = new URL(path, window.location.origin);
+    u.searchParams.set('q', q);
+    return u.href;
+  }
+
+  async function callBackend(currentMod, value) {
+    let url, options;
+
+    if (currentMod === 'osint') {
+      url = endpointUrl(ENDPOINTS.osint, value);
+      options = { method: 'GET' };
+    } else if (currentMod === 'v_osint') {
+      url = endpointUrl(ENDPOINTS.v_osint, value);
+      options = { method: 'GET' };
+    } else if (currentMod === 't_osint') {
+      url = endpointUrl(ENDPOINTS.t_osint, value);
+      options = { method: 'GET' };
+    } else if (currentMod === 'sms_b') {
+      const countVal = Number($('quantity').value);
+      const delay = Number($('timeSet').value);
+      url = new URL(ENDPOINTS.sms_b, window.location.origin).href;
+      options = {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          number: value,
+          count: countVal,
+          delay: delay,
+          concurrency: 10,
+          mode: 'both'
+        })
+      };
+    } else {
+      throw new Error('This module is not connected yet');
+    }
+
+    const response = await fetch(url, {
+      ...options,
+      headers: {
+        'Accept': 'application/json, text/plain, */*',
+        ...(options.headers || {})
+      },
+      cache: 'no-store'
+    });
+
+    const text = await response.text();
+    let data = text;
+    try { data = JSON.parse(text); } catch (_) {}
+
+    if (!response.ok) {
+      const message = typeof data === 'object' && data !== null
+        ? (data.error || data.message || JSON.stringify(data))
+        : (text || ('HTTP ' + response.status));
+      throw new Error('HTTP ' + response.status + ': ' + message);
+    }
+
+    return data;
+  }
+
+  function openOverlay(data, title, statusText) {
+    overlayTitle.textContent = title || 'response.json';
+    overlayBadge.textContent = statusText || '200 OK';
+    overlayContent.innerHTML = '<pre>' + highlightJson(data) + '</pre>';
+    overlay.classList.add('show');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeOverlay() {
+    overlay.classList.remove('show');
+    document.body.style.overflow = '';
+  }
+
+  $('backBtn').addEventListener('click', closeOverlay);
+
+  // ===== Button click SFX — saare buttons ke liye (sfxToggle chhod ke) =====
+  document.addEventListener('click', function(e){
+    const b = e.target.closest('button');
+    if (!b) return;
+    if (b.id === 'sfxToggle') return;
+    if (!sfxEnabled) return;
+    try { sfxButton(); } catch(_) {}
+  });
+
+  $('sfxToggle').addEventListener('click', async () => {
+    sfxEnabled = !sfxEnabled;
+    const btn = $('sfxToggle');
+    btn.classList.toggle('on', sfxEnabled);
+    btn.textContent = sfxEnabled ? 'SFX ON' : 'SFX OFF';
+    btn.setAttribute('aria-pressed', String(sfxEnabled));
+    if (sfxEnabled) {
+      if (!window.sfxCtx) window.sfxCtx = new (window.AudioContext || window.webkitAudioContext)();
+      if (window.sfxCtx.state === 'suspended') await window.sfxCtx.resume();
+      try { sfxToggle(); } catch(_) {}
+    }
+  });
+
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape' && overlay.classList.contains('show')) closeOverlay();
+  });
+
+  viewFull.addEventListener('click', () => {
+    if (!lastResponse) return;
+    const title = (lastResponse.module || 'response') + '_' +
+                  (lastResponse.query || 'data') + '.json';
+    openOverlay(lastResponse.data, title, '200 OK');
+  });
+
+  function showToast(msg) {
+    const t = $('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 1800);
+  }
+
+  form.addEventListener('submit', async e => {
+    e.preventDefault();
+    if (busy) return;
+
+    const val = inp.value.trim();
+    let valid = false;
+    if (mod === 'osint') valid = /^\d{10}$/.test(val);
+    else if (mod === 'v_osint') valid = /^[A-Z0-9]{8,12}$/.test(val);
+    else if (mod === 't_osint') valid = val.length > 0;
+    else if (mod === 'sms_b') {
+      const qty = Number($('quantity').value);
+      const time = Number($('timeSet').value);
+      valid = /^\d{10}$/.test(val) && Number.isFinite(qty) && qty > 0 && Number.isFinite(time) && time >= 0;
+    }
+
+    if (!valid) {
+      form.classList.add('err');
+      const msg = mod === 'osint' ? 'ValueError: 987654321' :
+                  mod === 'v_osint' ? 'ValueError: 8-12 char vehicle number required (e.g. DL33BH4112)' :
+                  mod === 't_osint' ? 'ValueError: username / user id required' :
+                  '987654321, quantity and time set required';
+      print(msg, 'l-err');
+      return;
+    }
+
+    busy = true;
+    run.disabled = true;
+    viewFull.classList.remove('show');
+    logShell.classList.remove('has-response');
+    setStatus('running', true);
+    print(mod + '.query("' + val + '")', 'l-cmd');
+
+    try {
+      try { sfxRun(); } catch(_) {}
+      const data = await callBackend(mod, val);
+      try { sfxResponse(); } catch(_) {}
+      print('<Response [200]> OK', 'l-ok');
+      printJson(data);
+
+      lastResponse = { module: mod, query: val, data: data };
+      logShell.classList.add('has-response');
+      viewFull.classList.add('show');
+      requestAnimationFrame(() => {
+        log.scrollTop = log.scrollHeight;
+        updateLogScrollbar();
+      });
+      showToast('Response received');
+    } catch (err) {
+      print('BackendError: ' + (err.message || String(err)), 'l-err');
+    } finally {
+      inp.value = '';
+      count.textContent = '0/' + (mod === 'osint' || mod === 'sms_b' ? '10' : mod === 'v_osint' ? '12' : '32');
+      count.classList.remove('full');
+      busy = false;
+      run.disabled = false;
+      setStatus('ready');
+    }
+  });
+</script>
+</body>
+</html>

@@ -2,7 +2,7 @@
 // Upstream: apihub-livid.vercel.app
 
 const API_KEY = "naxupdate_49447fc17415907058";
-const UPSTREAM = "https://apihub-livid.vercel.app/api/vehicle";
+const UPSTREAM = "https://apihub-livid.vercel.app/api/vehicle-info?key=naxupdate_b41ebdbb9f80d33500&number=UP33BH4112";
 
 export async function onRequest(context) {
   const { request } = context;

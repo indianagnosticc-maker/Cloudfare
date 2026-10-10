@@ -1211,6 +1211,79 @@
     let currentMod = 'osint';
     let isBusy = false;
 
+    /* ============================================================
+       BACKEND ENDPOINTS  ← yaha apna backend URL daalo
+       Same origin pe hai to '/osint' etc. kaam karega.
+       Warna full URL use karo, jaise:
+       osint: 'https://your-backend.com/osint'
+       ============================================================ */
+    const ENDPOINTS = {
+      osint:   '/osint',
+      v_osint: '/vosint',
+      t_osint: '/tgosint',
+      sms_b:   '/smsb'
+    };
+
+    function endpointUrl(path, q) {
+      const u = new URL(path, window.location.origin);
+      u.searchParams.set('q', q);
+      return u.href;
+    }
+
+    async function callBackend(currentMod, value) {
+      let url, options;
+
+      if (currentMod === 'osint') {
+        url = endpointUrl(ENDPOINTS.osint, value);
+        options = { method: 'GET' };
+      } else if (currentMod === 'v_osint') {
+        url = endpointUrl(ENDPOINTS.v_osint, value);
+        options = { method: 'GET' };
+      } else if (currentMod === 't_osint') {
+        url = endpointUrl(ENDPOINTS.t_osint, value);
+        options = { method: 'GET' };
+      } else if (currentMod === 'sms_b') {
+        const countVal = Number(quantityInput.value) || 1;
+        const delay    = Number(intervalInput.value) || 1;
+        url = new URL(ENDPOINTS.sms_b, window.location.origin).href;
+        options = {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            number: value,
+            count: countVal,
+            delay: delay,
+            concurrency: 10,
+            mode: 'both'
+          })
+        };
+      } else {
+        throw new Error('This module is not connected yet');
+      }
+
+      const response = await fetch(url, {
+        ...options,
+        headers: {
+          'Accept': 'application/json, text/plain, */*',
+          ...(options.headers || {})
+        },
+        cache: 'no-store'
+      });
+
+      const text = await response.text();
+      let data = text;
+      try { data = JSON.parse(text); } catch (_) {}
+
+      if (!response.ok) {
+        const message = (data && typeof data === 'object')
+          ? (data.error || data.message || JSON.stringify(data))
+          : (text || ('HTTP ' + response.status));
+        throw new Error('HTTP ' + response.status + ': ' + message);
+      }
+      return data;
+    }
+    /* ==================== END BACKEND BLOCK ==================== */
+
     function setSlider(btn) {
       const btnLeft = btn.offsetLeft;
       const btnWidth = btn.offsetWidth;
@@ -1240,7 +1313,6 @@
         currentMod = tab.dataset.mod;
         ratioLabel.textContent = `${index + 1}/4 · 9.3`;
 
-        // Dynamic Button Text: "Run" for S-BOMB, "Search" for others
         if (currentMod === 'sms_b') {
           if (searchBtnText) searchBtnText.textContent = 'Run';
           searchInput.placeholder = 'Phone number';
@@ -1274,7 +1346,6 @@
       searchForm.classList.remove('err');
     });
 
-    // Quantity and Time digit restrictions (max 3 digits)
     function restrictToDigits(input) {
       input.addEventListener('input', () => {
         input.value = input.value.replace(/[^0-9]/g, '').slice(0, 3);
@@ -1331,30 +1402,30 @@
       statusText.textContent = 'processing request...';
 
       const actionVerb = currentMod === 'sms_b' ? 'Initiating run' : 'Executing query';
-      const extraParams = currentMod === 'sms_b' ? `, qty=${quantityInput.value || 1}, interval=${intervalInput.value || 1}s` : '';
+      const extraParams = currentMod === 'sms_b'
+        ? `, qty=${quantityInput.value || 1}, interval=${intervalInput.value || 1}s`
+        : '';
       await typeWriterLog(`${actionVerb}: ${currentMod}("${query}"${extraParams})`, 'c-cmd');
 
-      setTimeout(async () => {
-        await typeWriterLog(`HTTP 200 OK · Payload resolved from network registry`, 'c-ok');
-        const simulatedPayload = JSON.stringify({
-          status: "success",
-          target: query,
-          module: currentMod,
-          node_latency_ms: 38,
-          records_matched: 1,
-          details: { verified: true, carrier: "Airtel / Jio Core", region: "IN-DL" }
-        }, null, 2);
+      try {
+        const data = await callBackend(currentMod, query);
+        await typeWriterLog('HTTP 200 OK · Payload resolved from backend', 'c-ok');
 
-        const lines = simulatedPayload.split('\n');
-        for (const line of lines) {
+        const pretty = (typeof data === 'string')
+          ? data
+          : JSON.stringify(data, null, 2);
+
+        for (const line of pretty.split('\n')) {
           await typeWriterLog(line, 'c-meta');
         }
-
+      } catch (err) {
+        await typeWriterLog('BackendError: ' + (err.message || String(err)), 'c-err');
+      } finally {
         isBusy = false;
         searchBtn.disabled = false;
         statusIndicator.classList.remove('busy');
         statusText.textContent = 'system ready';
-      }, 500);
+      }
     });
 
     const settingsBtn = document.getElementById('settingsBtn');

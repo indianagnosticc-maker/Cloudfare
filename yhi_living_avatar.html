@@ -1,0 +1,1547 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>YHI — Advanced Living AI Avatar</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600&display=swap');
+
+  :root {
+    --bg-color: #000000;
+  }
+
+  * {
+    box-sizing: border-box;
+    user-select: none;
+    -webkit-user-select: none;
+    -webkit-touch-callout: none;
+    touch-action: none;
+  }
+
+  body, html {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    background-color: #000000;
+    font-family: 'Space Grotesk', -apple-system, BlinkMacSystemFont, sans-serif;
+    color: #e5e7eb;
+    background: #000000;
+  }
+
+  /* Ultra-subtle ambient particle canvas */
+  #fx-canvas {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 1;
+  }
+
+  /* Character Main Container */
+  #character-stage {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 2;
+    cursor: grab;
+    will-change: transform;
+  }
+
+  #character-stage:active {
+    cursor: grabbing;
+  }
+
+  /* SVG Character Elements Styling */
+  .face-svg {
+    width: 90vw;
+    max-width: 440px;
+    height: auto;
+    filter: drop-shadow(0 0 1px rgba(255, 255, 255, 0.4));
+    will-change: transform;
+  }
+
+  /* Ethereal eyelid and pupil gradients and glowing paths */
+  .eye-white {
+    fill: #fdfdfd;
+    filter: drop-shadow(0 0 8px rgba(255, 255, 255, 0.25));
+  }
+
+  .eye-accent {
+    fill: #e0f2fe;
+    opacity: 0.85;
+  }
+
+  .eye-pupil {
+    fill: #09090b;
+  }
+
+  .facial-stroke {
+    stroke: #ffffff;
+    stroke-width: 3.5;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    fill: none;
+    transition: stroke 0.3s ease;
+  }
+
+  .subtle-brow {
+    stroke: #94a3b8;
+    stroke-width: 2.2;
+    stroke-linecap: round;
+    fill: none;
+  }
+
+  .accent-glint {
+    fill: #bae6fd;
+    opacity: 0.9;
+  }
+
+  /* Minimal Settings Drawer / Glass Overlay */
+  .glass-panel {
+    background: rgba(12, 12, 14, 0.82);
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.9);
+  }
+
+  /* Toggle button styles */
+  .switch-bg {
+    transition: background-color 0.25s ease;
+  }
+  .switch-dot {
+    transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  /* Discreet Status Indicator (Hidden by default, fades on touch) */
+  .hud-badge {
+    opacity: 0;
+    transition: opacity 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+    pointer-events: none;
+  }
+  .hud-badge.visible {
+    opacity: 0.65;
+  }
+
+  /* Subtle pulsing breath ring when character is deeply calm */
+  @keyframes ethereal-breath {
+    0%, 100% { transform: scale(1); opacity: 0.12; }
+    50% { transform: scale(1.04); opacity: 0.22; }
+  }
+
+  .ambient-glow {
+    animation: ethereal-breath 7s ease-in-out infinite;
+  }
+</style>
+</head>
+<body class="bg-black text-white select-none">
+
+  <!-- Canvas for micro-ambient star dust / presence particles -->
+  <canvas id="fx-canvas"></canvas>
+
+  <!-- Ambient Sub-Glow (Very subtle dark blue/monochrome focal ring) -->
+  <div class="absolute inset-0 flex items-center justify-center pointer-events-none z-0">
+    <div class="w-[320px] h-[320px] rounded-full bg-sky-950/20 blur-[100px] ambient-glow"></div>
+  </div>
+
+  <!-- HUD Status Pill (Very unobtrusive, top center) -->
+  <div id="hud-status" class="hud-badge absolute top-6 left-1/2 -translate-x-1/2 z-20 flex items-center gap-2 px-3.5 py-1.5 rounded-full glass-panel border border-white/10 text-[11px] font-mono tracking-wider uppercase text-neutral-400">
+    <span id="emotion-tag-dot" class="w-1.5 h-1.5 rounded-full bg-sky-400 animate-pulse"></span>
+    <span id="emotion-tag-text">YHI • Awake</span>
+    <span class="text-neutral-600">|</span>
+    <span id="state-detail" class="text-neutral-400">Energy 94%</span>
+  </div>
+
+  <!-- Minimal Icon Controls (Top corners: Sensor status left, settings/sound right) -->
+  <div class="absolute top-5 left-5 z-30 flex items-center gap-2">
+    <button id="btn-motion-sensor" aria-label="Motion Sensor" class="p-2.5 rounded-full glass-panel border border-white/5 text-neutral-400 hover:text-white hover:border-white/20 active:scale-95 transition-all flex items-center justify-center group" title="Device Gyro/Motion Sensor">
+      <svg id="gyro-icon" class="w-4 h-4 transition-transform group-hover:rotate-45" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <circle cx="12" cy="12" r="9" stroke-opacity="0.3"></circle>
+        <path d="M12 3v3M12 18v3M3 12h3M18 12h3"></path>
+        <circle cx="12" cy="12" r="2.5" fill="currentColor"></circle>
+      </svg>
+      <span id="gyro-status-dot" class="w-1.5 h-1.5 rounded-full bg-neutral-600 ml-1.5"></span>
+    </button>
+  </div>
+
+  <div class="absolute top-5 right-5 z-30 flex items-center gap-2.5">
+    <button id="btn-sound-toggle" aria-label="Sound Toggle" class="p-2.5 rounded-full glass-panel border border-white/5 text-neutral-400 hover:text-white hover:border-white/20 active:scale-95 transition-all flex items-center justify-center" title="Acoustic Voice Synthesis">
+      <svg id="sound-icon-on" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+        <path d="M15.54 8.46a5 5 0 0 1 0 7.07"></path>
+        <path d="M19.07 4.93a10 10 0 0 1 0 14.14" stroke-opacity="0.4"></path>
+      </svg>
+      <svg id="sound-icon-off" class="w-4 h-4 hidden text-neutral-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+        <line x1="23" y1="9" x2="17" y2="15"></line>
+        <line x1="17" y1="9" x2="23" y2="15"></line>
+      </svg>
+    </button>
+
+    <button id="btn-settings-toggle" aria-label="Character Settings" class="p-2.5 rounded-full glass-panel border border-white/5 text-neutral-400 hover:text-white hover:border-white/20 active:scale-95 transition-all flex items-center justify-center">
+      <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <line x1="4" y1="21" x2="4" y2="14"></line>
+        <line x1="4" y1="10" x2="4" y2="3"></line>
+        <line x1="12" y1="21" x2="12" y2="12"></line>
+        <line x1="12" y1="8" x2="12" y2="3"></line>
+        <line x1="20" y1="21" x2="20" y2="16"></line>
+        <line x1="20" y1="12" x2="20" y2="3"></line>
+        <line x1="1" y1="14" x2="7" y2="14"></line>
+        <line x1="9" y1="8" x2="15" y2="8"></line>
+        <line x1="17" y1="16" x2="23" y2="16"></line>
+      </svg>
+    </button>
+  </div>
+
+  <!-- Interactive Stage Container -->
+  <main id="character-stage">
+    <div id="character-anchor" class="relative flex flex-col items-center justify-center">
+      
+      <!-- SVG Creature Face Geometry -->
+      <svg id="character-svg" class="face-svg" viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <!-- Eye Glow Filter -->
+          <filter id="yhi-soft-glow" x="-30%" y="-30%" width="160%" height="160%">
+            <feGaussianBlur stdDeviation="3.5" result="blur" />
+            <feComposite in="SourceGraphic" in2="blur" operator="over" />
+          </filter>
+          
+          <radialGradient id="grad-eye" cx="45%" cy="40%" r="55%">
+            <stop offset="0%" stop-color="#ffffff" />
+            <stop offset="65%" stop-color="#e2e8f0" />
+            <stop offset="100%" stop-color="#94a3b8" />
+          </radialGradient>
+
+          <radialGradient id="pupil-highlight" cx="30%" cy="30%" r="70%">
+            <stop offset="0%" stop-color="#38bdf8" stop-opacity="0.35" />
+            <stop offset="100%" stop-color="#020617" stop-opacity="1" />
+          </radialGradient>
+
+          <!-- Clip Paths for Eyelids (Upper and Lower morphing) -->
+          <clipPath id="left-eye-clip">
+            <path id="left-eye-clip-path" d="M 90 200 C 90 145, 170 145, 170 200 C 170 255, 90 255, 90 200 Z" />
+          </clipPath>
+          <clipPath id="right-eye-clip">
+            <path id="right-eye-clip-path" d="M 230 200 C 230 145, 310 145, 310 200 C 310 255, 230 255, 230 200 Z" />
+          </clipPath>
+        </defs>
+
+        <!-- Dynamic Head Tilt & Jitter Group -->
+        <g id="head-group" transform="translate(0, 0) rotate(0, 200, 200)">
+          
+          <!-- Subtle Floating Antenna / Neural Tendril (Secondary Physics) -->
+          <g id="tendril-group" opacity="0.4">
+            <path id="tendril-path" d="M 200 100 Q 200 65 200 50" stroke="#64748b" stroke-width="1.8" stroke-linecap="round" fill="none" />
+            <circle id="tendril-tip" cx="200" cy="50" r="2.8" fill="#bae6fd" filter="url(#yhi-soft-glow)" />
+          </g>
+
+          <!-- EYEBROWS (Expressive arcs) -->
+          <g id="eyebrows-group">
+            <path id="left-eyebrow" class="subtle-brow" d="M 92 148 Q 130 145 168 152" />
+            <path id="right-eyebrow" class="subtle-brow" d="M 232 152 Q 270 145 308 148" />
+          </g>
+
+          <!-- LEFT EYE CONTAINER -->
+          <g id="left-eye-container" class="cursor-pointer">
+            <!-- Eye Socket Base -->
+            <path id="left-eye-socket" d="M 90 200 C 90 145, 170 145, 170 200 C 170 255, 90 255, 90 200 Z" fill="#030712" stroke="#1e293b" stroke-width="1.5" />
+            
+            <!-- Clipped Eyeball & Pupil -->
+            <g clip-path="url(#left-eye-clip)">
+              <!-- Sclera / Bioluminescent Iris -->
+              <ellipse id="left-sclera" cx="130" cy="200" rx="40" ry="46" fill="url(#grad-eye)" />
+              
+              <!-- Left Pupil & Focus Center -->
+              <g id="left-pupil-group" transform="translate(0, 0)">
+                <ellipse cx="130" cy="200" rx="16" ry="19" fill="url(#pupil-highlight)" />
+                <circle cx="125" cy="194" r="4.2" class="accent-glint" />
+                <circle cx="135" cy="204" r="2" fill="#ffffff" opacity="0.6" />
+                <!-- Subtle Iris Texture Ring -->
+                <circle cx="130" cy="200" r="10" stroke="#38bdf8" stroke-width="0.7" stroke-dasharray="2 3" opacity="0.4" fill="none" />
+              </g>
+            </g>
+
+            <!-- Upper & Lower Eyelid Bezier Lines (Physical contour) -->
+            <path id="left-lid-upper" class="facial-stroke" d="M 90 200 Q 130 148 170 200" />
+            <path id="left-lid-lower" class="facial-stroke" d="M 90 200 Q 130 252 170 200" stroke-width="2" />
+          </g>
+
+          <!-- RIGHT EYE CONTAINER -->
+          <g id="right-eye-container" class="cursor-pointer">
+            <!-- Eye Socket Base -->
+            <path id="right-eye-socket" d="M 230 200 C 230 145, 310 145, 310 200 C 310 255, 230 255, 230 200 Z" fill="#030712" stroke="#1e293b" stroke-width="1.5" />
+            
+            <!-- Clipped Eyeball & Pupil -->
+            <g clip-path="url(#right-eye-clip)">
+              <!-- Sclera -->
+              <ellipse id="right-sclera" cx="270" cy="200" rx="40" ry="46" fill="url(#grad-eye)" />
+              
+              <!-- Right Pupil & Focus Center -->
+              <g id="right-pupil-group" transform="translate(0, 0)">
+                <ellipse cx="270" cy="200" rx="16" ry="19" fill="url(#pupil-highlight)" />
+                <circle cx="265" cy="194" r="4.2" class="accent-glint" />
+                <circle cx="275" cy="204" r="2" fill="#ffffff" opacity="0.6" />
+                <!-- Subtle Iris Texture Ring -->
+                <circle cx="270" cy="200" r="10" stroke="#38bdf8" stroke-width="0.7" stroke-dasharray="2 3" opacity="0.4" fill="none" />
+              </g>
+            </g>
+
+            <!-- Upper & Lower Eyelid Bezier Lines -->
+            <path id="right-lid-upper" class="facial-stroke" d="M 230 200 Q 270 148 310 200" />
+            <path id="right-lid-lower" class="facial-stroke" d="M 230 200 Q 270 252 310 200" stroke-width="2" />
+          </g>
+
+          <!-- MOUTH GEOMETRY (Smooth procedural bezier curve) -->
+          <g id="mouth-group">
+            <path id="mouth-path" class="facial-stroke" d="M 182 284 Q 200 286 218 284" stroke-width="3" />
+            <!-- Tiny Subtle Lip shadow/accent -->
+            <circle id="mouth-accent-left" cx="182" cy="284" r="1.2" fill="#94a3b8" opacity="0.6" />
+            <circle id="mouth-accent-right" cx="218" cy="284" r="1.2" fill="#94a3b8" opacity="0.6" />
+          </g>
+
+          <!-- Delicate Cheek Micro-blush (for embarrassment/excitement) -->
+          <g id="cheeks-group" opacity="0">
+            <circle cx="110" cy="242" r="16" fill="#38bdf8" filter="url(#yhi-soft-glow)" opacity="0.15" />
+            <circle cx="290" cy="242" r="16" fill="#38bdf8" filter="url(#yhi-soft-glow)" opacity="0.15" />
+          </g>
+
+        </g>
+      </svg>
+
+    </div>
+  </main>
+
+  <!-- Bottom Interactive Cue Bar (Fades out gently, tap anywhere cue) -->
+  <footer id="interaction-hint" class="absolute bottom-7 inset-x-0 flex flex-col items-center justify-center gap-1.5 pointer-events-none transition-opacity duration-700 z-10 opacity-40">
+    <div class="w-10 h-1 bg-white/20 rounded-full mb-1"></div>
+    <p class="text-[11px] font-mono tracking-widest text-neutral-400 uppercase">Touch • Tilt • Shake Device</p>
+  </footer>
+
+  <!-- Drawer Backdrop -->
+  <div id="drawer-backdrop" class="fixed inset-0 bg-black/75 z-40 backdrop-blur-md opacity-0 pointer-events-none transition-opacity duration-300"></div>
+
+  <!-- Settings & Diagnostics Slide-over Drawer -->
+  <aside id="settings-drawer" class="fixed bottom-0 inset-x-0 max-w-md mx-auto z-50 glass-panel rounded-t-3xl border-t border-white/10 p-6 translate-y-full transition-transform duration-300 ease-out flex flex-col gap-5 max-h-[88vh] overflow-y-auto">
+    <div class="flex items-center justify-between border-b border-white/10 pb-3">
+      <div class="flex items-center gap-2.5">
+        <div class="w-2 h-2 rounded-full bg-sky-400"></div>
+        <h2 class="text-sm font-semibold tracking-wider uppercase text-white font-mono">YHI Control & State</h2>
+      </div>
+      <button id="btn-close-settings" class="p-1 text-neutral-400 hover:text-white rounded-lg">
+        <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="18" y1="6" x2="6" y2="18"></line>
+          <line x1="6" y1="6" x2="18" y2="18"></line>
+        </svg>
+      </button>
+    </div>
+
+    <!-- Emotion Trigger Grid for Testing & Psychology Inspection -->
+    <div class="flex flex-col gap-2">
+      <label class="text-[11px] font-mono uppercase tracking-wider text-neutral-400">Force Expression Test</label>
+      <div class="grid grid-cols-4 gap-1.5 text-[10px] font-mono">
+        <button data-emotion="neutral" class="emotion-trigger px-2 py-1.5 rounded-lg bg-neutral-900 border border-white/5 hover:border-sky-500/40 text-neutral-300">Neutral</button>
+        <button data-emotion="happiness" class="emotion-trigger px-2 py-1.5 rounded-lg bg-neutral-900 border border-white/5 hover:border-sky-500/40 text-neutral-300">Happy</button>
+        <button data-emotion="curiosity" class="emotion-trigger px-2 py-1.5 rounded-lg bg-neutral-900 border border-white/5 hover:border-sky-500/40 text-neutral-300">Curious</button>
+        <button data-emotion="amusement" class="emotion-trigger px-2 py-1.5 rounded-lg bg-neutral-900 border border-white/5 hover:border-sky-500/40 text-neutral-300">Amused</button>
+        
+        <button data-emotion="confusion" class="emotion-trigger px-2 py-1.5 rounded-lg bg-neutral-900 border border-white/5 hover:border-sky-500/40 text-neutral-300">Confused</button>
+        <button data-emotion="skepticism" class="emotion-trigger px-2 py-1.5 rounded-lg bg-neutral-900 border border-white/5 hover:border-sky-500/40 text-neutral-300">Skeptical</button>
+        <button data-emotion="surprise" class="emotion-trigger px-2 py-1.5 rounded-lg bg-neutral-900 border border-white/5 hover:border-sky-500/40 text-neutral-300">Surprise</button>
+        <button data-emotion="embarrassment" class="emotion-trigger px-2 py-1.5 rounded-lg bg-neutral-900 border border-white/5 hover:border-sky-500/40 text-neutral-300">Shy</button>
+
+        <button data-emotion="sadness" class="emotion-trigger px-2 py-1.5 rounded-lg bg-neutral-900 border border-white/5 hover:border-sky-500/40 text-neutral-300">Sad</button>
+        <button data-emotion="frustration" class="emotion-trigger px-2 py-1.5 rounded-lg bg-neutral-900 border border-white/5 hover:border-sky-500/40 text-neutral-300">Frustrated</button>
+        <button data-emotion="anger" class="emotion-trigger px-2 py-1.5 rounded-lg bg-neutral-900 border border-white/5 hover:border-sky-500/40 text-neutral-300">Anger</button>
+        <button data-emotion="sleepiness" class="emotion-trigger px-2 py-1.5 rounded-lg bg-neutral-900 border border-white/5 hover:border-sky-500/40 text-neutral-300">Sleepy</button>
+
+        <button data-emotion="thinking" class="emotion-trigger px-2 py-1.5 rounded-lg bg-neutral-900 border border-white/5 hover:border-sky-500/40 text-neutral-300">Thinking</button>
+        <button data-emotion="suspicion" class="emotion-trigger px-2 py-1.5 rounded-lg bg-neutral-900 border border-white/5 hover:border-sky-500/40 text-neutral-300">Suspicious</button>
+        <button data-emotion="excitement" class="emotion-trigger px-2 py-1.5 rounded-lg bg-neutral-900 border border-white/5 hover:border-sky-500/40 text-neutral-300">Excited</button>
+        <button data-emotion="fear" class="emotion-trigger px-2 py-1.5 rounded-lg bg-neutral-900 border border-white/5 hover:border-sky-500/40 text-neutral-300">Alarmed</button>
+
+        <button data-emotion="relief" class="emotion-trigger px-2 py-1.5 rounded-lg bg-neutral-900 border border-white/5 hover:border-sky-500/40 text-neutral-300">Relief</button>
+        <button data-emotion="boredom" class="emotion-trigger px-2 py-1.5 rounded-lg bg-neutral-900 border border-white/5 hover:border-sky-500/40 text-neutral-300">Bored</button>
+        <button data-emotion="mischievous" class="emotion-trigger px-2 py-1.5 rounded-lg bg-neutral-900 border border-white/5 hover:border-sky-500/40 text-neutral-300">Playful</button>
+        <button data-emotion="disappointment" class="emotion-trigger px-2 py-1.5 rounded-lg bg-neutral-900 border border-white/5 hover:border-sky-500/40 text-neutral-300">Dismayed</button>
+      </div>
+    </div>
+
+    <!-- Psychological Meters -->
+    <div class="flex flex-col gap-3 py-2 border-y border-white/5 text-[11px] font-mono">
+      <div class="flex items-center justify-between text-neutral-300">
+        <span class="text-neutral-400">Irritation (Repeated Taps)</span>
+        <span id="meter-irritation-val">0%</span>
+      </div>
+      <div class="w-full bg-neutral-900 h-1 rounded-full overflow-hidden">
+        <div id="meter-irritation-bar" class="h-full bg-red-400 transition-all duration-300 w-0"></div>
+      </div>
+
+      <div class="flex items-center justify-between text-neutral-300">
+        <span class="text-neutral-400">Curiosity Level</span>
+        <span id="meter-curiosity-val">70%</span>
+      </div>
+      <div class="w-full bg-neutral-900 h-1 rounded-full overflow-hidden">
+        <div id="meter-curiosity-bar" class="h-full bg-sky-400 transition-all duration-300 w-[70%]"></div>
+      </div>
+
+      <div class="flex items-center justify-between text-neutral-300">
+        <span class="text-neutral-400">Energy & Wakefulness</span>
+        <span id="meter-energy-val">95%</span>
+      </div>
+      <div class="w-full bg-neutral-900 h-1 rounded-full overflow-hidden">
+        <div id="meter-energy-bar" class="h-full bg-emerald-400 transition-all duration-300 w-[95%]"></div>
+      </div>
+    </div>
+
+    <!-- Sensor Permissions & Sound -->
+    <div class="flex flex-col gap-2.5">
+      <div class="flex items-center justify-between">
+        <div>
+          <div class="text-xs font-medium text-white">Motion Sensor (Gyro / Accel)</div>
+          <div id="sensor-status-label" class="text-[10px] text-neutral-500 font-mono">Listening (iOS/Chrome requires user tap)</div>
+        </div>
+        <button id="btn-request-sensor" class="px-3 py-1.5 text-[11px] font-mono bg-sky-950 border border-sky-600/30 text-sky-300 rounded-lg active:scale-95 transition-all">
+          Request
+        </button>
+      </div>
+
+      <div class="flex items-center justify-between pt-2">
+        <div>
+          <div class="text-xs font-medium text-white">Synthesized Audio Engine</div>
+          <div class="text-[10px] text-neutral-500 font-mono">Web Audio procedural voice blips</div>
+        </div>
+        <button id="drawer-sound-btn" class="px-3 py-1.5 text-[11px] font-mono bg-neutral-900 border border-white/10 text-white rounded-lg">
+          Active
+        </button>
+      </div>
+    </div>
+
+    <!-- Reset Creature Button -->
+    <div class="pt-2">
+      <button id="btn-reset-state" class="w-full py-2.5 rounded-xl bg-neutral-900 hover:bg-neutral-800 border border-white/10 text-xs font-mono text-neutral-300 tracking-wider uppercase active:scale-[0.98] transition-all">
+        Reset Creature Memory
+      </button>
+    </div>
+  </aside>
+
+  <!-- JAVASCRIPT: Procedural Expression, Physics, Web Audio & Sensors -->
+  <script>
+    (function () {
+      'use strict';
+
+      /* =========================================================================
+         1. STATE & PSYCHOLOGICAL BEHAVIORAL MEMORY
+         ========================================================================= */
+      const state = {
+        emotion: 'neutral',
+        previousEmotion: 'neutral',
+        irritation: 0,       // 0 to 100
+        curiosity: 75,       // 0 to 100
+        energy: 95,          // 0 to 100
+        timeSinceLastInteraction: 0,
+        recentEmotionHistory: [],
+        cooldown: false,
+        soundEnabled: true,
+        sensorActive: false,
+        isHoldingTouch: false,
+        touchStartTime: 0,
+        tapCount: 0,
+        lastTapTime: 0,
+        isDizzy: false
+      };
+
+      /* =========================================================================
+         2. EXPRESSION CONFIGURATIONS & MORPH TARGETS (Human Psychology)
+         ========================================================================= */
+      // Coordinate definitions for SVG paths
+      // Left eye socket: base 90..170 (center 130, y=200). Right eye socket: base 230..310 (center 270, y=200)
+      const EXPRESSIONS = {
+        neutral: {
+          name: 'Neutral',
+          leftLidTop: 'M 90 200 Q 130 148 170 200',
+          leftLidBottom: 'M 90 200 Q 130 252 170 200',
+          rightLidTop: 'M 230 200 Q 270 148 310 200',
+          rightLidBottom: 'M 230 200 Q 270 252 310 200',
+          leftBrow: 'M 92 148 Q 130 145 168 152',
+          rightBrow: 'M 232 152 Q 270 145 308 148',
+          mouth: 'M 184 284 Q 200 286 216 284',
+          pupilScale: 1.0,
+          headTilt: 0,
+          blush: 0,
+          soundType: 'curious'
+        },
+        happiness: {
+          name: 'Happiness',
+          // Soft crescent eyes curving gently upward
+          leftLidTop: 'M 90 196 Q 130 160 170 196',
+          leftLidBottom: 'M 90 196 Q 130 185 170 196',
+          rightLidTop: 'M 230 196 Q 270 160 310 196',
+          rightLidBottom: 'M 230 196 Q 270 185 310 196',
+          leftBrow: 'M 92 140 Q 130 134 168 146',
+          rightBrow: 'M 232 146 Q 270 134 308 140',
+          mouth: 'M 178 280 Q 200 302 222 280',
+          pupilScale: 0.9,
+          headTilt: 1.5,
+          blush: 0.2,
+          soundType: 'happy'
+        },
+        amusement: {
+          name: 'Amusement',
+          leftLidTop: 'M 90 200 Q 130 175 170 200',
+          leftLidBottom: 'M 90 200 Q 130 188 170 200',
+          rightLidTop: 'M 230 198 Q 270 170 310 198',
+          rightLidBottom: 'M 230 198 Q 270 185 310 198',
+          leftBrow: 'M 90 142 Q 130 136 168 148',
+          rightBrow: 'M 232 146 Q 270 138 310 142',
+          mouth: 'M 176 278 Q 200 306 224 278',
+          pupilScale: 0.85,
+          headTilt: -3.5,
+          blush: 0.4,
+          soundType: 'playful'
+        },
+        curiosity: {
+          name: 'Curiosity',
+          // Asymmetric eyes and raised outer brow
+          leftLidTop: 'M 90 200 Q 130 142 170 200',
+          leftLidBottom: 'M 90 200 Q 130 256 170 200',
+          rightLidTop: 'M 230 200 Q 270 152 310 200',
+          rightLidBottom: 'M 230 200 Q 270 248 310 200',
+          leftBrow: 'M 92 138 Q 130 130 168 148',
+          rightBrow: 'M 232 152 Q 270 148 308 152',
+          mouth: 'M 188 284 Q 198 282 208 285',
+          pupilScale: 1.15,
+          headTilt: 4.8,
+          blush: 0,
+          soundType: 'curious'
+        },
+        confusion: {
+          name: 'Confusion',
+          // One brow dipped low, one high, crooked mouth
+          leftLidTop: 'M 90 200 Q 130 160 170 200',
+          leftLidBottom: 'M 90 200 Q 130 240 170 200',
+          rightLidTop: 'M 230 200 Q 270 145 310 200',
+          rightLidBottom: 'M 230 200 Q 270 255 310 200',
+          leftBrow: 'M 92 158 Q 130 155 168 162',
+          rightBrow: 'M 232 140 Q 270 134 308 144',
+          mouth: 'M 182 288 Q 196 280 216 288',
+          pupilScale: 0.95,
+          headTilt: -4.5,
+          blush: 0,
+          soundType: 'confused'
+        },
+        skepticism: {
+          name: 'Skepticism',
+          // One raised brow, narrowed scrutinizing eyes
+          leftLidTop: 'M 90 200 Q 130 172 170 200',
+          leftLidBottom: 'M 90 200 Q 130 230 170 200',
+          rightLidTop: 'M 230 200 Q 270 150 310 200',
+          rightLidBottom: 'M 230 200 Q 270 240 310 200',
+          leftBrow: 'M 92 156 Q 130 154 168 158',
+          rightBrow: 'M 232 135 Q 270 128 308 140',
+          mouth: 'M 184 286 Q 204 284 218 280',
+          pupilScale: 0.85,
+          headTilt: -2.0,
+          blush: 0,
+          soundType: 'doubtful'
+        },
+        surprise: {
+          name: 'Surprise',
+          // Wide open circular aperture eyes, high brows, small O mouth
+          leftLidTop: 'M 90 200 Q 130 135 170 200',
+          leftLidBottom: 'M 90 200 Q 130 265 170 200',
+          rightLidTop: 'M 230 200 Q 270 135 310 200',
+          rightLidBottom: 'M 230 200 Q 270 265 310 200',
+          leftBrow: 'M 92 130 Q 130 120 168 135',
+          rightBrow: 'M 232 135 Q 270 120 308 130',
+          mouth: 'M 192 280 Q 200 270 208 280 Q 200 294 192 280',
+          pupilScale: 1.25,
+          headTilt: 0,
+          blush: 0.1,
+          soundType: 'surprised'
+        },
+        embarrassment: {
+          name: 'Embarrassment',
+          leftLidTop: 'M 90 200 Q 130 170 170 200',
+          leftLidBottom: 'M 90 200 Q 130 220 170 200',
+          rightLidTop: 'M 230 200 Q 270 170 310 200',
+          rightLidBottom: 'M 230 200 Q 270 220 310 200',
+          leftBrow: 'M 92 148 Q 130 152 168 148',
+          rightBrow: 'M 232 148 Q 270 152 308 148',
+          mouth: 'M 186 286 Q 200 284 214 286',
+          pupilScale: 0.9,
+          headTilt: -2.5,
+          blush: 0.7,
+          soundType: 'sleepy'
+        },
+        sadness: {
+          name: 'Sadness',
+          leftLidTop: 'M 90 200 Q 130 168 170 200',
+          leftLidBottom: 'M 90 200 Q 130 230 170 200',
+          rightLidTop: 'M 230 200 Q 270 168 310 200',
+          rightLidBottom: 'M 230 200 Q 270 230 310 200',
+          leftBrow: 'M 92 146 Q 130 154 168 144',
+          rightBrow: 'M 232 144 Q 270 154 308 146',
+          mouth: 'M 182 292 Q 200 280 218 292',
+          pupilScale: 0.95,
+          headTilt: 1.8,
+          blush: 0,
+          soundType: 'doubtful'
+        },
+        frustration: {
+          name: 'Frustration',
+          leftLidTop: 'M 90 200 Q 130 172 170 200',
+          leftLidBottom: 'M 90 200 Q 130 225 170 200',
+          rightLidTop: 'M 230 200 Q 270 172 310 200',
+          rightLidBottom: 'M 230 200 Q 270 225 310 200',
+          leftBrow: 'M 92 162 Q 130 158 168 168',
+          rightBrow: 'M 232 168 Q 270 158 308 162',
+          mouth: 'M 180 286 Q 200 286 220 286',
+          pupilScale: 0.8,
+          headTilt: 0,
+          blush: 0,
+          soundType: 'frustrated'
+        },
+        anger: {
+          name: 'Anger',
+          leftLidTop: 'M 90 200 Q 130 178 170 200',
+          leftLidBottom: 'M 90 200 Q 130 220 170 200',
+          rightLidTop: 'M 230 200 Q 270 178 310 200',
+          rightLidBottom: 'M 230 200 Q 270 220 310 200',
+          leftBrow: 'M 92 168 Q 130 162 168 174',
+          rightBrow: 'M 232 174 Q 270 162 308 168',
+          mouth: 'M 182 290 Q 200 282 218 290',
+          pupilScale: 0.75,
+          headTilt: 0,
+          blush: 0,
+          soundType: 'frustrated'
+        },
+        sleepiness: {
+          name: 'Sleepiness',
+          // Heavy eyelids nearly shut
+          leftLidTop: 'M 90 200 Q 130 186 170 200',
+          leftLidBottom: 'M 90 200 Q 130 214 170 200',
+          rightLidTop: 'M 230 200 Q 270 186 310 200',
+          rightLidBottom: 'M 230 200 Q 270 214 310 200',
+          leftBrow: 'M 92 152 Q 130 150 168 154',
+          rightBrow: 'M 232 154 Q 270 150 308 152',
+          mouth: 'M 186 284 Q 200 285 214 284',
+          pupilScale: 0.7,
+          headTilt: 2.2,
+          blush: 0,
+          soundType: 'sleepy'
+        },
+        thinking: {
+          name: 'Thinking',
+          leftLidTop: 'M 90 200 Q 130 165 170 200',
+          leftLidBottom: 'M 90 200 Q 130 235 170 200',
+          rightLidTop: 'M 230 200 Q 270 165 310 200',
+          rightLidBottom: 'M 230 200 Q 270 235 310 200',
+          leftBrow: 'M 92 144 Q 130 140 168 148',
+          rightBrow: 'M 232 148 Q 270 140 308 144',
+          mouth: 'M 184 286 Q 198 288 214 284',
+          pupilScale: 0.95,
+          headTilt: -3.0,
+          blush: 0,
+          soundType: 'curious'
+        },
+        suspicion: {
+          name: 'Suspicion',
+          leftLidTop: 'M 90 200 Q 130 176 170 200',
+          leftLidBottom: 'M 90 200 Q 130 224 170 200',
+          rightLidTop: 'M 230 200 Q 270 168 310 200',
+          rightLidBottom: 'M 230 200 Q 270 232 310 200',
+          leftBrow: 'M 92 160 Q 130 156 168 162',
+          rightBrow: 'M 232 145 Q 270 142 308 148',
+          mouth: 'M 185 285 Q 200 284 215 286',
+          pupilScale: 0.8,
+          headTilt: 3.5,
+          blush: 0,
+          soundType: 'doubtful'
+        },
+        excitement: {
+          name: 'Excitement',
+          leftLidTop: 'M 90 196 Q 130 145 170 196',
+          leftLidBottom: 'M 90 196 Q 130 255 170 196',
+          rightLidTop: 'M 230 196 Q 270 145 310 196',
+          rightLidBottom: 'M 230 196 Q 270 255 310 196',
+          leftBrow: 'M 92 134 Q 130 124 168 138',
+          rightBrow: 'M 232 138 Q 270 124 308 134',
+          mouth: 'M 176 278 Q 200 308 224 278',
+          pupilScale: 1.3,
+          headTilt: 0,
+          blush: 0.3,
+          soundType: 'playful'
+        },
+        fear: {
+          name: 'Alarmed',
+          leftLidTop: 'M 90 200 Q 130 138 170 200',
+          leftLidBottom: 'M 90 200 Q 130 262 170 200',
+          rightLidTop: 'M 230 200 Q 270 138 310 200',
+          rightLidBottom: 'M 230 200 Q 270 262 310 200',
+          leftBrow: 'M 92 136 Q 130 144 168 136',
+          rightBrow: 'M 232 136 Q 270 144 308 136',
+          mouth: 'M 186 288 Q 200 280 214 288',
+          pupilScale: 0.65,
+          headTilt: 0,
+          blush: 0,
+          soundType: 'surprised'
+        },
+        relief: {
+          name: 'Relief',
+          leftLidTop: 'M 90 198 Q 130 170 170 198',
+          leftLidBottom: 'M 90 198 Q 130 218 170 198',
+          rightLidTop: 'M 230 198 Q 270 170 310 198',
+          rightLidBottom: 'M 230 198 Q 270 218 310 198',
+          leftBrow: 'M 92 144 Q 130 140 168 146',
+          rightBrow: 'M 232 146 Q 270 140 308 144',
+          mouth: 'M 180 284 Q 200 292 220 284',
+          pupilScale: 0.95,
+          headTilt: 1.0,
+          blush: 0.15,
+          soundType: 'happy'
+        },
+        boredom: {
+          name: 'Boredom',
+          leftLidTop: 'M 90 200 Q 130 180 170 200',
+          leftLidBottom: 'M 90 200 Q 130 220 170 200',
+          rightLidTop: 'M 230 200 Q 270 180 310 200',
+          rightLidBottom: 'M 230 200 Q 270 220 310 200',
+          leftBrow: 'M 92 150 Q 130 152 168 150',
+          rightBrow: 'M 232 150 Q 270 152 308 150',
+          mouth: 'M 184 286 Q 200 285 216 286',
+          pupilScale: 0.9,
+          headTilt: 4.0,
+          blush: 0,
+          soundType: 'sleepy'
+        },
+        mischievous: {
+          name: 'Mischievous',
+          leftLidTop: 'M 90 200 Q 130 168 170 200',
+          leftLidBottom: 'M 90 200 Q 130 238 170 200',
+          rightLidTop: 'M 230 200 Q 270 178 310 200',
+          rightLidBottom: 'M 230 200 Q 270 222 310 200',
+          leftBrow: 'M 92 140 Q 130 134 168 148',
+          rightBrow: 'M 232 158 Q 270 152 308 158',
+          mouth: 'M 182 284 Q 204 296 222 278',
+          pupilScale: 1.05,
+          headTilt: -3.8,
+          blush: 0.2,
+          soundType: 'playful'
+        },
+        disappointment: {
+          name: 'Disappointment',
+          leftLidTop: 'M 90 200 Q 130 174 170 200',
+          leftLidBottom: 'M 90 200 Q 130 224 170 200',
+          rightLidTop: 'M 230 200 Q 270 174 310 200',
+          rightLidBottom: 'M 230 200 Q 270 224 310 200',
+          leftBrow: 'M 92 150 Q 130 156 168 152',
+          rightBrow: 'M 232 152 Q 270 156 308 150',
+          mouth: 'M 184 290 Q 200 282 216 290',
+          pupilScale: 0.85,
+          headTilt: 1.5,
+          blush: 0,
+          soundType: 'doubtful'
+        }
+      };
+
+      /* =========================================================================
+         3. SPRING PHYSICS ENGINE (Position, Velocity, Damping, Mass)
+         ========================================================================= */
+      class SpringValue {
+        constructor(initial = 0, stiffness = 0.08, damping = 0.82) {
+          this.current = initial;
+          this.target = initial;
+          this.velocity = 0;
+          this.stiffness = stiffness;
+          this.damping = damping;
+        }
+
+        update() {
+          const force = (this.target - this.current) * this.stiffness;
+          this.velocity = (this.velocity + force) * this.damping;
+          this.current += this.velocity;
+          return this.current;
+        }
+
+        snap(val) {
+          this.current = val;
+          this.target = val;
+          this.velocity = 0;
+        }
+      }
+
+      // Physics variables for character head, gaze, pupil, and antenna
+      const phys = {
+        gazeX: new SpringValue(0, 0.09, 0.78),
+        gazeY: new SpringValue(0, 0.09, 0.78),
+        headX: new SpringValue(0, 0.05, 0.84),
+        headY: new SpringValue(0, 0.05, 0.84),
+        headRotate: new SpringValue(0, 0.06, 0.82),
+        tendrilLagX: new SpringValue(0, 0.04, 0.80),
+        blinkProgress: new SpringValue(0, 0.28, 0.65), // 0 is open, 1 is closed
+        mouthSmile: new SpringValue(0, 0.08, 0.8)
+      };
+
+      /* =========================================================================
+         4. WEB AUDIO API SYNTHESIZER (Organic Acoustic Non-Verbal Voice)
+         ========================================================================= */
+      let audioCtx = null;
+
+      function getAudioContext() {
+        if (!audioCtx) {
+          const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+          if (AudioContextClass) {
+            audioCtx = new AudioContextClass();
+          }
+        }
+        if (audioCtx && audioCtx.state === 'suspended') {
+          audioCtx.resume();
+        }
+        return audioCtx;
+      }
+
+      function playCreatureSound(type = 'curious', intensity = 1.0) {
+        if (!state.soundEnabled) return;
+        try {
+          const ctx = getAudioContext();
+          if (!ctx) return;
+
+          const now = ctx.currentTime;
+          const osc1 = ctx.createOscillator();
+          const osc2 = ctx.createOscillator();
+          const gain = ctx.createGain();
+          const filter = ctx.createBiquadFilter();
+
+          // Organic warm filter
+          filter.type = 'lowpass';
+          filter.frequency.setValueAtTime(1400, now);
+
+          osc1.connect(filter);
+          osc2.connect(filter);
+          filter.connect(gain);
+          gain.connect(ctx.destination);
+
+          // Subtle FM modulation / soft sinewaves for creature vocal chirps
+          osc1.type = 'sine';
+          osc2.type = 'triangle';
+
+          let duration = 0.18;
+          let baseFreq = 480 + (Math.random() * 60 - 30);
+
+          if (type === 'happy') {
+            baseFreq = 540;
+            duration = 0.24;
+            osc1.frequency.setValueAtTime(baseFreq, now);
+            osc1.frequency.exponentialRampToValueAtTime(baseFreq * 1.5, now + duration * 0.7);
+            osc1.frequency.exponentialRampToValueAtTime(baseFreq * 1.3, now + duration);
+            osc2.frequency.setValueAtTime(baseFreq * 1.01, now);
+            osc2.frequency.exponentialRampToValueAtTime(baseFreq * 1.52, now + duration);
+          } else if (type === 'curious') {
+            baseFreq = 420;
+            duration = 0.22;
+            osc1.frequency.setValueAtTime(baseFreq, now);
+            osc1.frequency.exponentialRampToValueAtTime(baseFreq * 1.6, now + duration);
+            osc2.frequency.setValueAtTime(baseFreq * 0.99, now);
+            osc2.frequency.exponentialRampToValueAtTime(baseFreq * 1.59, now + duration);
+          } else if (type === 'surprised') {
+            baseFreq = 620;
+            duration = 0.16;
+            osc1.frequency.setValueAtTime(baseFreq, now);
+            osc1.frequency.exponentialRampToValueAtTime(baseFreq * 1.9, now + duration);
+            osc2.frequency.setValueAtTime(baseFreq * 1.02, now);
+          } else if (type === 'playful') {
+            baseFreq = 520;
+            duration = 0.26;
+            osc1.frequency.setValueAtTime(baseFreq, now);
+            osc1.frequency.exponentialRampToValueAtTime(baseFreq * 1.3, now + 0.1);
+            osc1.frequency.exponentialRampToValueAtTime(baseFreq * 1.7, now + duration);
+            osc2.frequency.setValueAtTime(baseFreq * 0.5, now);
+          } else if (type === 'confused' || type === 'doubtful') {
+            baseFreq = 380;
+            duration = 0.28;
+            osc1.frequency.setValueAtTime(baseFreq * 1.2, now);
+            osc1.frequency.exponentialRampToValueAtTime(baseFreq * 0.85, now + duration);
+            osc2.frequency.setValueAtTime(baseFreq * 1.18, now);
+          } else if (type === 'frustrated') {
+            baseFreq = 260;
+            duration = 0.22;
+            osc1.type = 'sawtooth';
+            filter.frequency.setValueAtTime(700, now);
+            osc1.frequency.setValueAtTime(baseFreq, now);
+            osc1.frequency.linearRampToValueAtTime(baseFreq * 0.75, now + duration);
+            osc2.frequency.setValueAtTime(baseFreq * 0.98, now);
+          } else if (type === 'sleepy') {
+            baseFreq = 280;
+            duration = 0.45;
+            osc1.frequency.setValueAtTime(baseFreq, now);
+            osc1.frequency.exponentialRampToValueAtTime(baseFreq * 0.65, now + duration);
+            osc2.frequency.setValueAtTime(baseFreq * 0.64, now);
+          }
+
+          // Gentle Volume Envelope
+          const maxVol = 0.08 * Math.min(1.2, intensity);
+          gain.gain.setValueAtTime(0.0001, now);
+          gain.gain.linearRampToValueAtTime(maxVol, now + 0.03);
+          gain.gain.exponentialRampToValueAtTime(0.0001, now + duration);
+
+          osc1.start(now);
+          osc2.start(now);
+          osc1.stop(now + duration + 0.02);
+          osc2.stop(now + duration + 0.02);
+        } catch (e) {
+          // Silent fallback for strict audio policies
+        }
+      }
+
+      /* =========================================================================
+         5. DOM NODES REFERENCE
+         ========================================================================= */
+      const stageEl = document.getElementById('character-stage');
+      const headGroup = document.getElementById('head-group');
+      const leftPupil = document.getElementById('left-pupil-group');
+      const rightPupil = document.getElementById('right-pupil-group');
+      const leftLidTop = document.getElementById('left-lid-upper');
+      const leftLidBottom = document.getElementById('left-lid-lower');
+      const rightLidTop = document.getElementById('right-lid-upper');
+      const rightLidBottom = document.getElementById('right-lid-lower');
+      const leftLidClip = document.getElementById('left-eye-clip-path');
+      const rightLidClip = document.getElementById('right-eye-clip-path');
+      const leftBrow = document.getElementById('left-eyebrow');
+      const rightBrow = document.getElementById('right-eyebrow');
+      const mouthPath = document.getElementById('mouth-path');
+      const cheeksGroup = document.getElementById('cheeks-group');
+      const tendrilPath = document.getElementById('tendril-path');
+      const tendrilTip = document.getElementById('tendril-tip');
+
+      // Status HUD
+      const hudStatus = document.getElementById('hud-status');
+      const emotionTagDot = document.getElementById('emotion-tag-dot');
+      const emotionTagText = document.getElementById('emotion-tag-text');
+      const stateDetail = document.getElementById('state-detail');
+
+      // Buttons
+      const btnSoundToggle = document.getElementById('btn-sound-toggle');
+      const soundIconOn = document.getElementById('sound-icon-on');
+      const soundIconOff = document.getElementById('sound-icon-off');
+      const btnMotionSensor = document.getElementById('btn-motion-sensor');
+      const gyroStatusDot = document.getElementById('gyro-status-dot');
+      const btnSettingsToggle = document.getElementById('btn-settings-toggle');
+      const btnCloseSettings = document.getElementById('btn-close-settings');
+      const settingsDrawer = document.getElementById('settings-drawer');
+      const drawerBackdrop = document.getElementById('drawer-backdrop');
+      const btnRequestSensor = document.getElementById('btn-request-sensor');
+      const sensorStatusLabel = document.getElementById('sensor-status-label');
+      const btnResetState = document.getElementById('btn-reset-state');
+      const drawerSoundBtn = document.getElementById('drawer-sound-btn');
+
+      // Meters
+      const meterIrritationVal = document.getElementById('meter-irritation-val');
+      const meterIrritationBar = document.getElementById('meter-irritation-bar');
+      const meterCuriosityVal = document.getElementById('meter-curiosity-val');
+      const meterCuriosityBar = document.getElementById('meter-curiosity-bar');
+      const meterEnergyVal = document.getElementById('meter-energy-val');
+      const meterEnergyBar = document.getElementById('meter-energy-bar');
+
+      /* =========================================================================
+         6. PROCEDURAL EXPRESSION BLENDING & MORPHING
+         ========================================================================= */
+      let currentMorphProgress = 1.0;
+      let morphSource = EXPRESSIONS.neutral;
+      let morphTarget = EXPRESSIONS.neutral;
+      let morphDuration = 350; // ms
+      let morphStartTime = 0;
+
+      function triggerExpression(emotionKey, playAudio = true, reason = '') {
+        if (!EXPRESSIONS[emotionKey]) return;
+
+        // Micro-expression / transition logic
+        morphSource = { ...morphTarget };
+        morphTarget = EXPRESSIONS[emotionKey];
+        state.previousEmotion = state.emotion;
+        state.emotion = emotionKey;
+        morphStartTime = performance.now();
+        currentMorphProgress = 0;
+
+        // Randomize slight duration so every transition feels slightly different
+        morphDuration = 260 + Math.random() * 180;
+
+        // Head posture influence
+        phys.headRotate.target = morphTarget.headTilt + (Math.random() * 1.5 - 0.75);
+
+        // Update HUD
+        emotionTagText.textContent = `YHI • ${morphTarget.name}`;
+        stateDetail.textContent = reason || `Energy ${Math.round(state.energy)}%`;
+        showHudTemporary();
+
+        // Play appropriate non-verbal sound
+        if (playAudio && morphTarget.soundType) {
+          playCreatureSound(morphTarget.soundType, 0.9 + Math.random() * 0.3);
+        }
+
+        // Update settings trigger active state
+        document.querySelectorAll('.emotion-trigger').forEach(b => {
+          if (b.dataset.emotion === emotionKey) {
+            b.classList.add('border-sky-400', 'text-sky-300', 'bg-sky-950/40');
+          } else {
+            b.classList.remove('border-sky-400', 'text-sky-300', 'bg-sky-950/40');
+          }
+        });
+      }
+
+      function showHudTemporary(duration = 2400) {
+        hudStatus.classList.add('visible');
+        clearTimeout(hudStatus._timer);
+        hudStatus._timer = setTimeout(() => {
+          hudStatus.classList.remove('visible');
+        }, duration);
+      }
+
+      /* SVG Morphing helper for quadratic bezier curves */
+      function morphSvgD(fromD, toD, t) {
+        if (!fromD || !toD) return toD;
+        const fromNums = fromD.match(/-?\d+(\.\d+)?/g);
+        const toNums = toD.match(/-?\d+(\.\d+)?/g);
+        if (!fromNums || !toNums || fromNums.length !== toNums.length) return toD;
+
+        let res = '';
+        let numIdx = 0;
+        let inNum = false;
+
+        for (let i = 0; i < toD.length; i++) {
+          const char = toD[i];
+          if ((char >= '0' && char <= '9') || char === '-' || char === '.') {
+            if (!inNum) {
+              const startVal = parseFloat(fromNums[numIdx]);
+              const endVal = parseFloat(toNums[numIdx]);
+              const interp = startVal + (endVal - startVal) * t;
+              res += interp.toFixed(1);
+              numIdx++;
+              inNum = true;
+            }
+          } else {
+            inNum = false;
+            res += char;
+          }
+        }
+        return res;
+      }
+
+      /* =========================================================================
+         7. PROCEDURAL IDLE ENGINE (Micro-expressions, Random Blinks, Drifts)
+         ========================================================================= */
+      let nextBlinkTime = performance.now() + 2000;
+      let nextSaccadeTime = performance.now() + 1500;
+      let nextMicroExpressionTime = performance.now() + 7000;
+      let isBlinking = false;
+      let blinkStartTime = 0;
+      let blinkDuration = 140;
+
+      function updateIdleBehavior(now) {
+        // Natural Random Blinking with variable duration
+        if (now > nextBlinkTime && !isBlinking) {
+          isBlinking = true;
+          blinkStartTime = now;
+          // Weighted randomness for blink duration (regular, quick, slow)
+          const roll = Math.random();
+          blinkDuration = roll > 0.85 ? 240 : (roll < 0.2 ? 100 : 140);
+          nextBlinkTime = now + 1800 + Math.random() * 3800;
+        }
+
+        if (isBlinking) {
+          const elapsed = now - blinkStartTime;
+          if (elapsed < blinkDuration) {
+            // Halfway is full closed
+            const half = blinkDuration / 2;
+            const progress = elapsed < half ? (elapsed / half) : (1 - (elapsed - half) / half);
+            phys.blinkProgress.target = Math.min(1, Math.max(0, progress));
+          } else {
+            isBlinking = false;
+            phys.blinkProgress.target = 0;
+            // Occasional double blink (natural human trait)
+            if (Math.random() < 0.18) {
+              nextBlinkTime = now + 120;
+            }
+          }
+        }
+
+        // Natural Eye Saccades (gaze drifting and refocusing)
+        if (now > nextSaccadeTime && !state.isHoldingTouch) {
+          const rangeX = state.emotion === 'suspicion' ? 24 : 16;
+          const rangeY = 12;
+          
+          if (state.emotion === 'thinking') {
+            phys.gazeX.target = (Math.random() > 0.5 ? 1 : -1) * (14 + Math.random() * 8);
+            phys.gazeY.target = -12 - Math.random() * 6; // Look up & away
+          } else if (state.emotion === 'embarrassment' || state.emotion === 'sadness') {
+            phys.gazeX.target = (Math.random() - 0.5) * 8;
+            phys.gazeY.target = 14 + Math.random() * 6; // Gaze cast down
+          } else {
+            phys.gazeX.target = (Math.random() - 0.5) * rangeX;
+            phys.gazeY.target = (Math.random() - 0.5) * rangeY;
+          }
+
+          // Randomize next saccade interval
+          nextSaccadeTime = now + 1200 + Math.random() * 2800;
+        }
+
+        // Procedural Micro-expression & Mood drift
+        if (now > nextMicroExpressionTime) {
+          state.timeSinceLastInteraction += 8;
+
+          // Boredom or sleepiness after prolonged inactivity
+          if (state.timeSinceLastInteraction > 35 && state.emotion === 'neutral') {
+            triggerExpression('boredom', true, 'Idling...');
+          } else if (state.timeSinceLastInteraction > 70 && (state.emotion === 'boredom' || state.emotion === 'neutral')) {
+            triggerExpression('sleepiness', true, 'Dozing off...');
+          } else if (state.emotion === 'neutral') {
+            // Natural random emotional micro-states
+            const subtleFlavors = ['curiosity', 'neutral', 'thinking', 'mischievous'];
+            const chosen = subtleFlavors[Math.floor(Math.random() * subtleFlavors.length)];
+            if (chosen !== state.emotion) {
+              triggerExpression(chosen, Math.random() < 0.4, 'Micro-expression');
+            }
+          }
+
+          // Slow cooldown for irritation
+          if (state.irritation > 0) {
+            state.irritation = Math.max(0, state.irritation - 12);
+            updatePsychologicalMeters();
+          }
+
+          nextMicroExpressionTime = now + 6000 + Math.random() * 8000;
+        }
+      }
+
+      /* =========================================================================
+         8. TOUCH & INTERACTION INTELLIGENCE
+         ========================================================================= */
+      function handleTouchAt(clientX, clientY) {
+        getAudioContext(); // Ensure audio unlocks on user gesture
+
+        const rect = stageEl.getBoundingClientRect();
+        const centerX = rect.left + rect.width / 2;
+        const centerY = rect.top + rect.height / 2;
+
+        const deltaX = (clientX - centerX) / (rect.width / 2);
+        const deltaY = (clientY - centerY) / (rect.height / 2);
+
+        // Immediate gaze attraction to touch contact
+        phys.gazeX.target = deltaX * 28;
+        phys.gazeY.target = deltaY * 20;
+
+        // Head gently turns toward contact
+        phys.headX.target = deltaX * 14;
+        phys.headY.target = deltaY * 12;
+        phys.headRotate.target = deltaX * 4;
+      }
+
+      // Tap Interaction & Irritation Psychology
+      stageEl.addEventListener('pointerdown', (e) => {
+        state.isHoldingTouch = true;
+        state.touchStartTime = performance.now();
+        state.timeSinceLastInteraction = 0;
+
+        handleTouchAt(e.clientX, e.clientY);
+
+        // Track repeated rapid taps
+        const now = performance.now();
+        if (now - state.lastTapTime < 500) {
+          state.tapCount++;
+          state.irritation = Math.min(100, state.irritation + 22);
+        } else {
+          state.tapCount = 1;
+        }
+        state.lastTapTime = now;
+        updatePsychologicalMeters();
+
+        // Emotional response based on irritation and touch location
+        if (state.irritation > 75) {
+          triggerExpression('anger', true, 'Overstimulated');
+        } else if (state.irritation > 40) {
+          triggerExpression('skepticism', true, 'Poked repeatedly');
+        } else {
+          // Gentle tap
+          const distanceToEye = Math.hypot(e.clientX - window.innerWidth / 2, e.clientY - window.innerHeight / 2);
+          if (distanceToEye < 90) {
+            triggerExpression('curiosity', true, 'Intrigued');
+          } else {
+            triggerExpression('happiness', true, 'Affection');
+          }
+        }
+      });
+
+      window.addEventListener('pointermove', (e) => {
+        if (state.isHoldingTouch) {
+          handleTouchAt(e.clientX, e.clientY);
+        } else {
+          // Gentle desktop / tablet hover gaze following
+          const rect = stageEl.getBoundingClientRect();
+          const dx = (e.clientX - (rect.left + rect.width / 2)) / (rect.width / 2);
+          const dy = (e.clientY - (rect.top + rect.height / 2)) / (rect.height / 2);
+          phys.gazeX.target = dx * 16;
+          phys.gazeY.target = dy * 12;
+        }
+      });
+
+      window.addEventListener('pointerup', () => {
+        if (!state.isHoldingTouch) return;
+        state.isHoldingTouch = false;
+        const holdDuration = performance.now() - state.touchStartTime;
+
+        // Long press vs quick tap
+        if (holdDuration > 850) {
+          triggerExpression('relief', true, 'Touch released');
+        }
+
+        // Ease gaze back smoothly after a delay
+        setTimeout(() => {
+          if (!state.isHoldingTouch) {
+            phys.headX.target = 0;
+            phys.headY.target = 0;
+          }
+        }, 900);
+      });
+
+      /* =========================================================================
+         9. REAL PHONE MOTION SENSOR INTEGRATION (DeviceOrientation & Motion)
+         ========================================================================= */
+      let lastAccelMagnitude = 0;
+      let shakeCount = 0;
+      let lastShakeTime = 0;
+
+      function handleOrientation(e) {
+        if (!e.gamma && !e.beta) return;
+        state.sensorActive = true;
+        gyroStatusDot.classList.replace('bg-neutral-600', 'bg-emerald-400');
+
+        // Gamma: Left-to-Right tilt (-90 to 90)
+        // Beta: Front-to-Back tilt (-180 to 180)
+        const tiltX = Math.max(-45, Math.min(45, e.gamma || 0));
+        const tiltY = Math.max(-45, Math.min(45, (e.beta || 0) - 45)); // Calibrate for 45 deg viewing
+
+        // Subtle head tilt and gaze reaction matching physical phone orientation
+        phys.headRotate.target = tiltX * 0.22;
+        phys.gazeX.target = -tiltX * 0.35;
+        phys.gazeY.target = -tiltY * 0.25;
+
+        // Tendril physics reacting to gravity
+        phys.tendrilLagX.target = tiltX * 0.4;
+      }
+
+      function handleMotion(e) {
+        const accel = e.accelerationIncludingGravity || e.acceleration;
+        if (!accel || accel.x === null) return;
+
+        state.sensorActive = true;
+        gyroStatusDot.classList.replace('bg-neutral-600', 'bg-emerald-400');
+
+        const x = accel.x || 0;
+        const y = accel.y || 0;
+        const z = accel.z || 0;
+        const magnitude = Math.sqrt(x * x + y * y + z * z);
+        const delta = Math.abs(magnitude - lastAccelMagnitude);
+        lastAccelMagnitude = magnitude;
+
+        const now = performance.now();
+
+        // Sudden movement or violent shake detection
+        if (delta > 14) {
+          if (now - lastShakeTime < 700) {
+            shakeCount++;
+          } else {
+            shakeCount = 1;
+          }
+          lastShakeTime = now;
+
+          if (shakeCount >= 3) {
+            // Repeated shaking -> dizzy confusion or irritated
+            state.isDizzy = true;
+            phys.headRotate.snap(35);
+            triggerExpression('confusion', true, 'Physical Shake');
+            playCreatureSound('surprised', 1.3);
+
+            setTimeout(() => {
+              state.isDizzy = false;
+              triggerExpression('relief', true, 'Stabilized');
+            }, 1800);
+          } else {
+            // Single sharp movement -> brief startle
+            triggerExpression('fear', true, 'Motion startled');
+            playCreatureSound('surprised', 0.9);
+          }
+        }
+      }
+
+      // Sensor Permission Handlers (iOS 13+ & Android Chrome HTTPS)
+      async function setupSensors() {
+        if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function') {
+          try {
+            const permissionState = await DeviceOrientationEvent.requestPermission();
+            if (permissionState === 'granted') {
+              window.addEventListener('deviceorientation', handleOrientation, true);
+              window.addEventListener('devicemotion', handleMotion, true);
+              sensorStatusLabel.textContent = 'Hardware Gyro Linked (iOS)';
+              gyroStatusDot.className = 'w-1.5 h-1.5 rounded-full bg-emerald-400 ml-1.5';
+            } else {
+              sensorStatusLabel.textContent = 'Sensor Permission Denied';
+            }
+          } catch (err) {
+            sensorStatusLabel.textContent = 'Sensor Access Error';
+          }
+        } else {
+          // Android / Desktop standard Chrome implementation
+          window.addEventListener('deviceorientation', handleOrientation, true);
+          window.addEventListener('devicemotion', handleMotion, true);
+          sensorStatusLabel.textContent = 'Hardware Gyro Listening';
+        }
+      }
+
+      btnRequestSensor.addEventListener('click', () => {
+        getAudioContext();
+        setupSensors();
+      });
+
+      btnMotionSensor.addEventListener('click', () => {
+        getAudioContext();
+        setupSensors();
+        showHudTemporary();
+      });
+
+      /* =========================================================================
+         10. AMBIENT PARTICLES (Star-dust / Micro Presence)
+         ========================================================================= */
+      const canvas = document.getElementById('fx-canvas');
+      const ctx = canvas.getContext('2d');
+      let particles = [];
+
+      function resizeCanvas() {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+      }
+      window.addEventListener('resize', resizeCanvas);
+      resizeCanvas();
+
+      for (let i = 0; i < 35; i++) {
+        particles.push({
+          x: Math.random() * window.innerWidth,
+          y: Math.random() * window.innerHeight,
+          r: Math.random() * 1.2 + 0.3,
+          vx: (Math.random() - 0.5) * 0.15,
+          vy: -Math.random() * 0.25 - 0.05,
+          alpha: Math.random() * 0.35 + 0.05
+        });
+      }
+
+      function drawAmbientParticles() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.fillStyle = '#ffffff';
+
+        for (let p of particles) {
+          p.x += p.vx;
+          p.y += p.vy;
+          if (p.y < 0) p.y = canvas.height;
+          if (p.x < 0) p.x = canvas.width;
+          if (p.x > canvas.width) p.x = 0;
+
+          ctx.globalAlpha = p.alpha;
+          ctx.beginPath();
+          ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+          ctx.fill();
+        }
+        ctx.globalAlpha = 1.0;
+      }
+
+      /* =========================================================================
+         11. MAIN RENDER LOOP (requestAnimationFrame)
+         ========================================================================= */
+      function renderLoop(time) {
+        // 1. Update Physics
+        const curGazeX = phys.gazeX.update();
+        const curGazeY = phys.gazeY.update();
+        const curHeadX = phys.headX.update();
+        const curHeadY = phys.headY.update();
+        const curHeadRot = phys.headRotate.update();
+        const curTendrilLag = phys.tendrilLagX.update();
+        const curBlink = phys.blinkProgress.update();
+
+        // 2. Head transform with breathing subtle oscillation
+        const breathY = Math.sin(time * 0.0016) * 2.8;
+        const breathRotate = Math.sin(time * 0.0011) * 0.6;
+        headGroup.setAttribute(
+          'transform',
+          `translate(${curHeadX.toFixed(2)}, ${(curHeadY + breathY).toFixed(2)}) rotate(${(curHeadRot + breathRotate).toFixed(2)}, 200, 200)`
+        );
+
+        // 3. Eyeball / Pupil gaze offset
+        leftPupil.setAttribute('transform', `translate(${curGazeX.toFixed(2)}, ${curGazeY.toFixed(2)})`);
+        rightPupil.setAttribute('transform', `translate(${curGazeX.toFixed(2)}, ${curGazeY.toFixed(2)})`);
+
+        // 4. Secondary Antenna Physics
+        const tipX = 200 - curTendrilLag * 0.8;
+        const tipY = 50 + Math.abs(curHeadX) * 0.2;
+        tendrilPath.setAttribute('d', `M 200 100 Q ${200 - curTendrilLag * 0.4} 70 ${tipX.toFixed(1)} ${tipY.toFixed(1)}`);
+        tendrilTip.setAttribute('cx', tipX.toFixed(1));
+        tendrilTip.setAttribute('cy', tipY.toFixed(1));
+
+        // 5. Procedural Expression Interpolation
+        if (currentMorphProgress < 1.0) {
+          const elapsed = time - morphStartTime;
+          currentMorphProgress = Math.min(1.0, elapsed / morphDuration);
+          // Cubic ease-out
+          const t = 1 - Math.pow(1 - currentMorphProgress, 3);
+
+          const morphedLeftTop = morphSvgD(morphSource.leftLidTop, morphTarget.leftLidTop, t);
+          const morphedLeftBottom = morphSvgD(morphSource.leftLidBottom, morphTarget.leftLidBottom, t);
+          const morphedRightTop = morphSvgD(morphSource.rightLidTop, morphTarget.rightLidTop, t);
+          const morphedRightBottom = morphSvgD(morphSource.rightLidBottom, morphTarget.rightLidBottom, t);
+
+          const morphedLeftBrow = morphSvgD(morphSource.leftBrow, morphTarget.leftBrow, t);
+          const morphedRightBrow = morphSvgD(morphSource.rightBrow, morphTarget.rightBrow, t);
+          const morphedMouth = morphSvgD(morphSource.mouth, morphTarget.mouth, t);
+
+          // Apply Eyebrows and Mouth
+          leftBrow.setAttribute('d', morphedLeftBrow);
+          rightBrow.setAttribute('d', morphedRightBrow);
+          mouthPath.setAttribute('d', morphedMouth);
+
+          // Apply Eyelid Bezier contours
+          if (curBlink <= 0.02) {
+            leftLidTop.setAttribute('d', morphedLeftTop);
+            leftLidBottom.setAttribute('d', morphedLeftBottom);
+            rightLidTop.setAttribute('d', morphedRightTop);
+            rightLidBottom.setAttribute('d', morphedRightBottom);
+
+            // Update clip-path aperture
+            const leftClipD = `${morphedLeftTop} L 170 200 ${morphedLeftBottom.replace('M 90 200', '')} Z`;
+            leftLidClip.setAttribute('d', leftClipD);
+            const rightClipD = `${morphedRightTop} L 310 200 ${morphedRightBottom.replace('M 230 200', '')} Z`;
+            rightLidClip.setAttribute('d', rightClipD);
+          }
+
+          // Cheeks / Blush
+          const blushVal = morphSource.blush + (morphTarget.blush - morphSource.blush) * t;
+          cheeksGroup.setAttribute('opacity', blushVal.toFixed(2));
+        }
+
+        // 6. Blink Override (Slices upper and lower lids together)
+        if (curBlink > 0.02) {
+          const blinkLeftMidY = 200 + curBlink * 36;
+          const blinkRightMidY = 200 + curBlink * 36;
+
+          const blinkLeftD = `M 90 200 Q 130 ${blinkLeftMidY.toFixed(1)} 170 200`;
+          const blinkRightD = `M 230 200 Q 270 ${blinkRightMidY.toFixed(1)} 310 200`;
+
+          leftLidTop.setAttribute('d', blinkLeftD);
+          rightLidTop.setAttribute('d', blinkRightD);
+
+          const leftClipBlink = `M 90 200 Q 130 ${blinkLeftMidY.toFixed(1)} 170 200 Q 130 200 90 200 Z`;
+          leftLidClip.setAttribute('d', leftClipBlink);
+          const rightClipBlink = `M 230 200 Q 270 ${blinkRightMidY.toFixed(1)} 310 200 Q 270 200 230 200 Z`;
+          rightLidClip.setAttribute('d', rightClipBlink);
+        }
+
+        // 7. Idle behaviors & Particles
+        updateIdleBehavior(time);
+        drawAmbientParticles();
+
+        requestAnimationFrame(renderLoop);
+      }
+
+      /* =========================================================================
+         12. UI CONTROLS & SETTINGS
+         ========================================================================= */
+      function updatePsychologicalMeters() {
+        meterIrritationVal.textContent = `${Math.round(state.irritation)}%`;
+        meterIrritationBar.style.width = `${state.irritation}%`;
+        meterCuriosityVal.textContent = `${Math.round(state.curiosity)}%`;
+        meterCuriosityBar.style.width = `${state.curiosity}%`;
+        meterEnergyVal.textContent = `${Math.round(state.energy)}%`;
+        meterEnergyBar.style.width = `${state.energy}%`;
+      }
+
+      btnSoundToggle.addEventListener('click', (e) => {
+        e.stopPropagation();
+        getAudioContext();
+        state.soundEnabled = !state.soundEnabled;
+        if (state.soundEnabled) {
+          soundIconOn.classList.remove('hidden');
+          soundIconOff.classList.add('hidden');
+          drawerSoundBtn.textContent = 'Active';
+          drawerSoundBtn.className = 'px-3 py-1.5 text-[11px] font-mono bg-sky-950 border border-sky-600/30 text-sky-300 rounded-lg';
+          playCreatureSound('happy', 1.0);
+        } else {
+          soundIconOn.classList.add('hidden');
+          soundIconOff.classList.remove('hidden');
+          drawerSoundBtn.textContent = 'Muted';
+          drawerSoundBtn.className = 'px-3 py-1.5 text-[11px] font-mono bg-neutral-900 border border-white/10 text-neutral-400 rounded-lg';
+        }
+      });
+
+      drawerSoundBtn.addEventListener('click', () => {
+        btnSoundToggle.click();
+      });
+
+      // Settings Drawer toggle
+      function openSettings() {
+        settingsDrawer.classList.remove('translate-y-full');
+        drawerBackdrop.classList.remove('opacity-0', 'pointer-events-none');
+      }
+
+      function closeSettings() {
+        settingsDrawer.classList.add('translate-y-full');
+        drawerBackdrop.classList.add('opacity-0', 'pointer-events-none');
+      }
+
+      btnSettingsToggle.addEventListener('click', (e) => {
+        e.stopPropagation();
+        openSettings();
+      });
+
+      btnCloseSettings.addEventListener('click', closeSettings);
+      drawerBackdrop.addEventListener('click', closeSettings);
+
+      // Emotion test buttons
+      document.querySelectorAll('.emotion-trigger').forEach(btn => {
+        btn.addEventListener('click', () => {
+          getAudioContext();
+          const emotion = btn.dataset.emotion;
+          triggerExpression(emotion, true, 'Diagnostic Test');
+        });
+      });
+
+      // Reset Creature Memory
+      btnResetState.addEventListener('click', () => {
+        state.irritation = 0;
+        state.curiosity = 85;
+        state.energy = 100;
+        state.timeSinceLastInteraction = 0;
+        updatePsychologicalMeters();
+        triggerExpression('neutral', true, 'Memory Reset');
+        closeSettings();
+      });
+
+      // Init kick-off
+      triggerExpression('neutral', false);
+      updatePsychologicalMeters();
+      requestAnimationFrame(renderLoop);
+
+      // Fade interaction hint gently after first user interaction
+      stageEl.addEventListener('pointerdown', () => {
+        document.getElementById('interaction-hint').style.opacity = '0';
+      }, { once: true });
+
+    })();
+  </script>
+</body>
+</html>

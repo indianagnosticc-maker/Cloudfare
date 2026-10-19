@@ -255,25 +255,23 @@ header{display:flex;align-items:center;gap:6px;padding:10px 12px;background:var(
 .blocked-entry button{color:var(--bl);font-weight:600;padding:5px 10px;border-radius:6px;background:var(--bg);border:1px solid var(--ln);font-size:12px}
 
 
-/* Simplified settings requested */
+/* Minimal settings layout */
 #cfgNav{display:none!important}
-#cfgCatAppearance,#cfgCatPrivacy,#cfgCatAccount{display:block!important}
+#cfgCatAppearance,#cfgCatPrivacy,#cfgCatAccount{display:block!important;width:100%;}
 #cfgCatChat,#cfgCatNotifications{display:none!important}
-#cfgCatAppearance>.cfg-sec-title:not(:first-child),
-#cfgCatAppearance>.cfg-card:not(:first-of-type){display:none!important}
+#cfgCatAppearance>.cfg-sec-title:not(:first-child),#cfgCatAppearance>.cfg-card:not(:first-of-type){display:none!important}
 #cfgCatAppearance>.cfg-card:first-of-type .opt:nth-child(n+2){display:none!important}
-#cfgCatPrivacy>.cfg-sec-title:first-child{display:none!important}
-#cfgCatPrivacy>.cfg-card:first-of-type>.opt:not(#o7){display:none!important}
-#blockedList{display:none}
-#blockedList.show{display:block}
-#cfgCatPrivacy>.cfg-card:first-of-type{margin-bottom:14px}
-#cfgCatAccount>.cfg-sec-title:not(:first-child),
-#cfgCatAccount>.cfg-card:not(:first-of-type),
-#cfgCatAccount>p{display:none!important}
+#cfgCatPrivacy>.cfg-sec-title,#cfgCatPrivacy>.cfg-card .opt:not(#o7),#chatActionSec,#chatActionCard{display:none!important}
+#blockedList{display:none} #blockedList.show{display:block}
+#cfgCatAccount>.cfg-sec-title:not(:first-child),#cfgCatAccount>.cfg-card:not(:first-of-type),#cfgCatAccount>p{display:none!important}
 .sheet{max-height:calc(100dvh - env(safe-area-inset-top,0px));}
-.sheet-body{overflow-y:auto;overscroll-behavior:contain;padding-bottom:calc(28px + env(safe-area-inset-bottom,0px))}
-.cfg-panel{min-width:0}
-
+.sheet-body{overflow-y:auto;overscroll-behavior:contain;padding-bottom:calc(28px + env(safe-area-inset-bottom,0px));display:block!important}
+.cfg-panel{min-width:0;flex:none}
+#cfgCatPrivacy>.cfg-card:first-of-type{margin-bottom:14px}
+#cfgCatAccount .profile-email{padding:0 14px 12px;color:var(--mu);font-size:13px;overflow-wrap:anywhere}
+#accAvatar{width:52px;height:52px;border-radius:50%;overflow:hidden;display:flex;align-items:center;justify-content:center;flex:none}
+#accDisplay{cursor:pointer;text-decoration:underline;text-underline-offset:3px}
+#cfgCatAccount .opt{align-items:center}
 /* Toast notifications */
 .toast{position:absolute;left:50%;bottom:90px;transform:translate(-50%,20px) scale(.95);background:#1a1d22;border:1px solid var(--ln);box-shadow:0 8px 30px rgba(0,0,0,0.6);color:#fff;padding:10px 18px;border-radius:24px;font-size:13.5px;font-weight:500;opacity:0;transition:opacity .25s cubic-bezier(.3,.8,.3,1),transform .25s cubic-bezier(.3,.8,.3,1);z-index:150;pointer-events:none;white-space:nowrap;display:flex;align-items:center;gap:8px}
 .toast.on{opacity:1;transform:translate(-50%,0) scale(1)}
@@ -550,13 +548,14 @@ header{display:flex;align-items:center;gap:6px;padding:10px 12px;background:var(
   <div id="cfgCatAccount" class="cfg-panel" style="display:none">
    <div class="cfg-sec-title">Your Profile</div>
    <div class="cfg-card">
-    <div class="opt" style="pointer-events:none">
-     <div class="opt-info">
-      <span class="opt-label" id="accDisplay">Operative</span>
+    <div class="opt" style="gap:12px">
+     <div id="accAvatar"> </div>
+     <div class="opt-info" style="min-width:0">
+      <span class="opt-label" id="accDisplay" role="button" title="Tap to copy username">Username</span>
       <span class="opt-desc" id="accHandle">@username</span>
      </div>
-     <span class="btn gh" style="font-size:11px;padding:4px 8px">Verified</span>
     </div>
+    <div class="profile-email" id="accEmail">Email not available</div>
     <button class="opt" id="o4">
      <div class="opt-info">
       <span class="opt-label">Copy My ID</span>
@@ -902,7 +901,7 @@ function subMsgs(chatId){
    prev=x.by;
   });
   $('typ').insertAdjacentHTML('beforebegin',h);
-  if(userPrefs.autoScroll && (forceBottom||near||!painted)){requestAnimationFrame(()=>{msgs.style.scrollBehavior='auto';msgs.scrollTop=msgs.scrollHeight;forceBottom=false})}else{requestAnimationFrame(()=>{msgs.style.scrollBehavior='auto';msgs.scrollTop=oldTop})}
+  if(!painted || forceBottom || (userPrefs.autoScroll && near)){requestAnimationFrame(()=>{msgs.style.scrollBehavior='auto';msgs.scrollTop=msgs.scrollHeight;forceBottom=false})}else{requestAnimationFrame(()=>{msgs.style.scrollBehavior='auto';msgs.scrollTop=oldTop})}
   painted=true;markSeen(chatId);
  },e=>{console.error('Messages error',e);toast('Could not load messages')});
 }
@@ -1068,6 +1067,7 @@ $('cfgNav')?.addEventListener('click', (e) => {
 
 // Interactive settings controls
 $('o7')?.addEventListener('click', () => { const b=$('blockedList'); b?.classList.toggle('show'); });
+$('accDisplay')?.addEventListener('click',async()=>{const u=P?.username||'';if(!u)return;try{await navigator.clipboard.writeText(u);toast('Username copied')}catch(e){const t=document.createElement('textarea');t.value=u;document.body.appendChild(t);t.select();document.execCommand('copy');t.remove();toast('Username copied')}});
 $('profileSummary')?.addEventListener('click', async () => { const name=P?.username||''; try { await navigator.clipboard.writeText(name); toast('Username copied'); } catch(e) { toast(name); } });
 $('o1')?.addEventListener('click', () => {
   userPrefs.theme = (userPrefs.theme === 'dark') ? 'light' : 'dark';
@@ -1232,7 +1232,12 @@ $('inp')?.addEventListener('keydown',e=>{
   }
 });
 
-window.addEventListener('resize',()=>{const i=$('inp');if(document.activeElement===i){requestAnimationFrame(()=>{i.scrollIntoView({block:'nearest',behavior:'auto'});});}});
+function fitComposerToViewport(){const app=document.querySelector('.app'),cmp=document.querySelector('.cmp'),i=$('inp');if(!app||!cmp)return;const vh=window.visualViewport?.height||window.innerHeight;app.style.height=vh+'px';if(document.activeElement===i){requestAnimationFrame(()=>{msgs.scrollTop=msgs.scrollHeight;});}}
+window.visualViewport?.addEventListener('resize',fitComposerToViewport);
+window.visualViewport?.addEventListener('scroll',fitComposerToViewport);
+window.addEventListener('resize',fitComposerToViewport);
+$('inp')?.addEventListener('focus',()=>setTimeout(fitComposerToViewport,80));
+$('inp')?.addEventListener('blur',()=>{setTimeout(()=>{const app=document.querySelector('.app');if(app)app.style.height='100dvh';},100)});
 
 // Initialize app preferences on startup
 loadPreferences();

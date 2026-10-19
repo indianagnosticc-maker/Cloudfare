@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="en" data-theme="dark"><head><meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, interactive-widget=resizes-content">
 <title>Chats</title>
 <style>
 :root{
@@ -22,9 +22,8 @@
   --chat-bubble-radius:18px;
   --chat-density-pad:10px 14px;
   --anim-speed:0.3s;
+  --app-height:100dvh;
   box-sizing:border-box;
-  padding-top:env(safe-area-inset-top,0px);
-  padding-bottom:env(safe-area-inset-bottom,0px);
 }
 :root[data-theme="light"]{
   --bg:#f6f7f8;
@@ -70,16 +69,18 @@
 :root[data-bg-pattern="grid"] #msgs{background-image:linear-gradient(to right, var(--ln) 1px, transparent 1px), linear-gradient(to bottom, var(--ln) 1px, transparent 1px);background-size:20px 20px}
 :root[data-bg-pattern="clean"] #msgs{background-image:none}
 
-*{box-sizing:border-box;margin:0;-webkit-tap-highlight-color:transparent}
-html,body{height:100%;height:100dvh;overscroll-behavior:none}
-body{background:var(--bg);color:var(--tx);font:15px -apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;overflow:hidden}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;height:100dvh;overscroll-behavior:none;overflow:hidden;position:fixed;width:100%}
+body{background:var(--bg);color:var(--tx);font:15px -apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif}
 button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
 svg{width:1em;height:1em;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex:none}
-.app{height:100dvh;height:100%;position:relative;max-width:560px;margin:0 auto;background:var(--p);overflow:hidden}
-.scr{position:absolute;inset:0;display:flex;flex-direction:column;background:var(--p);transition:transform var(--anim-speed) cubic-bezier(.3,.8,.3,1),opacity var(--anim-speed)}
+.app{height:var(--app-height, 100dvh);max-height:var(--app-height, 100dvh);position:relative;max-width:560px;margin:0 auto;background:var(--p);overflow:hidden;display:flex;flex-direction:column}
+.scr{position:absolute;inset:0;display:flex;flex-direction:column;background:var(--p);transition:transform var(--anim-speed) cubic-bezier(.3,.8,.3,1),opacity var(--anim-speed);overflow:hidden;height:100%}
 #chat{transform:translateX(100%)}
 .app.open #chat{transform:none}.app.open #list{transform:translateX(-25%);opacity:.6}
-.top{padding:12px 16px 0;flex:none}
+
+/* List Screen Top & Tabs */
+.top{padding:calc(12px + env(safe-area-inset-top,0px)) 16px 0;flex:none}
 .sb{display:flex;align-items:center;gap:8px;background:var(--bg);border:1px solid var(--ln);border-radius:20px;padding:0 12px;height:38px;transition:border-color .2s,box-shadow .2s}
 .sb:focus-within{border-color:var(--bl);box-shadow:0 0 0 3px #0079d322}
 .sb input{flex:1;border:0;background:none;outline:0;font-size:16px;color:var(--tx);min-width:0}
@@ -94,8 +95,8 @@ svg{width:1em;height:1em;fill:none;stroke:currentColor;stroke-width:2;stroke-lin
 @keyframes bp{from{transform:scale(0)}}
 .body{flex:1;position:relative;overflow:hidden}
 .panes{display:flex;width:200%;height:100%;transition:transform var(--anim-speed) cubic-bezier(.3,.8,.3,1)}
-.pane{width:50%;overflow-y:auto;padding:0 16px 24px}
-#srch{position:absolute;inset:0;background:var(--p);overflow-y:auto;padding:0 16px 24px;opacity:0;pointer-events:none;transform:translateY(8px);transition:.25s}
+.pane{width:50%;overflow-y:auto;padding:0 16px calc(24px + env(safe-area-inset-bottom,0px));-webkit-overflow-scrolling:touch}
+#srch{position:absolute;inset:0;background:var(--p);overflow-y:auto;padding:0 16px 24px;opacity:0;pointer-events:none;transform:translateY(8px);transition:.25s;-webkit-overflow-scrolling:touch}
 #srch.on{opacity:1;pointer-events:auto;transform:none}
 .sec{font-size:12px;font-weight:700;color:var(--mu);letter-spacing:.08em;padding:16px 0 8px;border-bottom:1px solid var(--ln);margin-bottom:6px}
 .row{display:flex;align-items:center;gap:12px;padding:8px 0;width:100%;text-align:left;transition:opacity .25s,transform .25s,max-height .3s;max-height:90px;overflow:hidden}
@@ -104,9 +105,9 @@ svg{width:1em;height:1em;fill:none;stroke:currentColor;stroke-width:2;stroke-lin
 .rt{flex:1;min-width:0}
 .sub{font-size:13px;color:var(--mu);display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;transition:filter .2s,opacity .2s}
 .nm{font-weight:500;display:block}
-.av{border-radius:50%;display:grid;place-items:center;color:#fff;font-weight:700;flex:none}.av.photo{display:block;border:1px solid var(--ln)}
+.av{border-radius:50%;display:grid;place-items:center;color:#fff;font-weight:700;flex:none}.av.photo{display:block;border:1px solid var(--ln);border-radius:50%}
 .row{touch-action:pan-y}
-.btn{padding:6px 14px;border-radius:18px;font-size:13px;font-weight:600;background:var(--bl);color:#fff;transition:transform .15s,filter .2s;display:inline-flex;align-items:center;justify-content:center;gap:6px}
+.btn{padding:7px 16px;border-radius:18px;font-size:13px;font-weight:600;background:var(--bl);color:#fff;transition:transform .15s,filter .2s;display:inline-flex;align-items:center;justify-content:center;gap:6px}
 .btn:hover{filter:brightness(1.08)}
 .btn:active{transform:scale(.94)}
 .btn.gh{background:var(--bg);color:var(--mu);border:1px solid var(--ln)}
@@ -122,9 +123,9 @@ svg{width:1em;height:1em;fill:none;stroke:currentColor;stroke-width:2;stroke-lin
 .emp{text-align:center;color:var(--mu);padding:40px 12px;line-height:1.5}
 .hl{color:var(--bl);font-weight:700}
 
-/* Header & Reliable Settings Button */
-header{display:flex;align-items:center;gap:6px;padding:10px 12px;background:var(--hd);border-bottom:1px solid var(--ln);flex:none;position:relative;z-index:2}
-.ib{width:40px;height:40px;border-radius:50%;display:grid;place-items:center;font-size:21px;color:var(--bl);transition:background .2s,transform .2s,color .2s;position:relative;-webkit-appearance:none;touch-action:manipulation}
+/* Chat Header */
+header{display:flex;align-items:center;gap:6px;padding:calc(10px + env(safe-area-inset-top,0px)) 12px 10px;background:var(--hd);border-bottom:1px solid var(--ln);flex:none;position:relative;z-index:2}
+.ib{width:40px;height:40px;border-radius:50%;display:grid;place-items:center;font-size:21px;color:var(--bl);transition:background .2s,transform .2s,color .2s;position:relative;-webkit-appearance:none;touch-action:manipulation;flex:none}
 .ib:hover{background:var(--surface-hover)}
 .ib:active{background:var(--ln);transform:scale(.92)}
 .ib:focus-visible{outline:2px solid var(--bl);outline-offset:2px}
@@ -134,8 +135,8 @@ header{display:flex;align-items:center;gap:6px;padding:10px 12px;background:var(
 .gear:active svg,.gear.rotating svg{transform:rotate(90deg);color:var(--bl)}
 .ht{flex:1;min-width:0;padding-left:4px}.ht b{font-size:17px;display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.ht span{font-size:12px;color:var(--mu)}
 
-/* Messages area & customizable layout */
-#msgs{flex:1;overflow-y:auto;padding:12px 14px 8px;scroll-behavior:smooth;display:flex;flex-direction:column;font-size:var(--chat-font-size)}
+/* Messages area: ONLY this element scrolls vertically */
+#msgs{flex:1;min-height:0;overflow-y:auto;overflow-x:hidden;padding:12px 14px 8px;display:flex;flex-direction:column;font-size:var(--chat-font-size);overscroll-behavior:contain;-webkit-overflow-scrolling:touch}
 #msgs>.m:first-of-type{margin-top:auto}
 .m{display:flex;gap:10px;margin-bottom:var(--chat-spacing);animation:pop .25s cubic-bezier(.3,1.3,.5,1)}
 .mb{min-width:0;max-width:calc(100% - 46px)}
@@ -154,15 +155,47 @@ header{display:flex;align-items:center;gap:6px;padding:10px 12px;background:var(
 .typ i{width:6px;height:6px;border-radius:50%;background:var(--mu);animation:db 1s infinite}.typ i:nth-child(2){animation-delay:.15s}.typ i:nth-child(3){animation-delay:.3s}
 @keyframes db{50%{transform:translateY(-4px);opacity:.4}}
 
-/* Composer */
-.cmp{border-top:1px solid var(--ln);background:var(--hd);padding:8px 12px calc(8px + env(safe-area-inset-bottom,0px));flex:none;position:relative;z-index:5}
-.compose-row{display:flex;align-items:center;gap:8px;min-width:0;width:100%;min-height:42px}
-.cmp .compose-row input,.cmp .compose-row textarea{display:block;flex:1;min-width:0;height:42px;min-height:42px;max-height:120px;padding:10px 14px;background:var(--surface);border:1px solid var(--ln);border-radius:21px;font:inherit;font-size:15px;line-height:1.35;color:var(--tx);outline:0;resize:none;overflow-y:auto;transition:border-color .2s,box-shadow .2s}
-.cmp .compose-row input:focus,.cmp .compose-row textarea:focus{border-color:var(--bl);box-shadow:0 0 0 3px #1d9bf022}
-.cmp .compose-row #snd{display:grid;place-items:center;flex:0 0 40px;width:40px;height:40px;border-radius:50%;color:var(--mu);background:transparent;transition:background .2s,color .2s,transform .2s}
+/* Composer: remains firmly docked above virtual keyboard */
+.cmp{border-top:1px solid var(--ln);background:var(--hd);padding:8px 12px calc(8px + env(safe-area-inset-bottom,0px));flex:none;position:relative;z-index:10;width:100%}
+.compose-row{display:flex;align-items:flex-end;gap:8px;min-width:0;width:100%;min-height:42px}
+.cmp .compose-row textarea{
+  display:block;
+  flex:1;
+  min-width:0;
+  height:42px;
+  min-height:42px;
+  max-height:120px;
+  padding:10px 14px;
+  background:var(--surface);
+  border:1px solid var(--ln);
+  border-radius:21px;
+  font:inherit;
+  font-size:15px;
+  line-height:1.35;
+  color:var(--tx);
+  outline:0;
+  resize:none;
+  overflow-y:auto;
+  transition:border-color .2s,box-shadow .2s;
+  -webkit-appearance:none;
+}
+.cmp .compose-row textarea:focus{border-color:var(--bl);box-shadow:0 0 0 3px #1d9bf022}
+.cmp .compose-row #snd{
+  display:grid;
+  place-items:center;
+  flex:0 0 40px;
+  width:40px;
+  height:40px;
+  border-radius:50%;
+  color:var(--mu);
+  background:transparent;
+  transition:background .2s,color .2s,transform .2s;
+  align-self:flex-end;
+  margin-bottom:1px;
+}
 .cmp .compose-row #snd.on{color:#fff;background:var(--bl);transform:scale(1.05)}
 .cmp .compose-row #snd svg{width:20px;height:20px}
-.sug{position:absolute;left:0;right:0;bottom:100%;background:var(--surface);border-top:1px solid var(--ln);box-shadow:0 -6px 20px #0004;max-height:0;overflow:hidden;transition:max-height .25s}
+.sug{position:absolute;left:0;right:0;bottom:100%;background:var(--surface);border-top:1px solid var(--ln);box-shadow:0 -6px 20px #0004;max-height:0;overflow:hidden;transition:max-height .25s;z-index:15}
 .sug.on{max-height:170px;overflow-y:auto}
 .sug button{display:flex;align-items:center;gap:10px;width:100%;padding:10px 16px;text-align:left;border-bottom:1px solid var(--ln)}
 .sug button:hover{background:var(--surface-hover)}
@@ -171,7 +204,7 @@ header{display:flex;align-items:center;gap:6px;padding:10px 12px;background:var(
 .scrim{position:absolute;inset:0;background:rgba(0,0,0,0.65);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);opacity:0;pointer-events:none;transition:opacity .3s cubic-bezier(.3,.8,.3,1);z-index:90}
 .scrim.on{opacity:1;pointer-events:auto}
 
-/* Redesigned Modern Settings Sheet / Modal */
+/* Clean, Simplified Settings Sheet (Vertical Layout) */
 .sheet{
   position:absolute;
   left:0;
@@ -186,7 +219,7 @@ header{display:flex;align-items:center;gap:6px;padding:10px 12px;background:var(
   transition:transform .35s cubic-bezier(.25,1,.3,1),opacity .2s;
   display:flex;
   flex-direction:column;
-  max-height:88%;
+  max-height:90%;
   overflow:hidden;
 }
 .sheet.on{transform:none}
@@ -196,8 +229,8 @@ header{display:flex;align-items:center;gap:6px;padding:10px 12px;background:var(
     right:auto;
     bottom:auto;
     top:50%;
-    width:520px;
-    max-height:82vh;
+    width:500px;
+    max-height:85vh;
     border-radius:20px;
     border:1px solid var(--ln);
     transform:translate(-50%,-46%) scale(.96);
@@ -212,77 +245,112 @@ header{display:flex;align-items:center;gap:6px;padding:10px 12px;background:var(
   .sheet-handle{display:none!important}
 }
 .sheet-handle{width:40px;height:4.5px;border-radius:3px;background:var(--ln);margin:10px auto 4px;flex:none}
-.sheet-header{display:flex;align-items:center;justify-content:space-between;padding:12px 20px;border-bottom:1px solid var(--ln);flex:none;background:var(--hd)}
+.sheet-header{display:flex;align-items:center;justify-content:space-between;padding:14px 18px;border-bottom:1px solid var(--ln);flex:none;background:var(--hd)}
 .sheet-header-left{display:flex;align-items:center;gap:10px}
-.sheet-title{font-size:19px;font-weight:700;letter-spacing:-.01em}
-.sheet-close{width:34px;height:34px;border-radius:50%;display:grid;place-items:center;color:var(--mu);transition:background .2s,color .2s}
-.sheet-close:hover{background:var(--surface-hover);color:var(--tx)}
-.sheet-close:active{transform:scale(.92)}
+.sheet-title{font-size:18px;font-weight:700;letter-spacing:-.01em}
+.sheet-close, .sheet-back{width:36px;height:36px;border-radius:50%;display:grid;place-items:center;color:var(--mu);transition:background .2s,color .2s}
+.sheet-close:hover, .sheet-back:hover{background:var(--surface-hover);color:var(--tx)}
+.sheet-close:active, .sheet-back:active{transform:scale(.92)}
 
-/* Settings navigation tabs */
-.cfg-nav{display:flex;gap:6px;padding:8px 16px;background:var(--hd);border-bottom:1px solid var(--ln);overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none}
-.cfg-nav::-webkit-scrollbar{display:none}
-.cfg-tab{padding:7px 13px;border-radius:18px;font-size:13px;font-weight:600;color:var(--mu);white-space:nowrap;transition:background .2s,color .2s,transform .15s}
-.cfg-tab.active{background:var(--surface-hover);color:var(--tx);box-shadow:inset 0 0 0 1px var(--ln)}
-.cfg-tab:active{transform:scale(.95)}
+.sheet-body{flex:1;overflow-y:auto;padding:16px 18px calc(24px + env(safe-area-inset-bottom,0px));-webkit-overflow-scrolling:touch}
 
-.sheet-body{flex:1;overflow-y:auto;padding:16px 20px 28px;-webkit-overflow-scrolling:touch}
-.cfg-sec-title{font-size:11px;font-weight:700;color:var(--mu);text-transform:uppercase;letter-spacing:.08em;margin:16px 0 8px;padding-left:2px}
-.cfg-sec-title:first-child{margin-top:0}
-.cfg-card{background:var(--surface);border:1px solid var(--ln);border-radius:14px;overflow:hidden;margin-bottom:14px}
-.opt{display:flex;align-items:center;justify-content:space-between;padding:13px 14px;width:100%;text-align:left;border-bottom:1px solid var(--ln);transition:background .15s;gap:12px;font-size:14px}
-.opt:last-child{border-bottom:0}
-.opt:hover{background:var(--surface-hover)}
-.opt-info{flex:1;min-width:0}
-.opt-label{font-weight:500;display:block;color:var(--tx)}
-.opt-desc{font-size:12px;color:var(--mu);display:block;margin-top:2px;line-height:1.35}
-.opt.red .opt-label{color:#ef4444}
-.opt.red:hover{background:#ef444415}
+/* Dedicated Subviews in Settings */
+.settings-view{display:none}
+.settings-view.active{display:block;animation:fadeIn .2s ease-out}
+@keyframes fadeIn{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
 
-/* Smooth switch component */
-.sw{width:46px;height:26px;border-radius:13px;background:var(--ln);position:relative;transition:background .25s cubic-bezier(.3,.8,.3,1);flex:none;cursor:pointer}
-.sw:after{content:"";position:absolute;top:3px;left:3px;width:20px;height:20px;border-radius:50%;background:#fff;transition:transform .25s cubic-bezier(.34,1.56,.64,1);box-shadow:0 1px 4px rgba(0,0,0,0.4)}
+/* Simplified Row Components */
+.cfg-list{display:flex;flex-direction:column;gap:10px}
+.cfg-row{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  padding:14px 16px;
+  background:var(--surface);
+  border:1px solid var(--ln);
+  border-radius:14px;
+  text-align:left;
+  width:100%;
+  color:var(--tx);
+  transition:background .15s,border-color .15s;
+}
+.cfg-row:hover{background:var(--surface-hover)}
+.cfg-row-info{flex:1;min-width:0}
+.cfg-row-title{font-size:15px;font-weight:600;display:block;color:var(--tx)}
+.cfg-row-desc{font-size:12.5px;color:var(--mu);display:block;margin-top:2px;line-height:1.35}
+.cfg-row svg.chevron{color:var(--mu);font-size:18px}
+
+/* Smooth switch */
+.sw{width:48px;height:28px;border-radius:14px;background:var(--ln);position:relative;transition:background .25s cubic-bezier(.3,.8,.3,1);flex:none;cursor:pointer}
+.sw:after{content:"";position:absolute;top:3px;left:3px;width:22px;height:22px;border-radius:50%;background:#fff;transition:transform .25s cubic-bezier(.34,1.56,.64,1);box-shadow:0 1px 4px rgba(0,0,0,0.4)}
 .sw.on{background:var(--bl)}
 .sw.on:after{transform:translateX(20px)}
 
-/* Select and inputs inside settings */
-.cfg-select{background:var(--bg);color:var(--tx);border:1px solid var(--ln);border-radius:8px;padding:6px 10px;font-size:13px;outline:0;cursor:pointer;transition:border-color .2s}
-.cfg-select:focus{border-color:var(--bl)}
+/* Profile View Elements */
+.profile-card{
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  text-align:center;
+  padding:20px 16px;
+  background:var(--surface);
+  border:1px solid var(--ln);
+  border-radius:16px;
+  margin-bottom:14px;
+}
+.profile-dp-wrap{position:relative;margin-bottom:12px}
+.profile-dp{width:76px;height:76px;border-radius:50%;overflow:hidden;border:2px solid var(--ln);display:grid;place-items:center;background:var(--bg)}
+.profile-dp img{width:100%;height:100%;object-fit:cover}
+.profile-username-btn{
+  font-size:17px;
+  font-weight:700;
+  color:var(--tx);
+  display:inline-flex;
+  align-items:center;
+  gap:6px;
+  padding:4px 8px;
+  border-radius:8px;
+  cursor:pointer;
+  transition:background .15s;
+}
+.profile-username-btn:hover{background:var(--surface-hover)}
+.profile-username-btn svg{font-size:15px;color:var(--bl)}
+.profile-email-text{font-size:13.5px;color:var(--mu);margin-top:2px;word-break:break-all}
+.profile-actions{display:flex;flex-direction:column;gap:10px}
 
-/* Blocked list & chips */
-#blockedList{padding:4px 0}
-.blocked-entry{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 14px;border-bottom:1px solid var(--ln);font-size:14px}
-.blocked-entry button{color:var(--bl);font-weight:600;padding:5px 10px;border-radius:6px;background:var(--bg);border:1px solid var(--ln);font-size:12px}
+/* Block List View Elements */
+.blocked-container{display:flex;flex-direction:column;gap:8px}
+.blocked-card{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  padding:12px 14px;
+  background:var(--surface);
+  border:1px solid var(--ln);
+  border-radius:12px;
+}
+.blocked-card-left{display:flex;align-items:center;gap:10px;min-width:0;flex:1}
+.blocked-card-info{min-width:0;flex:1}
+.blocked-card-name{font-size:14.5px;font-weight:600;display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.blocked-card-user{font-size:12px;color:var(--mu);display:block}
+.btn-unblock{
+  padding:6px 12px;
+  border-radius:8px;
+  background:var(--bg);
+  border:1px solid var(--ln);
+  color:var(--bl);
+  font-size:12.5px;
+  font-weight:600;
+  transition:background .15s,border-color .15s;
+  flex:none;
+}
+.btn-unblock:hover{border-color:var(--bl);background:var(--surface-hover)}
+.btn-unblock:disabled{opacity:0.5;pointer-events:none}
 
-
-/* Simplified settings: three clear options, vertical scrolling */
-#cfgNav{display:none!important}
-#cfgCatAppearance,#cfgCatPrivacy,#cfgCatAccount{display:block!important;width:100%;}
-#cfgCatChat,#cfgCatNotifications{display:none!important}
-/* Keep only theme toggle in Appearance */
-#cfgCatAppearance>.cfg-sec-title:not(:first-child),
-#cfgCatAppearance>.cfg-card:not(:first-of-type),
-#cfgCatAppearance>.cfg-card:first-of-type .opt:nth-child(n+2){display:none!important}
-/* Keep only Block List button in Privacy */
-#cfgCatPrivacy>.cfg-sec-title,#cfgCatPrivacy>.cfg-card .opt:not(#o7),
-#chatActionSec,#chatActionCard{display:none!important}
-#blockedList{display:none;padding:4px 0} #blockedList.show{display:block}
-/* Profile is shown only after tapping Your Profile */
-#cfgCatAccount{display:none!important}
-#cfgCatAccount.profile-open{display:block!important}
-.sheet{max-height:calc(var(--app-vh,100dvh) - env(safe-area-inset-top,0px));}
-.sheet-body{overflow-y:auto;overscroll-behavior:contain;padding:14px 16px calc(28px + env(safe-area-inset-bottom,0px));display:block!important;-webkit-overflow-scrolling:touch}
-.cfg-panel{min-width:0;flex:none}
-#cfgCatPrivacy>.cfg-card:first-of-type{margin-bottom:10px}
-#cfgCatAccount .profile-email{padding:0 14px 12px;color:var(--mu);font-size:13px;overflow-wrap:anywhere}
-#accAvatar{width:52px;height:52px;border-radius:50%;overflow:hidden;display:flex;align-items:center;justify-content:center;flex:none}
-#accDisplay{cursor:pointer;text-decoration:underline;text-underline-offset:3px}
-#cfgCatAccount .opt{align-items:center}
-.settings-shortcut{width:100%;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px;border:1px solid var(--ln);border-radius:12px;background:var(--surface);margin:8px 0;color:var(--tx);text-align:left}
-.settings-shortcut .shortcut-sub{display:block;color:var(--mu);font-size:12px;margin-top:3px}
-.settings-shortcut svg{width:18px;height:18px;color:var(--mu)}
-/* Toast notifications */
-.toast{position:absolute;left:50%;bottom:90px;transform:translate(-50%,20px) scale(.95);background:#1a1d22;border:1px solid var(--ln);box-shadow:0 8px 30px rgba(0,0,0,0.6);color:#fff;padding:10px 18px;border-radius:24px;font-size:13.5px;font-weight:500;opacity:0;transition:opacity .25s cubic-bezier(.3,.8,.3,1),transform .25s cubic-bezier(.3,.8,.3,1);z-index:150;pointer-events:none;white-space:nowrap;display:flex;align-items:center;gap:8px}
+/* Toast */
+.toast{position:absolute;left:50%;bottom:84px;transform:translate(-50%,20px) scale(.95);background:#1a1d22;border:1px solid var(--ln);box-shadow:0 8px 30px rgba(0,0,0,0.6);color:#fff;padding:10px 18px;border-radius:24px;font-size:13.5px;font-weight:500;opacity:0;transition:opacity .25s cubic-bezier(.3,.8,.3,1),transform .25s cubic-bezier(.3,.8,.3,1);z-index:150;pointer-events:none;white-space:nowrap;display:flex;align-items:center;gap:8px}
 .toast.on{opacity:1;transform:translate(-50%,0) scale(1)}
 
 /* Confirmation dialog */
@@ -292,7 +360,7 @@ header{display:flex;align-items:center;gap:6px;padding:10px 12px;background:var(
 .conf-dialog p{font-size:13.5px;color:var(--mu);line-height:1.45;margin-bottom:18px}
 .conf-actions{display:flex;justify-content:flex-end;gap:10px}
 
-/* Auth modal preserved */
+/* Auth modal */
 #auth{position:absolute;inset:0;z-index:20;background:var(--p);display:flex;flex-direction:column;justify-content:center;gap:12px;padding:32px 28px;transition:opacity .35s,transform .35s,visibility .35s;opacity:0;pointer-events:none;transform:translateY(16px);visibility:hidden}
 #auth.show{opacity:1;pointer-events:auto;transform:none;visibility:visible}
 #auth h1{font-size:30px}#auth p.t{color:var(--mu);margin-bottom:8px}
@@ -361,7 +429,11 @@ header{display:flex;align-items:center;gap:6px;padding:10px 12px;background:var(
    <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M4.9 19.1L7 17M17 7l2.1-2.1"/></svg>
   </button>
  </header>
+ 
+ <!-- Vertical scroll messages container -->
  <div id="msgs"><div class="typ" id="typ"></div></div>
+ 
+ <!-- Firmly attached Composer for mobile and desktop -->
  <div class="cmp">
   <div class="sug" id="sug"></div>
   <div class="compose-row">
@@ -376,11 +448,14 @@ header{display:flex;align-items:center;gap:6px;padding:10px 12px;background:var(
 <!-- Scrim for modal overlays -->
 <div class="scrim" id="scrim"></div>
 
-<!-- Redesigned Modern Settings Interface -->
+<!-- Clean, Simple 3-Option Settings Interface -->
 <div class="sheet" id="sheet">
  <div class="sheet-handle"></div>
  <div class="sheet-header">
   <div class="sheet-header-left">
+   <button class="sheet-back" id="sheetBack" aria-label="Back" style="display:none">
+    <svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg>
+   </button>
    <h3 class="sheet-title" id="sh">Settings</h3>
   </div>
   <button class="sheet-close" id="sheetClose" aria-label="Close Settings">
@@ -388,218 +463,84 @@ header{display:flex;align-items:center;gap:6px;padding:10px 12px;background:var(
   </button>
  </div>
 
- <!-- Categorized Navigation for Settings -->
- <div class="cfg-nav" id="cfgNav">
-  <button class="cfg-tab active" data-cfg="appearance">Appearance</button>
-  <button class="cfg-tab" data-cfg="chat">Chat Experience</button>
-  <button class="cfg-tab" data-cfg="privacy">Privacy</button>
-  <button class="cfg-tab" data-cfg="notifications">Notifications</button>
-  <button class="cfg-tab" data-cfg="account">Account</button>
- </div>
-
  <div class="sheet-body" id="sheetBody">
-  <!-- Simple settings menu -->
-  <button type="button" class="settings-shortcut" id="openProfileSettings"><span><strong>Your Profile</strong><span class="shortcut-sub">Username, email, profile photo and logout</span></span><svg viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></svg></button>
-  <!-- Dynamic Category Sections -->
-  <div id="cfgCatAppearance" class="cfg-panel">
-   <div class="cfg-sec-title">Theme & Contrast</div>
-   <div class="cfg-card">
-    <div class="opt" id="o1" role="button">
-     <div class="opt-info">
-      <span class="opt-label">Dark mode / Light mode</span>
-      <span class="opt-desc">True pure black background for battery saving</span>
+  <!-- View 1: Main Simplified Settings (ONLY 3 options) -->
+  <div class="settings-view active" id="viewSettingsMain">
+   <div class="cfg-list">
+    <!-- Option 1: Dark Mode / Light Mode Toggle -->
+    <div class="cfg-row" id="rowThemeToggle" role="button">
+     <div class="cfg-row-info">
+      <span class="cfg-row-title">Dark Mode / Light Mode</span>
+      <span class="cfg-row-desc" id="themeDesc">Pure dark theme active</span>
      </div>
-     <i class="sw" id="s1"></i>
+     <i class="sw on" id="swTheme"></i>
     </div>
-    <div class="opt">
-     <div class="opt-info">
-      <span class="opt-label">Reduce UI Animations</span>
-      <span class="opt-desc">Minimize motion and transitions for performance</span>
+
+    <!-- Option 2: Block List -->
+    <button type="button" class="cfg-row" id="rowOpenBlockList">
+     <div class="cfg-row-info">
+      <span class="cfg-row-title">Block List</span>
+      <span class="cfg-row-desc">Manage operators blocked on your account</span>
      </div>
-     <i class="sw" id="swReduceMotion"></i>
-    </div>
+     <svg class="chevron" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></svg>
+    </button>
+
+    <!-- Option 3: Your Profile -->
+    <button type="button" class="cfg-row" id="rowOpenProfile">
+     <div class="cfg-row-info">
+      <span class="cfg-row-title">Your Profile</span>
+      <span class="cfg-row-desc">Profile photo, username, email & logout</span>
+     </div>
+     <svg class="chevron" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></svg>
+    </button>
    </div>
 
-   <div class="cfg-sec-title">Chat Typography & Layout</div>
-   <div class="cfg-card">
-    <div class="opt">
-     <div class="opt-info">
-      <span class="opt-label">Message Bubble Style</span>
-      <span class="opt-desc">Geometry of received and sent bubbles</span>
+   <!-- Contextual Direct Chat Action (shown only if opened from chat or conversation long-press) -->
+   <div id="directChatActionWrap" style="display:none;margin-top:16px;border-top:1px solid var(--ln);padding-top:14px">
+    <button type="button" class="cfg-row" id="btnDirectBlock" style="color:#ef4444;margin-bottom:8px">
+     <div class="cfg-row-info">
+      <span class="cfg-row-title" id="btnDirectBlockLabel">Block user</span>
      </div>
-     <select class="cfg-select" id="selBubbleStyle">
-      <option value="classic">Classic Rounded</option>
-      <option value="compact">Subtle Minimal</option>
-      <option value="round">Pill Full-Round</option>
-     </select>
-    </div>
-    <div class="opt">
-     <div class="opt-info">
-      <span class="opt-label">Chat Font Size</span>
-      <span class="opt-desc">Adjust reading scale for all conversations</span>
+    </button>
+    <button type="button" class="cfg-row" id="btnDirectDelete" style="color:#ef4444">
+     <div class="cfg-row-info">
+      <span class="cfg-row-title">Delete chat</span>
+      <span class="cfg-row-desc">Hide this conversation from your list</span>
      </div>
-     <select class="cfg-select" id="selFontSize">
-      <option value="sm">Small (13px)</option>
-      <option value="md" selected>Default (15px)</option>
-      <option value="lg">Large (17px)</option>
-     </select>
-    </div>
-    <div class="opt">
-     <div class="opt-info">
-      <span class="opt-label">Chat Density</span>
-      <span class="opt-desc">Vertical spacing between bubbles</span>
-     </div>
-     <select class="cfg-select" id="selDensity">
-      <option value="comfortable" selected>Comfortable</option>
-      <option value="compact">Compact</option>
-     </select>
-    </div>
-    <div class="opt">
-     <div class="opt-info">
-      <span class="opt-label">Chat Wallpaper Pattern</span>
-      <span class="opt-desc">Subtle procedural canvas texture</span>
-     </div>
-     <select class="cfg-select" id="selBgPattern">
-      <option value="clean" selected>Pure AMOLED (None)</option>
-      <option value="dots">Subtle Dots</option>
-      <option value="grid">Minimal Grid</option>
-     </select>
-    </div>
-   </div>
-
-   <div class="cfg-card">
-    <button class="opt" id="btnResetAppearance">
-     <div class="opt-info">
-      <span class="opt-label">Reset Appearance Settings</span>
-      <span class="opt-desc">Revert visual options to default without touching chats</span>
-     </div>
-     <svg viewBox="0 0 24 24"><path d="M3 12a9 9 0 109-9 9.75 9.75 0 00-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
     </button>
    </div>
   </div>
 
-  <div id="cfgCatChat" class="cfg-panel" style="display:none">
-   <div class="cfg-sec-title">Input & Behavior</div>
-   <div class="cfg-card">
-    <div class="opt">
-     <div class="opt-info">
-      <span class="opt-label">Send with Enter Key</span>
-      <span class="opt-desc">Press Enter to send message, Shift+Enter for newline</span>
-     </div>
-     <i class="sw" id="swEnterSend"></i>
-    </div>
-    <div class="opt">
-     <div class="opt-info">
-      <span class="opt-label">Auto-Scroll to Latest</span>
-      <span class="opt-desc">Smoothly jump to bottom on new incoming messages</span>
-     </div>
-     <i class="sw" id="swAutoScroll"></i>
-    </div>
-    <div class="opt">
-     <div class="opt-info">
-      <span class="opt-label">Message Timestamps</span>
-      <span class="opt-desc">Display relative send time next to usernames</span>
-     </div>
-     <i class="sw" id="swTimestamps"></i>
-    </div>
+  <!-- View 2: Block List Subview -->
+  <div class="settings-view" id="viewSettingsBlocked">
+   <div class="blocked-container" id="blockedUsersList">
+    <!-- Populated dynamically with real Firestore data -->
    </div>
   </div>
 
-  <div id="cfgCatPrivacy" class="cfg-panel" style="display:none">
-   <div class="cfg-sec-title">Local Privacy Controls</div>
-   <div class="cfg-card">
-    <div class="opt">
-     <div class="opt-info">
-      <span class="opt-label">Hide Message Previews</span>
-      <span class="opt-desc">Blurs chat previews in the conversation list</span>
-     </div>
-     <i class="sw" id="swHidePreview"></i>
+  <!-- View 3: Your Profile Subview -->
+  <div class="settings-view" id="viewSettingsProfile">
+   <div class="profile-card">
+    <div class="profile-dp-wrap">
+     <div class="profile-dp" id="profileDp"></div>
     </div>
-    <button class="opt" id="o7">
-     <div class="opt-info">
-      <span class="opt-label">Blocked Users</span>
-      <span class="opt-desc">Manage operators blocked on your account</span>
-     </div>
-     <svg viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"/></svg>
-    </button>
-    <div id="blockedList"></div>
-   </div>
-
-   <div class="cfg-sec-title" id="chatActionSec" style="display:none">Current Conversation Action</div>
-   <div class="cfg-card" id="chatActionCard" style="display:none">
-    <button class="opt red" id="o8" style="display:none">
-     <div class="opt-info"><span class="opt-label" id="o8Label">Block user</span></div>
-    </button>
-    <button class="opt red" id="o3">
-     <div class="opt-info"><span class="opt-label">Delete chat</span><span class="opt-desc">Hide this conversation from your list</span></div>
-    </button>
-   </div>
-  </div>
-
-  <div id="cfgCatNotifications" class="cfg-panel" style="display:none">
-   <div class="cfg-sec-title">Alerts & In-App Banners</div>
-   <div class="cfg-card">
-    <div class="opt" id="o2">
-     <div class="opt-info">
-      <span class="opt-label">Mute In-App Notifications</span>
-      <span class="opt-desc">Silence top banner alerts for incoming messages</span>
-     </div>
-     <i class="sw" id="s2"></i>
-    </div>
-    <div class="opt">
-     <div class="opt-info">
-      <span class="opt-label">Audio Chime</span>
-      <span class="opt-desc">Play a subtle ping when receiving messages</span>
-     </div>
-     <i class="sw" id="swSoundAlert"></i>
-    </div>
-   </div>
-  </div>
-
-  <div id="cfgCatAccount" class="cfg-panel" style="display:none">
-   <div class="cfg-sec-title">Your Profile</div>
-   <div class="cfg-card">
-    <div class="opt" style="gap:12px">
-     <div id="accAvatar"> </div>
-     <div class="opt-info" style="min-width:0">
-      <span class="opt-label" id="accDisplay" role="button" title="Tap to copy username">Username</span>
-      <span class="opt-desc" id="accHandle">@username</span>
-     </div>
-    </div>
-    <div class="profile-email" id="accEmail">Email not available</div>
-    <button class="opt" id="o4">
-     <div class="opt-info">
-      <span class="opt-label">Copy My ID</span>
-      <span class="opt-desc">Copy your username to clipboard</span>
-     </div>
+    <button type="button" class="profile-username-btn" id="btnCopyProfileUsername" title="Tap to copy username">
+     <span id="profileUsername">@username</span>
      <svg viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
     </button>
-    <button class="opt" id="o6">
-     <div class="opt-info">
-      <span class="opt-label">Change Profile Photo</span>
-      <span class="opt-desc">Upload a custom avatar for all rooms</span>
-     </div>
-     <svg viewBox="0 0 24 24"><path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z"/><circle cx="12" cy="13" r="4"/></svg>
-    </button>
+    <p class="profile-email-text" id="profileEmail">user@example.com</p>
    </div>
 
-   <div class="cfg-sec-title">System & Security</div>
-   <div class="cfg-card">
-    <button class="opt" id="btnRestoreAllDefaults">
-     <div class="opt-info">
-      <span class="opt-label">Restore Default Preferences</span>
-      <span class="opt-desc">Reset all local app configurations to factory settings</span>
-     </div>
+   <div class="profile-actions">
+    <button type="button" class="btn gh" id="btnTriggerChangePhoto" style="width:100%;padding:11px 16px;border-radius:12px;font-size:14px">
+     <svg viewBox="0 0 24 24" style="font-size:18px"><path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z"/><circle cx="12" cy="13" r="4"/></svg>
+     Change Profile Photo
     </button>
-    <button class="opt red" id="o5">
-     <div class="opt-info">
-      <span class="opt-label">Log Out</span>
-      <span class="opt-desc">Safely end your session</span>
-     </div>
-     <svg viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9"/></svg>
+    <button type="button" class="btn danger" id="btnLogout" style="width:100%;padding:11px 16px;border-radius:12px;font-size:14px">
+     <svg viewBox="0 0 24 24" style="font-size:18px"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9"/></svg>
+     Log Out
     </button>
    </div>
-   <p style="font-size:12px;color:var(--mu);text-align:center;padding:12px 0 4px">Chats Client v2.4 · Yuki Hybrid Protocol</p>
   </div>
  </div>
 </div>
@@ -643,9 +584,10 @@ const avProfile=(p,s=40)=>p?.photoURL?`<img class="av photo" src="${esc(p.photoU
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const IC='<svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c0-4 3-6 6.5-6s6.5 2 6.5 6M16 5a3.5 3.5 0 010 7M21.5 19c0-3-1.5-4.5-3.5-5.2"/></svg>';
 
-let ME=null,P=null,peer=null,cid=null,chans=[],uM=null,uS=null,uP=null,uR=null,signup=false,muted=false,tab=0,painted=false,seen=new Set(),tbt=null,lt=0,lp=0,bt=null,hist=[],sd=null,sr={q:'',res:[],busy:false},armed=null,forceBottom=false,selectedDirect=null,longPressTimer=null,longPressTriggered=false;
+let ME=null,P=null,peer=null,cid=null,chans=[],uM=null,uS=null,uP=null,uR=null,signup=false,muted=false,tab=0,seen=new Set(),tbt=null,lt=0,lp=0,bt=null,hist=[],sd=null,sr={q:'',res:[],busy:false},selectedDirect=null,longPressTimer=null,longPressTriggered=false;
+let isOpeningChat = false;
 
-/* --- PREFERENCES SYSTEM (LOCAL STORAGE SAFE) --- */
+/* --- PREFERENCES SYSTEM --- */
 const PREF_KEY='yuki_chat_user_prefs_v2';
 const DEFAULT_PREFS = {
   theme: 'dark',
@@ -686,43 +628,27 @@ function savePreferences() {
 
 function applyPreferences(showToastNotice = true) {
   const root = document.documentElement;
-  // Theme
+  // Apply theme immediately to root
   root.dataset.theme = userPrefs.theme;
-  $('s1')?.classList.toggle('on', userPrefs.theme === 'dark');
-  
-  // Customization tokens
+  const isDark = userPrefs.theme === 'dark';
+  $('swTheme')?.classList.toggle('on', isDark);
+  if ($('themeDesc')) {
+    $('themeDesc').textContent = isDark ? 'Pure dark theme active' : 'Clean light theme active';
+  }
+
+  // Preserve other CSS root configs seamlessly
   root.dataset.reduceMotion = String(userPrefs.reduceMotion);
-  $('swReduceMotion')?.classList.toggle('on', !!userPrefs.reduceMotion);
-
   root.dataset.bubbleStyle = userPrefs.bubbleStyle;
-  if ($('selBubbleStyle')) $('selBubbleStyle').value = userPrefs.bubbleStyle;
-
   root.dataset.fontSize = userPrefs.fontSize;
-  if ($('selFontSize')) $('selFontSize').value = userPrefs.fontSize;
-
   root.dataset.density = userPrefs.density;
-  if ($('selDensity')) $('selDensity').value = userPrefs.density;
-
   root.dataset.bgPattern = userPrefs.bgPattern;
-  if ($('selBgPattern')) $('selBgPattern').value = userPrefs.bgPattern;
-
   root.dataset.hidePreview = String(userPrefs.hidePreview);
-  $('swHidePreview')?.classList.toggle('on', !!userPrefs.hidePreview);
-
   root.dataset.hideTimestamps = String(!userPrefs.timestamps);
-  $('swTimestamps')?.classList.toggle('on', !!userPrefs.timestamps);
-
-  $('swEnterSend')?.classList.toggle('on', !!userPrefs.enterToSend);
-  $('swAutoScroll')?.classList.toggle('on', !!userPrefs.autoScroll);
-  $('swSoundAlert')?.classList.toggle('on', !!userPrefs.soundAlert);
-
   muted = !!userPrefs.muted;
-  $('s2')?.classList.toggle('on', muted);
 
-  if (showToastNotice) toast('Settings updated');
+  if (showToastNotice) toast(isDark ? 'Dark mode enabled' : 'Light mode enabled');
 }
 
-// Subtle audio chime synthesis without external assets
 function playMessageChime() {
   if (!userPrefs.soundAlert) return;
   try {
@@ -730,8 +656,8 @@ function playMessageChime() {
     const osc = ctx.createOscillator();
     const gain = ctx.createGain();
     osc.type = 'sine';
-    osc.frequency.setValueAtTime(587.33, ctx.currentTime); // D5
-    osc.frequency.exponentialRampToValueAtTime(880, ctx.currentTime + 0.12); // A5
+    osc.frequency.setValueAtTime(587.33, ctx.currentTime);
+    osc.frequency.exponentialRampToValueAtTime(880, ctx.currentTime + 0.12);
     gain.gain.setValueAtTime(0.08, ctx.currentTime);
     gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.22);
     osc.connect(gain);
@@ -809,21 +735,33 @@ $('rsd').onclick=async()=>{const email=$('em').value.trim().toLowerCase(),pw=$('
   await signOut(auth)}catch(e){$('aerr').textContent='Could not resend. Check email and password.'}};
 
 onAuthStateChanged(auth,async user=>{
- if(!user){ME=P=peer=cid=null;chans=[];stop();uR&&uR();uR=null;appEl.classList.remove('open');sheet(false);$('auth').classList.add('show');renderLists();return}
- if(!user.emailVerified){$('auth').classList.add('show');$('aerr').textContent='Please verify your email first. Check your inbox.';$('rsd').hidden=false;return}
+ if(!user){
+   ME=P=peer=cid=null;chans=[];stop();uR&&uR();uR=null;appEl.classList.remove('open');
+   sheet(false);
+   $('auth').classList.add('show');
+   renderLists();
+   return;
+ }
+ if(!user.emailVerified){
+   $('auth').classList.add('show');
+   $('aerr').textContent='Please verify your email first. Check your inbox.';
+   $('rsd').hidden=false;
+   return;
+ }
  ME=user;
  try{
   const u=await getDoc(doc(db,'users',user.uid));
   if(u.exists())P=u.data();else{
    const h=(user.email?user.email.split('@')[0]:'operator').replace(/[^a-zA-Z0-9_]/g,'_').toLowerCase();
    P={username:h,display:h.toUpperCase()+'_UNIT',email:user.email||'',createdAt:serverTimestamp(),lastSeen:serverTimestamp(),emailVerified:true};
-   await setDoc(doc(db,'users',user.uid),P,{merge:true});await setDoc(doc(db,'usernames',h),{uid:user.uid},{merge:true})}
+   await setDoc(doc(db,'users',user.uid),P,{merge:true});await setDoc(doc(db,'usernames',h),{uid:user.uid},{merge:true});
+  }
   if(u.exists()&&u.data().emailVerified!==true)updateDoc(doc(db,'users',user.uid),{emailVerified:true}).catch(()=>{});
   updateDoc(doc(db,'users',user.uid),{lastSeen:serverTimestamp()}).catch(()=>{});
   $('auth').classList.remove('show');$('rsd').hidden=true;$('pw').value='';
-  if($('accDisplay')) $('accDisplay').textContent = P.display || P.username || 'Operator';
-  if($('accHandle')) $('accHandle').textContent = '@' + (P.username || 'operator');
-  roster();renderLists();
+  syncProfileUI();
+  roster();
+  renderLists();
  }catch(e){console.error(e);$('auth').classList.add('show');$('aerr').textContent='Could not load your profile. Check connection and Firestore rules.'}
 });
 
@@ -836,7 +774,7 @@ function renderLists(){
 }
 function roster(){
  uR&&uR();
- uR=onSnapshot(query(collection(db,'chats'),where('users','array-contains',ME.uid)),async snap=>{
+ uR=onSnapshot(query(collection(db,'chats',where('users','array-contains',ME.uid))),async snap=>{
   const list=[];snap.docs.forEach(d=>{const data=d.data(),o=(data.users||[]).find(u=>u!==ME.uid);if(!o||o===YB||gd(ME.uid).includes(o))return;list.push({chatId:d.id,data,otherUid:o})});
   await Promise.all(list.map(async it=>{try{const u=await getDoc(doc(db,'users',it.otherUid));it.profile=u.exists()?u.data():{username:'operative',display:'Operative'}}catch(e){it.profile={username:'operative',display:'Operative'}}}));
   const ms=i=>{const t=i.data.lastMsgAt||i.data.touchAt;return t&&t.toMillis?t.toMillis():0};
@@ -856,8 +794,8 @@ function notify(){
 $('q').oninput=()=>{clearTimeout(sd);const v=$('q').value.trim();sr.q=v.toLowerCase().replace(/^(@|u\/)/,'');paintSearch();if(sr.q.length>=2){sr.busy=true;paintSearch();sd=setTimeout(()=>doSearch(sr.q),350)}};
 async function doSearch(q){
  const out=new Map();
- try{const ud=await getDoc(doc(db,'usernames',q));if(ud.exists()){const u=await getDoc(doc(db,'users',ud.data().uid));if(u.exists())out.set(u.id,u.data())}}catch(e){console.error(e)}
- try{const s=await getDocs(query(collection(db,'users'),where('username','>=',q),where('username','<=',q+'\uf8ff'),limit(15)));s.forEach(d=>out.set(d.id,d.data()))}catch(e){console.error(e)}
+ try{const ud=await getDoc(doc(db,'usernames',q));if(ud.exists()){const u=await getDoc(doc(db,'users',ud.data().uid));if(u.exists())out.set(u.id,u.data())}}catch(e){}
+ try{const s=await getDocs(query(collection(db,'users'),where('username','>=',q),where('username','<=',q+'\uf8ff'),limit(15)));s.forEach(d=>out.set(d.id,d.data()))}catch(e){}
  if(sr.q!==q)return;out.delete(ME.uid);sr.res=[...out];sr.busy=false;paintSearch();
 }
 function paintSearch(){
@@ -869,17 +807,29 @@ function paintSearch(){
  s.innerHTML=sr.res.length?'<div class="sec">PEOPLE</div>'+sr.res.map(([id,u])=>`<button class="row" data-u="${esc(id)}">${avProfile(u,40)}<span class="rt"><span class="nm">${esc(u.display||u.username)}</span><span class="sub">@${esc(u.username)}</span></span><span class="btn">Message</span></button>`).join(''):`<p class="emp">No user found: @${esc(q)}<br>Check the spelling and try again.</p>`;
 }
 
-/* CHAT */
-function openCommon(){stop();painted=false;seen=new Set();msgs.querySelectorAll('.m,.emp').forEach(e=>e.remove());$('typ').classList.remove('on');$('inp').value='';chg();appEl.classList.add('open')}
+/* CHAT LOGIC WITH CLEAN SCROLLING */
+function openCommon(){
+  stop();
+  seen=new Set();
+  isOpeningChat=true;
+  msgs.querySelectorAll('.m,.emp').forEach(e=>e.remove());
+  $('typ').classList.remove('on');
+  $('inp').value='';
+  $('inp').style.height='42px';
+  chg();
+  appEl.classList.add('open');
+}
+
 function openYuki(){
  if(!ME)return;openCommon();peer={uid:YB,username:'yuki_ai',display:'Yuki AI Companion',isYuki:true};cid=cidOf(ME.uid,YB);
- $('ttl').textContent=peer.display;$('sbt').textContent='AI companion';$('inp').placeholder='Message';$('o3').hidden=true;subMsgs(cid);renderLists();
+ $('ttl').textContent=peer.display;$('sbt').textContent='AI companion';$('inp').placeholder='Message';subMsgs(cid);renderLists();
 }
+
 function openChat(uid,prof){
  if(!ME||!uid)return;openCommon();rmDel(ME.uid,uid);
  const f=chans.find(c=>c.otherUid===uid);prof=prof||(f&&f.profile)||{};
- peer={uid,username:prof.username||'operator',display:prof.display||prof.username||'Operator',photoURL:prof.photoURL||''};cid=cidOf(ME.uid,uid);painted=false;forceBottom=true;
- $('ttl').textContent=peer.display;$('sbt').textContent='@'+peer.username;$('inp').placeholder='Message';$('o3').hidden=false;
+ peer={uid,username:prof.username||'operator',display:prof.display||prof.username||'Operator',photoURL:prof.photoURL||''};cid=cidOf(ME.uid,uid);
+ $('ttl').textContent=peer.display;$('sbt').textContent='@'+peer.username;$('inp').placeholder='Message';
  $('q').value='';paintSearch();subMsgs(cid);
  const my=cid;uS=onSnapshot(doc(db,'chats',cid),async s=>{
   if(cid!==my||!s.exists())return;const d=s.data();
@@ -891,41 +841,71 @@ function openChat(uid,prof){
  setDoc(doc(db,'chats',cid),{users:[ME.uid,uid],[`participants.${ME.uid}`]:true,[`participants.${uid}`]:true,touchAt:serverTimestamp()},{merge:true}).catch(()=>{});
  renderLists();
 }
+
 function fmt(raw){
  let t=esc(raw);
  t=t.replace(/```([a-zA-Z0-9_-]*)\n?([\s\S]*?)```/g,(m,l,c)=>`<pre>${c.trim()}</pre>`).replace(/`([^`]+)`/g,'<code>$1</code>');
  return t.replace(/\n/g,'<br>');
 }
+
+/* Stable scrolling inside #msgs */
 function subMsgs(chatId){
  uM=onSnapshot(query(collection(db,'chats',chatId,'messages'),orderBy('at','asc'),limit(300)),snap=>{
   if(cid!==chatId)return;
-  const near=msgs.scrollHeight-msgs.scrollTop-msgs.clientHeight<150;const oldTop=msgs.scrollTop;const initialLoad=!painted;
-  msgs.querySelectorAll('.m,.emp').forEach(e=>e.remove());let h='',prev=null;
+  // Determine if user was already at or near bottom (within 90px)
+  const isNearBottom = (msgs.scrollHeight - msgs.scrollTop - msgs.clientHeight) < 90;
+  const previousScrollTop = msgs.scrollTop;
+  const previousScrollHeight = msgs.scrollHeight;
+  const initialOpen = isOpeningChat;
+  
+  msgs.querySelectorAll('.m,.emp').forEach(e=>e.remove());
+  let h='',prev=null;
   if(snap.empty)h=`<p class="emp">${peer.isYuki?'Say hello to Yuki.':'No messages yet.<br>Send the first one.'}</p>`;
   snap.docs.forEach(d=>{
-   const x=d.data({serverTimestamps:'estimate'}),mine=x.by===ME.uid,nu=painted&&!seen.has(d.id);seen.add(d.id);
-   if(nu&&!mine) playMessageChime();
+   const x=d.data({serverTimestamps:'estimate'}),mine=x.by===ME.uid,nu=!seen.has(d.id);seen.add(d.id);
+   if(nu&&!mine&&!initialOpen) playMessageChime();
    const nm=mine?P.username:peer.username,tk='';
-   const b=`<div class="b${mine?' g':''}${nu?' pop':''}" data-id="${esc(d.id)}">${fmt(x.text||'')}${tk}</div>`;
+   const b=`<div class="b${mine?' g':''}" data-id="${esc(d.id)}">${fmt(x.text||'')}${tk}</div>`;
    if(prev===x.by){h=h.replace(/<\/div><\/div>$/,b+'</div></div>')}
    else h+=`<div class="m">${avProfile(mine?P:{...peer,username:nm},34)}<div class="mb"><div class="who">${esc(nm)}<small>${esc(clk(x.at))}</small></div>${b}</div></div>`;
    prev=x.by;
   });
   $('typ').insertAdjacentHTML('beforebegin',h);
-  if(initialLoad || forceBottom || (userPrefs.autoScroll && near)){requestAnimationFrame(()=>{msgs.style.scrollBehavior='auto';msgs.scrollTop=msgs.scrollHeight;requestAnimationFrame(()=>{msgs.scrollTop=msgs.scrollHeight});forceBottom=false})}else{requestAnimationFrame(()=>{msgs.style.scrollBehavior='auto';msgs.scrollTop=oldTop})}
-  painted=true;markSeen(chatId);
+  
+  if(initialOpen){
+    // Immediate, silent scroll to the very bottom upon opening conversation
+    msgs.scrollTop = msgs.scrollHeight;
+    requestAnimationFrame(()=>{
+      msgs.scrollTop = msgs.scrollHeight;
+      isOpeningChat = false;
+    });
+  } else if(isNearBottom){
+    // User was near the bottom, scroll gently down to latest
+    msgs.scrollTop = msgs.scrollHeight;
+  } else {
+    // User was reading older messages: preserve exact scroll offset
+    const heightDifference = msgs.scrollHeight - previousScrollHeight;
+    msgs.scrollTop = previousScrollTop + heightDifference;
+  }
+  markSeen(chatId);
  },e=>{console.error('Messages error',e);toast('Could not load messages')});
 }
+
 async function markSeen(c){
  if(!c||!ME||peer?.isYuki)return;
  try{updateDoc(doc(db,'chats',c),{[`unread.${ME.uid}`]:0}).catch(()=>{});
   const s=await getDocs(query(collection(db,'chats',c,'messages'),where('by','!=',ME.uid),where('seen','==',false),limit(50)));
   s.forEach(d=>updateDoc(d.ref,{seen:true}).catch(()=>{}))}catch(e){}
 }
+
 async function send(){
  const i=$('inp'),text=i.value.trim();if(!text||!ME||!cid||!peer)return;if(peer.uid!==YB&&(P?.blockedUids||[]).includes(peer.uid))return toast('Unblock this user before sending messages');
  if((text.match(/\S+/g)||[]).length>5000)return toast('Max 5,000 words');
- i.value='';i.style.height='42px';chg();forceBottom=true;i.focus();msgs.scrollTop=msgs.scrollHeight;const my=cid,pr=peer;
+ i.value='';
+ i.style.height='42px';
+ chg();
+ msgs.scrollTop=msgs.scrollHeight;
+ const my=cid,pr=peer;
  try{
   await addDoc(collection(db,'chats',my,'messages'),{text,by:ME.uid,at:serverTimestamp(),seen:false});
   await setDoc(doc(db,'chats',my),{users:[ME.uid,pr.uid],[`participants.${ME.uid}`]:true,[`participants.${pr.uid}`]:true,lastMsg:text.slice(0,80),lastMsgAt:serverTimestamp(),lastMsgBy:ME.uid,touchAt:serverTimestamp(),unread:pr.isYuki?{}:{[pr.uid]:increment(1),[ME.uid]:0},typing:{[ME.uid]:false}},{merge:true});
@@ -941,108 +921,282 @@ async function send(){
   },700);
  }catch(e){console.error(e);toast('Message failed to send')}
 }
+
 function typing(){
  if(!ME||!cid||peer?.isYuki)return;const n=Date.now();if(n-lt<2500)return;lt=n;const my=cid;
  updateDoc(doc(db,'chats',my),{[`typing.${ME.uid}`]:true}).catch(()=>{});clearTimeout(tbt);
  tbt=setTimeout(()=>updateDoc(doc(db,'chats',my),{[`typing.${ME.uid}`]:false}).catch(()=>{}),3000);
 }
+
 function chg(){
  const v=$('inp').value,mt=v.match(/(?:^|\s)u\/([\w]*)$/),s=$('sug');typing&&v&&typing();
  $('snd').classList.toggle('on',!!v.trim());
  if(mt){const k=mt[1].toLowerCase(),l=chans.map(c=>c.profile?.username).filter(u=>u&&u.toLowerCase().includes(k));
   s.innerHTML=l.slice(0,6).map(n=>`<button data-c="u/${esc(n)}">${av(n,28)}u/${esc(n)}</button>`).join('');s.classList.toggle('on',l.length>0)}else s.classList.remove('on');
 }
+
 async function mention(n){
  if(n.toLowerCase()===P.username.toLowerCase())return toast('That’s you');
  try{const ud=await getDoc(doc(db,'usernames',n.toLowerCase()));if(!ud.exists())return toast('User not found');
   const u=await getDoc(doc(db,'users',ud.data().uid));openChat(ud.data().uid,u.exists()?u.data():null)}catch(e){toast('User not found')}
 }
 
-/* SETTINGS SHEET CONTROLLER */
-let activeContext = 'acc';
-function switchSettingsTab(category) {
-  document.querySelectorAll('.cfg-tab').forEach(b => {
-    b.classList.toggle('active', b.dataset.cfg === category);
-  });
-  const panels = {
-    appearance: $('cfgCatAppearance'),
-    chat: $('cfgCatChat'),
-    privacy: $('cfgCatPrivacy'),
-    notifications: $('cfgCatNotifications'),
-    account: $('cfgCatAccount')
-  };
-  Object.keys(panels).forEach(k => {
-    if (panels[k]) panels[k].style.display = (k === category) ? 'block' : 'none';
-  });
+/* --- SETTINGS NAVIGATION & VIEWS --- */
+let currentView = 'main'; // 'main' | 'blocked' | 'profile'
+
+function showSettingsView(viewName) {
+  currentView = viewName;
+  const isSub = viewName !== 'main';
+  $('sheetBack').style.display = isSub ? 'grid' : 'none';
+  
+  if (viewName === 'main') {
+    $('sh').textContent = 'Settings';
+  } else if (viewName === 'blocked') {
+    $('sh').textContent = 'Blocked Users';
+    loadBlockedListUsers();
+  } else if (viewName === 'profile') {
+    $('sh').textContent = 'Your Profile';
+    syncProfileUI();
+  }
+
+  $('viewSettingsMain').classList.toggle('active', viewName === 'main');
+  $('viewSettingsBlocked').classList.toggle('active', viewName === 'blocked');
+  $('viewSettingsProfile').classList.toggle('active', viewName === 'profile');
+  $('sheetBody').scrollTop = 0;
 }
 
 function sheet(on, ctx='acc'){
- activeContext = ctx;
  if(on){
-  $('sh').textContent = ctx === 'chat' ? ($('ttl').textContent || 'Chat Settings') : ctx === 'direct' ? (selectedDirect?.profile?.display || selectedDirect?.profile?.username || 'Direct Chat') : 'Settings';
-  
-  // Configure conversation-specific actions inside Privacy tab
-  const hasChatAction = (ctx==='chat' && !peer?.isYuki) || ctx==='direct';
-  if ($('chatActionSec')) $('chatActionSec').style.display = hasChatAction ? 'block' : 'none';
-  if ($('chatActionCard')) $('chatActionCard').style.display = hasChatAction ? 'block' : 'none';
-  if ($('o8')) {
-    $('o8').style.display = ctx==='direct' ? 'flex' : 'none';
+  showSettingsView('main');
+  const hasDirectAction = (ctx==='chat' && !peer?.isYuki) || ctx==='direct';
+  const wrap = $('directChatActionWrap');
+  if (wrap) wrap.style.display = hasDirectAction ? 'block' : 'none';
+
+  if (hasDirectAction) {
     const targetUid = selectedDirect?.uid || (peer?.isYuki ? null : peer?.uid);
     const isBlocked = (P?.blockedUids||[]).includes(targetUid);
-    $('o8Label').textContent = isBlocked ? 'Unblock user' : 'Block user';
-  }
-  if ($('o3')) {
-    $('o3').style.display = hasChatAction ? 'flex' : 'none';
-  }
-
-  // Update profile badges in Account tab
-  if (P) {
-    if ($('accDisplay')) $('accDisplay').textContent = P.display || P.username || 'Operator';
-    if ($('accHandle')) $('accHandle').textContent = '@' + (P.username || 'operator');
-    if ($('accEmail')) $('accEmail').textContent = ME?.email || 'Email not available';
-    if ($('accAvatar')) $('accAvatar').innerHTML = P.photoURL ? `<img src="${esc(P.photoURL)}" alt="Profile" style="width:100%;height:100%;object-fit:cover">` : avProfile(P,44);
-  }
-
-  renderBlockedList();
-  if ($('blockedList')) $('blockedList').classList.remove('show');
-  $('cfgCatAccount')?.classList.remove('profile-open');
-  if ($('cfgCatAccount')) $('cfgCatAccount').style.removeProperty('display');
-  
-  // Set tab
-  if (ctx === 'chat' || ctx === 'direct') {
-    switchSettingsTab('privacy');
-  } else {
-    switchSettingsTab('appearance');
+    $('btnDirectBlockLabel').textContent = isBlocked ? 'Unblock user' : 'Block user';
   }
  }
- armed=null;
- if ($('o3')) $('o3').querySelector('.opt-label').textContent = 'Delete chat';
- if ($('o5')) $('o5').querySelector('.opt-label').textContent = 'Log out';
  $('sheet').classList.toggle('on',on);
  $('scrim').classList.toggle('on',on);
 }
 
-function renderBlockedList(){
- const box=$('blockedList'),ids=P?.blockedUids||[];if(!ids.length){box.innerHTML='<p class="sub" style="padding:10px 14px">No blocked users.</p>';return}
- box.innerHTML=ids.map(id=>{const c=chans.find(x=>x.otherUid===id),p=c?.profile||{};return `<div class="blocked-entry"><span>${esc(p.display||p.username||id.slice(0,12))}</span><button data-unblock="${esc(id)}">Unblock</button></div>`}).join('');
-}
-async function changePhoto(file){
- if(!file||!ME)return;if(!file.type.startsWith('image/'))return toast('Choose an image file');
- try{const data=await new Promise((resolve,reject)=>{const r=new FileReader();r.onload=()=>resolve(r.result);r.onerror=reject;r.readAsDataURL(file)});
-  const img=await new Promise((resolve,reject)=>{const im=new Image();im.onload=()=>resolve(im);im.onerror=reject;im.src=data});
-  const c=document.createElement('canvas'),scale=Math.min(1,320/Math.max(img.width,img.height));c.width=Math.max(1,Math.round(img.width*scale));c.height=Math.max(1,Math.round(img.height*scale));c.getContext('2d').drawImage(img,0,0,c.width,c.height);
-  const photoURL=c.toDataURL('image/jpeg',.68);if(photoURL.length>850000)return toast('Image too large. Choose a smaller photo');
-  await updateDoc(doc(db,'users',ME.uid),{photoURL});P={...P,photoURL};renderLists();toast('Profile photo updated');sheet(false);
- }catch(e){console.error(e);toast('Could not update photo. Check Firestore rules')}
-}
-async function toggleBlock(uid,block){
- if(!uid||!ME||uid===YB)return;const ids=new Set(P?.blockedUids||[]);block?ids.add(uid):ids.delete(uid);const blockedUids=[...ids];
- try{await updateDoc(doc(db,'users',ME.uid),{blockedUids});P={...P,blockedUids};renderLists();if(block&&peer?.uid===uid)toast('User blocked on your account');else toast(block?'User blocked':'User unblocked');renderBlockedList();}
- catch(e){console.error(e);toast('Could not update block list')}
+// Back button inside sheet
+$('sheetBack')?.addEventListener('click', () => showSettingsView('main'));
+
+// Close button
+$('sheetClose')?.addEventListener('click', () => sheet(false));
+$('scrim')?.addEventListener('click', () => {
+  hideConfirmation();
+  sheet(false);
+});
+
+// View switchers from main Settings
+$('rowOpenBlockList')?.addEventListener('click', () => showSettingsView('blocked'));
+$('rowOpenProfile')?.addEventListener('click', () => showSettingsView('profile'));
+
+// Option 1: Theme Toggle
+$('rowThemeToggle')?.addEventListener('click', () => {
+  userPrefs.theme = (userPrefs.theme === 'dark') ? 'light' : 'dark';
+  savePreferences();
+  applyPreferences();
+});
+
+// Option 2: Live Block List population & unblocking
+async function loadBlockedListUsers() {
+  const container = $('blockedUsersList');
+  const blockedIds = P?.blockedUids || [];
+  if (!blockedIds.length) {
+    container.innerHTML = '<p class="emp" style="padding:28px 0">No blocked users.</p>';
+    return;
+  }
+  container.innerHTML = '<p class="emp" style="padding:20px 0">Loading blocked users…</p>';
+  try {
+    const userDocs = await Promise.all(blockedIds.map(async id => {
+      try {
+        const snap = await getDoc(doc(db, 'users', id));
+        return { uid: id, profile: snap.exists() ? snap.data() : { username: 'user', display: 'Operative' } };
+      } catch(e) {
+        return { uid: id, profile: { username: 'user', display: 'Operative' } };
+      }
+    }));
+
+    if (!userDocs.length) {
+      container.innerHTML = '<p class="emp" style="padding:28px 0">No blocked users.</p>';
+      return;
+    }
+
+    container.innerHTML = userDocs.map(({ uid, profile }) => `
+      <div class="blocked-card" data-card-uid="${esc(uid)}">
+        <div class="blocked-card-left">
+          ${avProfile(profile, 38)}
+          <div class="blocked-card-info">
+            <span class="blocked-card-name">${esc(profile.display || profile.username || 'Operator')}</span>
+            <span class="blocked-card-user">@${esc(profile.username || 'operator')}</span>
+          </div>
+        </div>
+        <button type="button" class="btn-unblock" data-action-unblock="${esc(uid)}">Unblock</button>
+      </div>
+    `).join('');
+  } catch(e) {
+    console.error('Failed to load blocked users', e);
+    container.innerHTML = '<p class="emp" style="padding:28px 0;color:#ef4444">Failed to load blocked users.</p>';
+  }
 }
 
-function tabTo(n){tab=n;document.querySelectorAll('.tab').forEach((t,i)=>t.classList.toggle('on',i===n));$('panes').style.transform=`translateX(${-50*n}%)`;$('ind').style.transform=`translateX(${100*n}%)`}
-function back(){appEl.classList.remove('open');peer&&!peer.isYuki&&cid&&updateDoc(doc(db,'chats',cid),{[`typing.${ME.uid}`]:false}).catch(()=>{});stop();peer=cid=null;renderLists()}
+async function unblockUser(targetUid) {
+  if (!ME || !targetUid || !P) return;
+  const btn = document.querySelector(`[data-action-unblock="${targetUid}"]`);
+  if (btn) {
+    btn.disabled = true;
+    btn.textContent = 'Unblocking…';
+  }
+  try {
+    const current = new Set(P.blockedUids || []);
+    current.delete(targetUid);
+    const updatedBlocked = [...current];
+    await updateDoc(doc(db, 'users', ME.uid), { blockedUids: updatedBlocked });
+    P = { ...P, blockedUids: updatedBlocked };
+    toast('User unblocked');
+    renderLists();
+    loadBlockedListUsers();
+  } catch(e) {
+    console.error('Error unblocking user', e);
+    toast('Could not unblock user. Check connection.');
+    if (btn) {
+      btn.disabled = false;
+      btn.textContent = 'Unblock';
+    }
+  }
+}
+
+document.addEventListener('click', e => {
+  const unblockBtn = e.target.closest('[data-action-unblock]');
+  if (unblockBtn) {
+    const uid = unblockBtn.dataset.actionUnblock;
+    if (uid) unblockUser(uid);
+  }
+});
+
+// Option 3: Profile synchronization and actions
+function syncProfileUI() {
+  if (!P && !ME) return;
+  const username = P?.username || 'operator';
+  const display = P?.display || username;
+  const email = ME?.email || P?.email || 'Email not available';
+
+  if ($('profileUsername')) $('profileUsername').textContent = '@' + username;
+  if ($('profileEmail')) $('profileEmail').textContent = email;
+  if ($('profileDp')) {
+    $('profileDp').innerHTML = P?.photoURL ? `<img src="${esc(P.photoURL)}" alt="Profile photo">` : av(username, 76);
+  }
+}
+
+// Copy username to clipboard with feedback
+$('btnCopyProfileUsername')?.addEventListener('click', async () => {
+  const username = P?.username || '';
+  if (!username) return;
+  try {
+    await navigator.clipboard.writeText(username);
+    toast('Username copied to clipboard!');
+  } catch(e) {
+    const ta = document.createElement('textarea');
+    ta.value = username;
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand('copy');
+    ta.remove();
+    toast('Username copied to clipboard!');
+  }
+});
+
+// Trigger change photo
+$('btnTriggerChangePhoto')?.addEventListener('click', () => $('photoFile').click());
+$('photoFile')?.addEventListener('change', e => {
+  const file = e.target.files?.[0];
+  if (file) changePhoto(file);
+  e.target.value = '';
+});
+
+async function changePhoto(file) {
+  if (!file || !ME) return;
+  if (!file.type.startsWith('image/')) return toast('Please select an image file');
+  try {
+    const data = await new Promise((resolve, reject) => {
+      const r = new FileReader();
+      r.onload = () => resolve(r.result);
+      r.onerror = reject;
+      r.readAsDataURL(file);
+    });
+    const img = await new Promise((resolve, reject) => {
+      const im = new Image();
+      im.onload = () => resolve(im);
+      im.onerror = reject;
+      im.src = data;
+    });
+    const canvas = document.createElement('canvas');
+    const scale = Math.min(1, 320 / Math.max(img.width, img.height));
+    canvas.width = Math.max(1, Math.round(img.width * scale));
+    canvas.height = Math.max(1, Math.round(img.height * scale));
+    canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height);
+    const photoURL = canvas.toDataURL('image/jpeg', 0.72);
+    if (photoURL.length > 850000) return toast('Image too large. Please select a smaller photo');
+
+    await updateDoc(doc(db, 'users', ME.uid), { photoURL });
+    P = { ...P, photoURL };
+    syncProfileUI();
+    renderLists();
+    toast('Profile photo updated successfully!');
+  } catch(e) {
+    console.error('Error changing photo', e);
+    toast('Could not update photo. Check connection.');
+  }
+}
+
+// Logout button
+$('btnLogout')?.addEventListener('click', () => {
+  showConfirmation('Log Out?', 'Are you sure you want to log out of your session?', 'Log Out', true, () => {
+    sheet(false);
+    if (ME) updateDoc(doc(db, 'users', ME.uid), { lastSeen: serverTimestamp() }).catch(()=>{});
+    signOut(auth);
+  });
+});
+
+// Direct chat contextual actions
+$('btnDirectBlock')?.addEventListener('click', async () => {
+  const uid = selectedDirect?.uid || (peer && !peer.isYuki ? peer.uid : null);
+  if (!uid || !ME || !P) return;
+  const isBlocked = (P.blockedUids || []).includes(uid);
+  try {
+    const set = new Set(P.blockedUids || []);
+    if (isBlocked) set.delete(uid);
+    else set.add(uid);
+    const updated = [...set];
+    await updateDoc(doc(db, 'users', ME.uid), { blockedUids: updated });
+    P = { ...P, blockedUids: updated };
+    toast(isBlocked ? 'User unblocked' : 'User blocked');
+    renderLists();
+    sheet(false);
+  } catch(e) {
+    console.error(e);
+    toast('Could not update block status');
+  }
+});
+
+$('btnDirectDelete')?.addEventListener('click', () => {
+  const o = selectedDirect?.uid || (peer && !peer.isYuki ? peer.uid : null);
+  if (o) {
+    showConfirmation('Delete Chat?', 'This conversation will be hidden from your direct chats list.', 'Delete', true, () => {
+      addDel(ME.uid, o);
+      chans = chans.filter(c => c.otherUid !== o);
+      sheet(false);
+      if (peer?.uid === o) back();
+      renderLists();
+      toast('Chat deleted');
+    });
+  }
+});
 
 /* --- RELIABLE EVENT LISTENERS & ROTATING GEAR --- */
 function triggerGearAnimation(btn) {
@@ -1051,7 +1205,6 @@ function triggerGearAnimation(btn) {
   setTimeout(() => btn.classList.remove('rotating'), 450);
 }
 
-// Gear button click bindings
 $('acc')?.addEventListener('click', (e) => {
   e.stopPropagation();
   triggerGearAnimation($('acc'));
@@ -1063,125 +1216,10 @@ $('gear')?.addEventListener('click', (e) => {
   sheet(true, 'chat');
 });
 
-// Close sheet
-$('sheetClose')?.addEventListener('click', () => sheet(false));
-$('scrim')?.addEventListener('click', () => {
-  hideConfirmation();
-  sheet(false);
-});
+function tabTo(n){tab=n;document.querySelectorAll('.tab').forEach((t,i)=>t.classList.toggle('on',i===n));$('panes').style.transform=`translateX(${-50*n}%)`;$('ind').style.transform=`translateX(${100*n}%)`}
+function back(){appEl.classList.remove('open');peer&&!peer.isYuki&&cid&&updateDoc(doc(db,'chats',cid),{[`typing.${ME.uid}`]:false}).catch(()=>{});stop();peer=cid=null;renderLists()}
 
-// Settings category tab click
-$('cfgNav')?.addEventListener('click', (e) => {
-  const tabBtn = e.target.closest('.cfg-tab');
-  if (tabBtn && tabBtn.dataset.cfg) {
-    switchSettingsTab(tabBtn.dataset.cfg);
-  }
-});
-
-// Interactive settings controls
-$('o7')?.addEventListener('click', () => { const b=$('blockedList'); b?.classList.toggle('show'); });
-$('openProfileSettings')?.addEventListener('click',()=>{const a=$('cfgCatAccount');if(a){a.classList.add('profile-open');a.style.setProperty('display','block','important');a.scrollIntoView({behavior:'smooth',block:'start'});}});
-$('sheetClose')?.addEventListener('click',()=>{const a=$('cfgCatAccount');a?.classList.remove('profile-open');});
-$('accDisplay')?.addEventListener('click',async()=>{const u=P?.username||'';if(!u)return;try{await navigator.clipboard.writeText(u);toast('Username copied')}catch(e){const t=document.createElement('textarea');t.value=u;document.body.appendChild(t);t.select();document.execCommand('copy');t.remove();toast('Username copied')}});
-$('profileSummary')?.addEventListener('click', async () => { const name=P?.username||''; try { await navigator.clipboard.writeText(name); toast('Username copied'); } catch(e) { toast(name); } });
-$('o1')?.addEventListener('click', () => {
-  userPrefs.theme = (userPrefs.theme === 'dark') ? 'light' : 'dark';
-  savePreferences();
-  applyPreferences();
-});
-
-$('swReduceMotion')?.closest('.opt')?.addEventListener('click', () => {
-  userPrefs.reduceMotion = !userPrefs.reduceMotion;
-  savePreferences();
-  applyPreferences();
-});
-
-$('selBubbleStyle')?.addEventListener('change', (e) => {
-  userPrefs.bubbleStyle = e.target.value;
-  savePreferences();
-  applyPreferences();
-});
-
-$('selFontSize')?.addEventListener('change', (e) => {
-  userPrefs.fontSize = e.target.value;
-  savePreferences();
-  applyPreferences();
-});
-
-$('selDensity')?.addEventListener('change', (e) => {
-  userPrefs.density = e.target.value;
-  savePreferences();
-  applyPreferences();
-});
-
-$('selBgPattern')?.addEventListener('change', (e) => {
-  userPrefs.bgPattern = e.target.value;
-  savePreferences();
-  applyPreferences();
-});
-
-$('swEnterSend')?.closest('.opt')?.addEventListener('click', () => {
-  userPrefs.enterToSend = !userPrefs.enterToSend;
-  savePreferences();
-  applyPreferences();
-});
-
-$('swAutoScroll')?.closest('.opt')?.addEventListener('click', () => {
-  userPrefs.autoScroll = !userPrefs.autoScroll;
-  savePreferences();
-  applyPreferences();
-});
-
-$('swTimestamps')?.closest('.opt')?.addEventListener('click', () => {
-  userPrefs.timestamps = !userPrefs.timestamps;
-  savePreferences();
-  applyPreferences();
-});
-
-$('swHidePreview')?.closest('.opt')?.addEventListener('click', () => {
-  userPrefs.hidePreview = !userPrefs.hidePreview;
-  savePreferences();
-  applyPreferences();
-});
-
-$('o2')?.addEventListener('click', () => {
-  userPrefs.muted = !userPrefs.muted;
-  savePreferences();
-  applyPreferences();
-  toast(userPrefs.muted ? 'Banner notifications muted' : 'Notifications unmuted');
-});
-
-$('swSoundAlert')?.closest('.opt')?.addEventListener('click', () => {
-  userPrefs.soundAlert = !userPrefs.soundAlert;
-  savePreferences();
-  applyPreferences();
-  if (userPrefs.soundAlert) playMessageChime();
-});
-
-$('btnResetAppearance')?.addEventListener('click', () => {
-  showConfirmation('Reset Appearance?', 'This will revert themes, fonts, and bubbles to default styling.', 'Reset', false, () => {
-    userPrefs.theme = DEFAULT_PREFS.theme;
-    userPrefs.bubbleStyle = DEFAULT_PREFS.bubbleStyle;
-    userPrefs.fontSize = DEFAULT_PREFS.fontSize;
-    userPrefs.density = DEFAULT_PREFS.density;
-    userPrefs.bgPattern = DEFAULT_PREFS.bgPattern;
-    userPrefs.reduceMotion = DEFAULT_PREFS.reduceMotion;
-    savePreferences();
-    applyPreferences();
-    toast('Appearance reset to defaults');
-  });
-});
-
-$('btnRestoreAllDefaults')?.addEventListener('click', () => {
-  showConfirmation('Restore Factory Defaults?', 'Reset all settings to default. Your chats, accounts, and messages will remain intact.', 'Restore Defaults', true, () => {
-    userPrefs = { ...DEFAULT_PREFS };
-    savePreferences();
-    applyPreferences();
-    toast('All settings restored to defaults');
-  });
-});
-
-// Preserved core document interactions
+// Conversation selections
 document.addEventListener('click',e=>{
  const g=s=>e.target.closest(s);let x;
  if(x=g('.tab'))tabTo(+x.dataset.t);
@@ -1191,74 +1229,79 @@ document.addEventListener('click',e=>{
  else if(x=g('.mention'))mention(x.dataset.m);
  else if(g('#clr')){$('q').value='';sr.q='';paintSearch();$('q').focus()}
  else if(g('#back'))back();
- else if(g('#o4')){if(P?.username)navigator.clipboard.writeText(P.username).then(()=>toast('ID copied: '+P.username)).catch(()=>toast('Could not copy'))}
- else if(g('#o6'))$('photoFile').click();
- else if(g('#o7')){switchSettingsTab('privacy')}
- else if(x=g('[data-unblock]'))toggleBlock(x.dataset.unblock,false);
- else if(g('#o8')){
-   const uid=selectedDirect?.uid || (peer&&!peer.isYuki?peer.uid:null);
-   if(uid)toggleBlock(uid,!(P?.blockedUids||[]).includes(uid));
-   sheet(false);
- }
- else if(g('#o3')){
-   const o=selectedDirect?.uid||(peer&&!peer.isYuki?peer.uid:null);
-   if(o){
-     showConfirmation('Delete Chat?', 'This conversation will be hidden from your direct chats list.', 'Delete', true, () => {
-       addDel(ME.uid,o);
-       chans=chans.filter(c=>c.otherUid!==o);
-       sheet(false);
-       if(peer?.uid===o)back();
-       renderLists();
-       toast('Chat deleted');
-     });
-   }
- }
- else if(g('#o5')){
-   showConfirmation('Sign Out?', 'Are you sure you want to log out of your session?', 'Log Out', true, () => {
-     sheet(false);
-     if (ME) updateDoc(doc(db,'users',ME.uid),{lastSeen:serverTimestamp()}).catch(()=>{});
-     signOut(auth);
-   });
- }
  else if(x=g('#sug [data-c]')){const i=$('inp');i.value=i.value.replace(/u\/[\w]*$/,x.dataset.c+' ');i.focus();chg()}
  else if(g('#snd'))send();
 });
 
 function openChatFromRow(uid){const c=chans.find(z=>z.otherUid===uid);if(c)openChat(uid,c.profile)}
-$('photoFile')?.addEventListener('change',e=>{const f=e.target.files?.[0];if(f)changePhoto(f);e.target.value=''});
 
-// Long press for conversation options
+// Long press / context menu for direct chats
 document.addEventListener('pointerdown',e=>{const row=e.target.closest('[data-ch]');if(!row)return;longPressTriggered=false;clearTimeout(longPressTimer);longPressTimer=setTimeout(()=>{const uid=row.dataset.ch,c=chans.find(z=>z.otherUid===uid);if(c){longPressTriggered=true;selectedDirect={uid,profile:c.profile};sheet(true,'direct')}},550)});
 document.addEventListener('pointerup',()=>clearTimeout(longPressTimer));
 document.addEventListener('pointercancel',()=>clearTimeout(longPressTimer));
 document.addEventListener('contextmenu',e=>{const row=e.target.closest('[data-ch]');if(!row)return;e.preventDefault();const c=chans.find(z=>z.otherUid===row.dataset.ch);if(c){selectedDirect={uid:c.otherUid,profile:c.profile};sheet(true,'direct')}});
 
-$('inp')?.addEventListener('input',()=>{
-  const i=$('inp');
-  i.style.height='42px';
-  i.style.height=Math.min(i.scrollHeight,120)+'px';
+/* --- MESSAGE COMPOSER & ANDROID VIRTUAL KEYBOARD HANDLING --- */
+const inp = $('inp');
+
+// Auto-grow textarea up to 120px without cutting off buttons
+inp?.addEventListener('input', () => {
+  inp.style.height = '42px';
+  const newHeight = Math.min(inp.scrollHeight, 120);
+  inp.style.height = newHeight + 'px';
   chg();
 });
-$('inp')?.addEventListener('keydown',e=>{
-  if(e.key==='Enter'){
-    if(userPrefs.enterToSend){
-      if(!e.shiftKey){e.preventDefault();send()}
+
+inp?.addEventListener('keydown', e => {
+  if (e.key === 'Enter') {
+    if (userPrefs.enterToSend && !e.shiftKey) {
+      e.preventDefault();
+      send();
     }
   }
 });
 
-function fitComposerToViewport(){const app=document.querySelector('.app'),cmp=document.querySelector('.cmp'),i=$('inp');if(!app||!cmp)return;const vv=window.visualViewport;const vh=vv?Math.round(vv.height):window.innerHeight;document.documentElement.style.setProperty('--app-vh',vh+'px');app.style.height=vh+'px';app.style.maxHeight=vh+'px';if(document.activeElement===i){requestAnimationFrame(()=>{const r=cmp.getBoundingClientRect();if(r.bottom>vh){app.style.height=vh+'px';} });}}
-window.visualViewport?.addEventListener('resize',fitComposerToViewport);
-window.visualViewport?.addEventListener('scroll',fitComposerToViewport);
-window.addEventListener('resize',fitComposerToViewport);
-$('inp')?.addEventListener('focus',()=>setTimeout(fitComposerToViewport,80));
-$('inp')?.addEventListener('blur',()=>{setTimeout(()=>{const app=document.querySelector('.app');if(app){app.style.height='100dvh';app.style.maxHeight='100dvh';}document.documentElement.style.setProperty('--app-vh','100dvh');},180)});
-fitComposerToViewport();
+// Robust Viewport adjustment for Android Chrome & mobile browsers
+function updateVisualViewport() {
+  const vv = window.visualViewport;
+  const currentHeight = vv ? Math.round(vv.height) : window.innerHeight;
+  document.documentElement.style.setProperty('--app-height', `${currentHeight}px`);
 
-document.addEventListener('click',async e=>{const b=e.target.closest('[data-unblock]');if(!b)return;const uid=b.dataset.unblock;if(!uid||!ME||!P)return;try{const ids=(P.blockedUids||[]).filter(x=>x!==uid);await updateDoc(doc(db,'users',ME.uid),{blockedUids:ids});P={...P,blockedUids:ids};renderBlockedList();toast('User unblocked');}catch(err){console.error(err);toast('Could not unblock user');}});
+  // Ensure message container remains correctly positioned above composer
+  if (appEl.classList.contains('open') && msgs) {
+    const isNearBottom = (msgs.scrollHeight - msgs.scrollTop - msgs.clientHeight) < 120;
+    if (isNearBottom) {
+      requestAnimationFrame(() => {
+        msgs.scrollTop = msgs.scrollHeight;
+      });
+    }
+  }
+}
 
-// Initialize app preferences on startup
+if (window.visualViewport) {
+  window.visualViewport.addEventListener('resize', updateVisualViewport);
+  window.visualViewport.addEventListener('scroll', updateVisualViewport);
+}
+window.addEventListener('resize', updateVisualViewport);
+window.addEventListener('orientationchange', () => setTimeout(updateVisualViewport, 150));
+
+inp?.addEventListener('focus', () => {
+  // Prevent default window scroll jump on focus
+  setTimeout(() => {
+    updateVisualViewport();
+    if (msgs) msgs.scrollTop = msgs.scrollHeight;
+  }, 100);
+});
+
+inp?.addEventListener('blur', () => {
+  setTimeout(() => {
+    updateVisualViewport();
+  }, 150);
+});
+
+// Initial load
 loadPreferences();
+updateVisualViewport();
 </script>
 </body>
 </html>

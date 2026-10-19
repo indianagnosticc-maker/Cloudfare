@@ -32,12 +32,13 @@
             resize: none;
             font-family: Arial, sans-serif;
         }
-        textarea:focus {
-            border-color: #1a73e8;
-        }
+        textarea:focus { border-color: #1a73e8; }
         .file-input {
             margin: 15px 0;
             font-size: 14px;
+            padding: 10px;
+            background: #f1f3f4;
+            border-radius: 8px;
         }
         button {
             width: 100%;
@@ -51,18 +52,14 @@
             font-weight: bold;
             margin-top: 10px;
         }
-        button:hover {
-            background-color: #1557b0;
-        }
+        button:hover { background-color: #1557b0; }
         #status {
             margin-top: 20px;
             font-size: 16px;
             color: #d93025;
             word-wrap: break-word;
         }
-        .success {
-            color: #188038 !important;
-        }
+        .success { color: #188038 !important; }
         .result-box {
             margin-top: 20px;
             padding: 15px;
@@ -71,6 +68,7 @@
             font-weight: bold;
             display: none;
             word-break: break-all;
+            font-size: 18px;
         }
     </style>
 </head>
@@ -81,7 +79,8 @@
     
     <div class="file-input">
         <p>OR upload a Siren (.wav) file to decode:</p>
-        <input type="file" id="fileInput" accept=".wav">
+        <!-- Yahan 'accept' hata diya hai taaki koi bhi file select ho sake -->
+        <input type="file" id="fileInput">
     </div>
 
     <button onclick="process()">Convert</button>
@@ -108,17 +107,13 @@
         resultBox.style.display = "none";
         resultBox.textContent = "";
 
-        // If file is selected, Decode it
         if (fileInput.files.length > 0) {
             status.textContent = "Decoding...";
             decodeAudio(fileInput.files[0], status, resultBox);
-        } 
-        // If text is entered, Encode it
-        else if (text) {
+        } else if (text) {
             status.textContent = "Generating Siren...";
             encodeText(text, status);
-        } 
-        else {
+        } else {
             status.textContent = "Please enter text or select a file.";
         }
     }
@@ -182,7 +177,7 @@
 
             status.textContent = "✅ WAV file downloaded!";
             status.className = "success";
-            document.getElementById('mainInput').value = ""; // clear text
+            document.getElementById('mainInput').value = ""; 
         } catch (e) {
             status.textContent = "❌ Error generating audio.";
         }
@@ -254,9 +249,9 @@
             resultBox.textContent = decoded;
             resultBox.style.display = "block";
             
-            document.getElementById('fileInput').value = ""; // clear file
+            document.getElementById('fileInput').value = ""; 
         } catch (e) {
-            status.textContent = "❌ Failed to decode audio.";
+            status.textContent = "❌ Failed to decode audio. Make sure it's a valid WAV file.";
         }
     }
 

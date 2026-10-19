@@ -149,7 +149,8 @@ header{display:flex;align-items:center;gap:6px;padding:10px 8px;background:var(-
 <section class="scr" id="chat">
  <header><button class="ib" id="back" aria-label="Back"><svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg></button><div class="ht"><b id="ttl"></b><span id="sbt"></span></div><button class="ib gear" id="gear" aria-label="Settings"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M4.9 19.1L7 17M17 7l2.1-2.1"/></svg></button></header>
  <div id="msgs"><div class="typ" id="typ"></div></div>
- <div class="cmp"><div class="sug" id="sug"></div><div class="compose-row"><input id="inp" name="chat-message" placeholder="Message" autocomplete="off" autocorrect="off" autocapitalize="sentences" spellcheck="false" data-form-type="other" enterkeyhint="send"><button class="ib" id="snd" aria-label="Send"><svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button></div></div>
+ <div class="cmp"><div class="sug" id="sug"></div><div class="compose-row"><input id="inp" placeholder="Message" autocomplete="off" autocorrect="off" autocapitalize="sentences" spellcheck="false" enterkeyhint="send"><button class="ib" id="snd" aria-label="Send"><svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button></div>
+</div>
 </section>
 <div class="scrim" id="scrim"></div>
 <div class="sheet" id="sheet"><div class="grab"></div><h3 id="sh"></h3>
@@ -439,7 +440,8 @@ $('photoFile').addEventListener('change',e=>{const f=e.target.files?.[0];if(f)ch
 let holdStart=0;document.addEventListener('pointerdown',e=>{const row=e.target.closest('[data-ch]');if(!row)return;longPressTriggered=false;holdStart=Date.now();clearTimeout(longPressTimer);longPressTimer=setTimeout(()=>{const uid=row.dataset.ch,c=chans.find(z=>z.otherUid===uid);if(c){longPressTriggered=true;selectedDirect={uid,profile:c.profile};sheet(true,'direct')}},550)});document.addEventListener('pointerup',()=>clearTimeout(longPressTimer));document.addEventListener('pointercancel',()=>clearTimeout(longPressTimer));document.addEventListener('contextmenu',e=>{const row=e.target.closest('[data-ch]');if(!row)return;e.preventDefault();const c=chans.find(z=>z.otherUid===row.dataset.ch);if(c){selectedDirect={uid:c.otherUid,profile:c.profile};sheet(true,'direct')}});
 $('inp').addEventListener('input',chg);
 // Keep the composer focused on message entry rather than browser autofill/password suggestions.
-$('inp').setAttribute('autocomplete','new-password');$('inp').setAttribute('data-lpignore','true');$('inp').setAttribute('data-1p-ignore','true');
+$('inp').setAttribute('data-lpignore','true');$('inp').setAttribute('data-1p-ignore','true');
+
 window.addEventListener('resize',()=>{if(appEl.classList.contains('open')){msgs.scrollTop=msgs.scrollHeight}});
 $('inp').addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();send()}});
 </script></body></html>

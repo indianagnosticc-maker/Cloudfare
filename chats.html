@@ -1,70 +1,80 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="light">
+
+<html data-theme="dark" lang="en">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, interactive-widget=resizes-content">
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1, viewport-fit=cover, interactive-widget=resizes-content" name="viewport"/>
 <title>Chat App</title>
+<!-- Google Fonts: Inter -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
 <style>
 :root {
+  /* Dark Navy Primary Theme matching Reference */
+  --bg-canvas: #070b13;
+  --bg-gradient: radial-gradient(circle at 50% 0%, #111a2d 0%, #070b13 75%);
+  --app-bg: #0b101c;
+  --header-bg: #0b101c;
+  --card-bg: #141c2c;
+  --card-hover: #192336;
+  --surface-subtle: #121826;
+  --border-subtle: #243044;
+  --border-focus: #2864ed;
+  --primary-blue: #2864ed;
+  --primary-blue-hover: #1e52cb;
+  --primary-blue-glow: rgba(40, 100, 237, 0.45);
+  --primary-blue-light: #1b263b;
+  --accent-red: #f43f5e;
+  --text-main: #f4f6fc;
+  --text-muted: #9aa8be;
+  --text-dim: #60718c;
+  --shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.25);
+  --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.35);
+  --shadow-lg: 0 16px 36px rgba(0, 0, 0, 0.55);
+  --bubble-incoming: #141c2c;
+  --bubble-incoming-text: #f4f6fc;
+  --bubble-outgoing: #2864ed;
+  --bubble-outgoing-text: #ffffff;
+  --nav-active: #2864ed;
+  --nav-inactive: #9aa8be;
+  --scrim-bg: rgba(5, 8, 15, 0.75);
+  --radius-xl: 28px;
+  --radius-lg: 20px;
+  --radius-md: 14px;
+  --radius-full: 9999px;
+  --anim-speed: 0.24s;
+  box-sizing: border-box;
+}
+
+:root[data-theme="light"] {
   --bg-canvas: #e8effa;
   --bg-gradient: linear-gradient(135deg, #f7d6e6 0%, #e2ecf9 50%, #d5e5fa 100%);
   --app-bg: #eaf1fb;
   --card-bg: #ffffff;
   --card-hover: #f3f7fd;
   --surface-subtle: #f0f5fc;
-  --primary-blue: #1d72fe;
-  --primary-blue-hover: #155ecc;
+  --primary-blue: #2864ed;
+  --primary-blue-hover: #1d52ce;
+  --primary-blue-glow: rgba(40, 100, 237, 0.25);
   --primary-blue-light: #e8f1ff;
   --accent-red: #f43f5e;
-  --text-main: #1e293b;
+  --text-main: #141c2c;
   --text-muted: #64748b;
-  --border-subtle: #e2e8f0;
+  --text-dim: #94a3b8;
+  --border-subtle: #dbe3ee;
   --border-focus: #93c5fd;
   --shadow-sm: 0 2px 8px rgba(30, 41, 59, 0.04);
   --shadow-md: 0 8px 24px rgba(30, 41, 59, 0.08);
   --shadow-lg: 0 16px 36px rgba(30, 41, 59, 0.12);
   --bubble-incoming: #ffffff;
   --bubble-incoming-text: #1e293b;
-  --bubble-outgoing: #1d72fe;
+  --bubble-outgoing: #2864ed;
   --bubble-outgoing-text: #ffffff;
-  --header-bg: rgba(255, 255, 255, 0.94);
-  --nav-active: #1d72fe;
+  --header-bg: #eaf1fb;
+  --nav-active: #2864ed;
   --nav-inactive: #64748b;
   --scrim-bg: rgba(15, 23, 42, 0.45);
-  --radius-xl: 24px;
-  --radius-lg: 18px;
-  --radius-md: 12px;
-  --radius-full: 9999px;
-  --anim-speed: 0.28s;
-  box-sizing: border-box;
-}
-
-:root[data-theme="dark"] {
-  --bg-canvas: #090d16;
-  --bg-gradient: linear-gradient(135deg, #111422 0%, #0d121d 50%, #080c14 100%);
-  --app-bg: #0d131f;
-  --card-bg: #141b2a;
-  --card-hover: #1b2437;
-  --surface-subtle: #182235;
-  --primary-blue: #2563eb;
-  --primary-blue-hover: #1d4ed8;
-  --primary-blue-light: #1e293b;
-  --accent-red: #f43f5e;
-  --text-main: #f1f5f9;
-  --text-muted: #94a3b8;
-  --border-subtle: #243047;
-  --border-focus: #3b82f6;
-  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.3);
-  --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.45);
-  --shadow-lg: 0 16px 36px rgba(0, 0, 0, 0.6);
-  --bubble-incoming: #192235;
-  --bubble-incoming-text: #f1f5f9;
-  --bubble-outgoing: #2563eb;
-  --bubble-outgoing-text: #ffffff;
-  --header-bg: rgba(20, 27, 42, 0.94);
-  --nav-active: #3b82f6;
-  --nav-inactive: #94a3b8;
-  --scrim-bg: rgba(0, 0, 0, 0.7);
 }
 
 * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
@@ -76,9 +86,11 @@ html, body {
   position: fixed;
   background: var(--bg-canvas);
   background-image: var(--bg-gradient);
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
   color: var(--text-main);
   overscroll-behavior: none;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 button { font: inherit; color: inherit; background: none; border: 0; cursor: pointer; outline: 0; }
 svg { width: 1.15em; height: 1.15em; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; flex: none; }
@@ -91,10 +103,12 @@ svg { width: 1.15em; height: 1.15em; fill: none; stroke: currentColor; stroke-wi
   height: 100dvh;
   margin: 0 auto;
   background: var(--app-bg);
-  box-shadow: 0 20px 60px rgba(15, 23, 42, 0.18);
+  box-shadow: 0 24px 70px rgba(0, 0, 0, 0.45);
   display: flex;
   flex-direction: column;
   overflow: hidden;
+  border-left: 1px solid rgba(255, 255, 255, 0.03);
+  border-right: 1px solid rgba(255, 255, 255, 0.03);
 }
 
 /* Master Screens Stack */
@@ -116,23 +130,20 @@ svg { width: 1.15em; height: 1.15em; fill: none; stroke: currentColor; stroke-wi
   transform: translateX(0);
 }
 .device-wrapper.in-chat #screenInbox {
-  transform: translateX(-22%);
-  opacity: 0.65;
+  transform: translateX(-20%);
+  opacity: 0.6;
 }
 
 /* ==========================================================================
-   APP HEADER
+   APP HEADER (Matches Reference 1)
    ========================================================================== */
 .app-header {
-  height: 64px;
+  height: 72px;
   background: var(--header-bg);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border-bottom: 1px solid var(--border-subtle);
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0 16px;
+  padding: 12px 20px 8px;
   flex: none;
   z-index: 30;
 }
@@ -140,24 +151,26 @@ svg { width: 1.15em; height: 1.15em; fill: none; stroke: currentColor; stroke-wi
 .brand-badge {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 14px;
   cursor: pointer;
+  user-select: none;
 }
 .brand-logo-icon {
-  width: 38px;
-  height: 38px;
+  width: 44px;
+  height: 44px;
   border-radius: 50%;
-  background: #1d72fe;
+  background: #2864ed;
   display: flex;
   align-items: center;
   justify-content: center;
   color: #fff;
-  box-shadow: 0 4px 12px rgba(29, 114, 254, 0.35);
+  box-shadow: 0 0 22px rgba(40, 100, 237, 0.6);
+  flex-shrink: 0;
 }
-.brand-logo-icon svg { width: 22px; height: 22px; stroke-width: 2.2; }
+.brand-logo-icon svg { width: 22px; height: 22px; stroke-width: 2.3; }
 .brand-title {
-  font-size: 19px;
-  font-weight: 800;
+  font-size: 23px;
+  font-weight: 700;
   letter-spacing: -0.4px;
   color: var(--text-main);
 }
@@ -165,11 +178,11 @@ svg { width: 1.15em; height: 1.15em; fill: none; stroke: currentColor; stroke-wi
 .header-actions {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 10px;
 }
 .action-btn-circle {
-  width: 38px;
-  height: 38px;
+  width: 42px;
+  height: 42px;
   border-radius: 50%;
   background: var(--card-bg);
   border: 1px solid var(--border-subtle);
@@ -184,11 +197,15 @@ svg { width: 1.15em; height: 1.15em; fill: none; stroke: currentColor; stroke-wi
   transform: scale(0.92);
   background: var(--card-hover);
 }
+.action-btn-circle svg {
+  width: 20px;
+  height: 20px;
+}
 .action-btn-circle.unread-dot:after {
   content: "";
   position: absolute;
-  top: 8px;
-  right: 8px;
+  top: 9px;
+  right: 9px;
   width: 8px;
   height: 8px;
   border-radius: 50%;
@@ -196,14 +213,16 @@ svg { width: 1.15em; height: 1.15em; fill: none; stroke: currentColor; stroke-wi
   box-shadow: 0 0 0 2px var(--card-bg);
 }
 .header-profile-btn {
-  width: 38px;
-  height: 38px;
+  width: 44px;
+  height: 44px;
   border-radius: 50%;
   overflow: hidden;
-  border: 2px solid var(--primary-blue);
-  padding: 1px;
+  border: 2px solid #2864ed;
+  padding: 1.5px;
   background: var(--card-bg);
-  box-shadow: var(--shadow-sm);
+  box-shadow: 0 0 14px rgba(40, 100, 237, 0.35);
+  display: grid;
+  place-items: center;
 }
 .header-profile-btn img, .header-profile-btn .av {
   width: 100%;
@@ -213,7 +232,9 @@ svg { width: 1.15em; height: 1.15em; fill: none; stroke: currentColor; stroke-wi
   display: grid;
   place-items: center;
   font-weight: 700;
+  font-size: 14.5px;
   color: #fff;
+  background: #f43f5e;
 }
 
 /* ==========================================================================
@@ -223,37 +244,43 @@ svg { width: 1.15em; height: 1.15em; fill: none; stroke: currentColor; stroke-wi
   flex: 1;
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
-  padding: 14px 16px 90px;
+  padding: 10px 18px 40px;
 }
+.inbox-scroll-body::-webkit-scrollbar { display: none; }
 
-/* Search bar with clean clear button */
+/* Search bar with clean pill shape */
 .search-container {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 12px;
   background: var(--card-bg);
   border: 1px solid var(--border-subtle);
   border-radius: var(--radius-full);
-  padding: 0 14px;
-  height: 44px;
+  padding: 0 18px;
+  height: 48px;
   box-shadow: var(--shadow-sm);
-  transition: border-color 0.2s, box-shadow 0.2s;
-  margin-bottom: 14px;
+  transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
+  margin-bottom: 20px;
 }
 .search-container:focus-within {
   border-color: var(--primary-blue);
-  box-shadow: 0 0 0 3px rgba(29, 114, 254, 0.15);
+  box-shadow: 0 0 0 3px rgba(40, 100, 237, 0.2);
 }
 .search-container input {
   flex: 1;
   border: 0;
   background: none;
   font-size: 15px;
+  font-weight: 500;
   color: var(--text-main);
   outline: 0;
   min-width: 0;
 }
-.search-container svg { color: var(--text-muted); font-size: 18px; }
+.search-container input::placeholder {
+  color: #60718c;
+  font-weight: 400;
+}
+.search-container svg { color: #60718c; width: 19px; height: 19px; }
 #searchClear {
   opacity: 0;
   transform: scale(0.6);
@@ -267,57 +294,59 @@ svg { width: 1.15em; height: 1.15em; fill: none; stroke: currentColor; stroke-wi
   pointer-events: auto;
 }
 
-/* Quick Categories & Tabs (Rooms vs Directs) */
+/* Tabs: Directs & AI Room */
 .inbox-tab-bar {
   display: flex;
   align-items: center;
-  gap: 8px;
-  margin-bottom: 16px;
+  gap: 0;
+  margin-bottom: 20px;
   position: relative;
-  border-bottom: 1px solid var(--border-subtle);
-  padding-bottom: 4px;
+  border-bottom: 2px solid var(--border-subtle);
+  padding-bottom: 0;
 }
 .inbox-tab {
   flex: 1;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 6px;
-  padding: 10px 0;
-  font-size: 14.5px;
+  gap: 8px;
+  padding: 12px 0 14px;
+  font-size: 16px;
   font-weight: 700;
   color: var(--text-muted);
   position: relative;
   transition: color 0.2s ease;
+  cursor: pointer;
 }
 .inbox-tab.active {
   color: var(--primary-blue);
 }
 .inbox-tab-indicator {
   position: absolute;
-  bottom: -1px;
+  bottom: -2px;
   left: 0;
   width: 50%;
   height: 2.5px;
   background: var(--primary-blue);
   border-radius: 2px;
   transition: transform 0.25s cubic-bezier(0.25, 1, 0.3, 1);
+  box-shadow: 0 0 10px rgba(40, 100, 237, 0.8);
 }
 .tab-badge {
   display: inline-block;
-  min-width: 18px;
-  height: 18px;
-  line-height: 18px;
-  border-radius: 9px;
+  min-width: 19px;
+  height: 19px;
+  line-height: 19px;
+  border-radius: 10px;
   background: var(--accent-red);
   color: #fff;
-  font-size: 10.5px;
+  font-size: 11px;
   font-weight: 800;
   text-align: center;
   padding: 0 5px;
 }
 
-/* Roster Views (Rooms and Directs sliding container) */
+/* Roster Views */
 .panes-wrapper {
   position: relative;
   overflow: hidden;
@@ -333,123 +362,150 @@ svg { width: 1.15em; height: 1.15em; fill: none; stroke: currentColor; stroke-wi
   overflow: hidden;
 }
 
-/* Directs / Channels Cards */
+/* Directs / Channels Cards (Spacious, Rounded, High-Fidelity) */
 .chat-card {
   display: flex;
   align-items: center;
-  gap: 12px;
-  padding: 12px 14px;
+  gap: 16px;
+  padding: 16px 18px;
   background: var(--card-bg);
   border-radius: var(--radius-lg);
   border: 1px solid var(--border-subtle);
-  margin-bottom: 10px;
-  box-shadow: var(--shadow-sm);
-  transition: all 0.18s ease;
+  margin-bottom: 12px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+  transition: transform 0.16s ease, background 0.18s ease, border-color 0.18s ease, box-shadow 0.18s ease;
   cursor: pointer;
   text-align: left;
   width: 100%;
 }
 .chat-card:active {
-  transform: scale(0.98);
-  background: var(--card-hover);
+  transform: scale(0.985);
 }
+.chat-card:hover:not(.highlighted-blue) {
+  background: var(--card-hover);
+  border-color: #313f57;
+}
+
+/* Bright Electric Blue Highlighted Card (Leslie Alexander in reference) */
 .chat-card.highlighted-blue {
   background: var(--primary-blue);
   border-color: var(--primary-blue);
   color: #ffffff;
-  box-shadow: 0 8px 20px rgba(29, 114, 254, 0.3);
+  box-shadow: 0 8px 28px rgba(40, 100, 237, 0.45);
 }
-.chat-card.highlighted-blue .chat-card-name { color: #ffffff; }
-.chat-card.highlighted-blue .chat-card-preview { color: rgba(255, 255, 255, 0.85); }
-.chat-card.highlighted-blue .chat-card-time { color: rgba(255, 255, 255, 0.75); }
+.chat-card.highlighted-blue .chat-card-name {
+  color: #ffffff;
+}
+.chat-card.highlighted-blue .chat-card-preview {
+  color: rgba(255, 255, 255, 0.88);
+}
+.chat-card.highlighted-blue .chat-card-time {
+  color: rgba(255, 255, 255, 0.8);
+}
 
 .chat-card-avatar {
-  width: 44px;
-  height: 44px;
+  width: 52px;
+  height: 52px;
   border-radius: 50%;
-  overflow: hidden;
+  overflow: visible;
   flex: none;
-  background: #cbd5e1;
+  background: #3b82f6;
   display: grid;
   place-items: center;
   font-weight: 700;
+  font-size: 16px;
   color: #ffffff;
   position: relative;
+  letter-spacing: -0.2px;
 }
-.chat-card-avatar img { width: 100%; height: 100%; object-fit: cover; }
+.chat-card-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 50%;
+}
 .online-indicator {
   position: absolute;
-  bottom: 0;
-  right: 0;
-  width: 11px;
-  height: 11px;
+  bottom: 0px;
+  right: 0px;
+  width: 13px;
+  height: 13px;
   border-radius: 50%;
   background: #22c55e;
-  border: 2px solid var(--card-bg);
+  border: 2.5px solid var(--card-bg);
 }
+.chat-card.highlighted-blue .online-indicator {
+  border-color: var(--primary-blue);
+}
+
 .chat-card-body {
   flex: 1;
   min-width: 0;
 }
 .chat-card-header {
   display: flex;
-  align-items: center;
+  align-items: baseline;
   justify-content: space-between;
-  margin-bottom: 3px;
+  margin-bottom: 4px;
 }
 .chat-card-name {
-  font-size: 15px;
+  font-size: 16.5px;
   font-weight: 700;
+  letter-spacing: -0.25px;
   color: var(--text-main);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 .chat-card-time {
-  font-size: 12px;
+  font-size: 13px;
+  font-weight: 500;
   color: var(--text-muted);
   flex: none;
-  margin-left: 6px;
+  margin-left: 8px;
 }
 .chat-card-preview {
-  font-size: 13px;
+  font-size: 14px;
+  line-height: 1.35;
   color: var(--text-muted);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  letter-spacing: -0.15px;
 }
 
 /* AI Companion Room Card */
 .ai-companion-card {
   display: flex;
   align-items: center;
-  gap: 14px;
-  padding: 14px;
-  background: linear-gradient(135deg, rgba(29, 114, 254, 0.08) 0%, rgba(147, 197, 253, 0.12) 100%);
-  border: 1px solid rgba(29, 114, 254, 0.25);
+  gap: 16px;
+  padding: 18px 20px;
+  background: var(--card-bg);
+  border: 1px solid var(--border-subtle);
   border-radius: var(--radius-lg);
-  margin-bottom: 12px;
+  margin-bottom: 14px;
   cursor: pointer;
   transition: all 0.2s ease;
   width: 100%;
   text-align: left;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
 }
-:root[data-theme="dark"] .ai-companion-card {
-  background: linear-gradient(135deg, rgba(37, 99, 235, 0.15) 0%, rgba(30, 41, 59, 0.4) 100%);
-  border-color: rgba(37, 99, 235, 0.35);
+.ai-companion-card:hover {
+  background: var(--card-hover);
+  border-color: #313f57;
 }
 .ai-companion-card:active {
-  transform: scale(0.98);
+  transform: scale(0.985);
 }
 .ai-companion-icon {
-  width: 44px;
-  height: 44px;
+  width: 48px;
+  height: 48px;
   border-radius: 50%;
   background: var(--primary-blue);
   color: #fff;
   display: grid;
   place-items: center;
-  box-shadow: 0 4px 14px rgba(29, 114, 254, 0.35);
+  box-shadow: 0 4px 16px rgba(40, 100, 237, 0.4);
   flex: none;
 }
 
@@ -463,51 +519,23 @@ svg { width: 1.15em; height: 1.15em; fill: none; stroke: currentColor; stroke-wi
   display: block;
 }
 
-
-
-/* Floating Action Button (New Chat / Compose) */
-.fab-new-chat {
-  position: absolute;
-  right: 20px;
-  bottom: 84px;
-  height: 48px;
-  padding: 0 18px;
-  border-radius: var(--radius-full);
-  background: var(--primary-blue);
-  color: #fff;
-  font-size: 14px;
-  font-weight: 700;
-  box-shadow: 0 8px 24px rgba(29, 114, 254, 0.4);
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  z-index: 28;
-  transition: transform 0.18s ease, filter 0.18s ease;
-}
-.fab-new-chat:active {
-  transform: scale(0.95);
-  filter: brightness(0.92);
-}
-
 /* ==========================================================================
    ACTIVE CHAT VIEW
    ========================================================================== */
 .chat-top-header {
-  height: 64px;
+  height: 70px;
   background: var(--header-bg);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
   border-bottom: 1px solid var(--border-subtle);
   display: flex;
   align-items: center;
-  gap: 10px;
-  padding: 0 12px;
+  gap: 12px;
+  padding: 0 16px;
   flex: none;
   z-index: 35;
 }
 .chat-back-btn {
-  width: 38px;
-  height: 38px;
+  width: 40px;
+  height: 40px;
   border-radius: 50%;
   display: grid;
   place-items: center;
@@ -523,17 +551,17 @@ svg { width: 1.15em; height: 1.15em; fill: none; stroke: currentColor; stroke-wi
 .chat-contact-info {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 12px;
   flex: 1;
   min-width: 0;
   cursor: pointer;
 }
 .chat-header-avatar {
-  width: 40px;
-  height: 40px;
+  width: 42px;
+  height: 42px;
   border-radius: 50%;
   overflow: hidden;
-  background: #cbd5e1;
+  background: #f59e0b;
   display: grid;
   place-items: center;
   font-weight: 700;
@@ -546,28 +574,30 @@ svg { width: 1.15em; height: 1.15em; fill: none; stroke: currentColor; stroke-wi
   min-width: 0;
 }
 .chat-header-meta b {
-  font-size: 15.5px;
+  font-size: 16px;
   font-weight: 700;
   color: var(--text-main);
   display: block;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  letter-spacing: -0.2px;
 }
 .chat-header-meta span {
-  font-size: 12px;
+  font-size: 12.5px;
   color: var(--text-muted);
   display: block;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  margin-top: 1px;
 }
 
 /* Messages Stream Area */
 .messages-container {
   flex: 1;
   overflow-y: auto;
-  padding: 16px 14px 12px;
+  padding: 18px 16px 14px;
   display: flex;
   flex-direction: column;
   -webkit-overflow-scrolling: touch;
@@ -576,20 +606,21 @@ svg { width: 1.15em; height: 1.15em; fill: none; stroke: currentColor; stroke-wi
 .messages-container > .chat-message-row:first-of-type {
   margin-top: auto;
 }
+.messages-container::-webkit-scrollbar { display: none; }
 
 .date-divider {
   display: flex;
   align-items: center;
   justify-content: center;
-  margin: 16px 0 10px;
+  margin: 18px 0 12px;
 }
 .date-pill {
-  padding: 4px 12px;
+  padding: 5px 14px;
   border-radius: var(--radius-full);
   background: var(--card-bg);
   border: 1px solid var(--border-subtle);
-  font-size: 11.5px;
-  font-weight: 700;
+  font-size: 12px;
+  font-weight: 600;
   color: var(--text-muted);
   box-shadow: var(--shadow-sm);
 }
@@ -597,7 +628,7 @@ svg { width: 1.15em; height: 1.15em; fill: none; stroke: currentColor; stroke-wi
 .chat-message-row {
   display: flex;
   gap: 10px;
-  margin-bottom: 12px;
+  margin-bottom: 14px;
   animation: messagePop 0.2s cubic-bezier(0.2, 0.9, 0.3, 1);
 }
 @keyframes messagePop {
@@ -609,8 +640,8 @@ svg { width: 1.15em; height: 1.15em; fill: none; stroke: currentColor; stroke-wi
 }
 
 .msg-avatar {
-  width: 32px;
-  height: 32px;
+  width: 34px;
+  height: 34px;
   border-radius: 50%;
   overflow: hidden;
   flex: none;
@@ -625,7 +656,7 @@ svg { width: 1.15em; height: 1.15em; fill: none; stroke: currentColor; stroke-wi
 .msg-avatar img { width: 100%; height: 100%; object-fit: cover; }
 
 .msg-bubble-wrap {
-  max-width: calc(100% - 74px);
+  max-width: calc(100% - 78px);
   min-width: 0;
   display: flex;
   flex-direction: column;
@@ -634,21 +665,21 @@ svg { width: 1.15em; height: 1.15em; fill: none; stroke: currentColor; stroke-wi
   align-items: flex-end;
 }
 .msg-sender-name {
-  font-size: 11.5px;
-  font-weight: 700;
+  font-size: 12px;
+  font-weight: 600;
   color: var(--text-muted);
-  margin-bottom: 3px;
+  margin-bottom: 4px;
   padding: 0 4px;
 }
 .msg-bubble {
-  padding: 10px 14px;
-  border-radius: 18px;
+  padding: 12px 16px;
+  border-radius: 20px;
   font-size: 14.5px;
-  line-height: 1.42;
+  line-height: 1.45;
   word-break: break-word;
   background: var(--bubble-incoming);
   color: var(--bubble-incoming-text);
-  box-shadow: var(--shadow-sm);
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.25);
   border: 1px solid var(--border-subtle);
 }
 .chat-message-row.is-mine .msg-bubble {
@@ -656,13 +687,14 @@ svg { width: 1.15em; height: 1.15em; fill: none; stroke: currentColor; stroke-wi
   color: var(--bubble-outgoing-text);
   border-color: var(--bubble-outgoing);
   border-bottom-right-radius: 4px;
+  box-shadow: 0 4px 16px rgba(40, 100, 237, 0.3);
 }
 .chat-message-row:not(.is-mine) .msg-bubble {
   border-bottom-left-radius: 4px;
 }
 .msg-time {
-  font-size: 11px;
-  color: var(--text-muted);
+  font-size: 11.5px;
+  color: var(--text-dim);
   margin-top: 4px;
   padding: 0 4px;
 }
@@ -671,9 +703,9 @@ svg { width: 1.15em; height: 1.15em; fill: none; stroke: currentColor; stroke-wi
 .typing-bar {
   display: none;
   align-items: center;
-  gap: 6px;
-  padding: 6px 14px 10px;
-  font-size: 12px;
+  gap: 8px;
+  padding: 8px 14px 12px;
+  font-size: 12.5px;
   color: var(--text-muted);
 }
 .typing-bar.active { display: flex; }
@@ -697,10 +729,8 @@ svg { width: 1.15em; height: 1.15em; fill: none; stroke: currentColor; stroke-wi
 /* Composer Bar */
 .composer-dock {
   background: var(--header-bg);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
   border-top: 1px solid var(--border-subtle);
-  padding: 10px 14px calc(10px + env(safe-area-inset-bottom, 0px));
+  padding: 12px 16px calc(12px + env(safe-area-inset-bottom, 0px));
   flex: none;
   z-index: 30;
   position: relative;
@@ -711,22 +741,22 @@ svg { width: 1.15em; height: 1.15em; fill: none; stroke: currentColor; stroke-wi
   gap: 10px;
   background: var(--card-bg);
   border: 1px solid var(--border-subtle);
-  border-radius: 24px;
-  padding: 6px 8px 6px 14px;
+  border-radius: 26px;
+  padding: 6px 8px 6px 16px;
   box-shadow: var(--shadow-sm);
   transition: border-color 0.2s, box-shadow 0.2s;
 }
 .composer-inner:focus-within {
   border-color: var(--primary-blue);
-  box-shadow: 0 0 0 3px rgba(29, 114, 254, 0.15);
+  box-shadow: 0 0 0 3px rgba(40, 100, 237, 0.2);
 }
 .composer-textarea {
   flex: 1;
   min-width: 0;
-  height: 36px;
-  min-height: 36px;
+  height: 38px;
+  min-height: 38px;
   max-height: 120px;
-  padding: 8px 0;
+  padding: 9px 0;
   border: 0;
   background: transparent;
   font: inherit;
@@ -739,11 +769,11 @@ svg { width: 1.15em; height: 1.15em; fill: none; stroke: currentColor; stroke-wi
   scrollbar-width: none;
   -ms-overflow-style: none;
 }
-.composer-textarea::-webkit-scrollbar { display: none; width: 0; height: 0; }
+.composer-textarea::-webkit-scrollbar { display: none; }
 
 .composer-btn {
-  width: 36px;
-  height: 36px;
+  width: 38px;
+  height: 38px;
   border-radius: 50%;
   display: grid;
   place-items: center;
@@ -753,14 +783,15 @@ svg { width: 1.15em; height: 1.15em; fill: none; stroke: currentColor; stroke-wi
 }
 .composer-btn:active { transform: scale(0.9); }
 .send-action-btn {
-  background: #cbd5e1;
-  color: #fff;
-  transition: background 0.2s, transform 0.2s;
+  background: #243044;
+  color: var(--text-muted);
+  transition: background 0.2s, transform 0.2s, color 0.2s;
 }
 .send-action-btn.can-send {
   background: var(--primary-blue);
-  box-shadow: 0 4px 12px rgba(29, 114, 254, 0.35);
-  transform: scale(1.04);
+  color: #fff;
+  box-shadow: 0 4px 14px rgba(40, 100, 237, 0.4);
+  transform: scale(1.02);
 }
 .send-action-btn.can-send:active {
   transform: scale(0.94);
@@ -769,8 +800,8 @@ svg { width: 1.15em; height: 1.15em; fill: none; stroke: currentColor; stroke-wi
 /* Mentions popup autocomplete */
 .mentions-box {
   position: absolute;
-  left: 14px;
-  right: 14px;
+  left: 16px;
+  right: 16px;
   bottom: 100%;
   background: var(--card-bg);
   border: 1px solid var(--border-subtle);
@@ -788,12 +819,12 @@ svg { width: 1.15em; height: 1.15em; fill: none; stroke: currentColor; stroke-wi
 .mention-item {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 12px;
   padding: 10px 14px;
   width: 100%;
   text-align: left;
   border-bottom: 1px solid var(--border-subtle);
-  font-size: 13.5px;
+  font-size: 14px;
   font-weight: 600;
   color: var(--text-main);
 }
@@ -827,32 +858,33 @@ svg { width: 1.15em; height: 1.15em; fill: none; stroke: currentColor; stroke-wi
   background: var(--card-bg);
   border: 1px solid var(--border-subtle);
   border-radius: var(--radius-xl);
-  padding: 28px 22px;
+  padding: 32px 24px;
   box-shadow: var(--shadow-lg);
   text-align: center;
 }
 .auth-brand-badge {
-  width: 56px;
-  height: 56px;
+  width: 60px;
+  height: 60px;
   border-radius: 50%;
   background: var(--primary-blue);
   color: #fff;
   display: grid;
   place-items: center;
-  margin: 0 auto 14px;
-  box-shadow: 0 8px 20px rgba(29, 114, 254, 0.35);
+  margin: 0 auto 16px;
+  box-shadow: 0 8px 24px rgba(40, 100, 237, 0.5);
 }
-.auth-brand-badge svg { width: 28px; height: 28px; }
+.auth-brand-badge svg { width: 30px; height: 30px; }
 .auth-card h2 {
-  font-size: 24px;
+  font-size: 25px;
   font-weight: 800;
   margin-bottom: 6px;
-  letter-spacing: -0.3px;
+  letter-spacing: -0.4px;
+  color: var(--text-main);
 }
 .auth-card p.auth-sub {
-  font-size: 14px;
+  font-size: 14.5px;
   color: var(--text-muted);
-  margin-bottom: 22px;
+  margin-bottom: 24px;
 }
 .auth-input-group {
   display: flex;
@@ -862,10 +894,10 @@ svg { width: 1.15em; height: 1.15em; fill: none; stroke: currentColor; stroke-wi
 }
 .auth-field {
   width: 100%;
-  height: 48px;
+  height: 50px;
   border: 1px solid var(--border-subtle);
   border-radius: var(--radius-md);
-  padding: 0 14px;
+  padding: 0 16px;
   font-size: 15px;
   background: var(--surface-subtle);
   color: var(--text-main);
@@ -874,21 +906,21 @@ svg { width: 1.15em; height: 1.15em; fill: none; stroke: currentColor; stroke-wi
 }
 .auth-field:focus {
   border-color: var(--primary-blue);
-  box-shadow: 0 0 0 3px rgba(29, 114, 254, 0.15);
+  box-shadow: 0 0 0 3px rgba(40, 100, 237, 0.2);
 }
 .auth-btn-primary {
   width: 100%;
-  height: 48px;
+  height: 50px;
   border-radius: var(--radius-full);
   background: var(--primary-blue);
   color: #fff;
-  font-size: 15.5px;
+  font-size: 16px;
   font-weight: 700;
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 8px;
-  box-shadow: 0 6px 18px rgba(29, 114, 254, 0.35);
+  box-shadow: 0 6px 20px rgba(40, 100, 237, 0.4);
   transition: transform 0.15s, filter 0.2s;
 }
 .auth-btn-primary:active {
@@ -896,14 +928,14 @@ svg { width: 1.15em; height: 1.15em; fill: none; stroke: currentColor; stroke-wi
   filter: brightness(0.95);
 }
 .auth-toggle-link {
-  font-size: 13.5px;
+  font-size: 14px;
   color: var(--primary-blue);
   font-weight: 600;
-  margin-top: 14px;
+  margin-top: 16px;
   display: inline-block;
 }
-.auth-msg-err { color: #dc2626; font-size: 13px; min-height: 18px; margin-top: 6px; }
-.auth-msg-ok { color: #16a34a; font-size: 13px; min-height: 18px; margin-top: 6px; }
+.auth-msg-err { color: #f43f5e; font-size: 13px; min-height: 18px; margin-top: 6px; }
+.auth-msg-ok { color: #22c55e; font-size: 13px; min-height: 18px; margin-top: 6px; }
 
 /* ==========================================================================
    SETTINGS SIDE DRAWER (3 CORE SECTIONS)
@@ -912,8 +944,8 @@ svg { width: 1.15em; height: 1.15em; fill: none; stroke: currentColor; stroke-wi
   position: absolute;
   inset: 0;
   background: var(--scrim-bg);
-  backdrop-filter: blur(4px);
-  -webkit-backdrop-filter: blur(4px);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
   opacity: 0;
   pointer-events: none;
   transition: opacity 0.25s ease;
@@ -933,7 +965,7 @@ svg { width: 1.15em; height: 1.15em; fill: none; stroke: currentColor; stroke-wi
   max-width: 380px;
   background: var(--card-bg);
   border-left: 1px solid var(--border-subtle);
-  box-shadow: -12px 0 36px rgba(0, 0, 0, 0.25);
+  box-shadow: -14px 0 40px rgba(0, 0, 0, 0.4);
   z-index: 70;
   transform: translateX(105%);
   transition: transform 0.28s cubic-bezier(0.2, 0.9, 0.3, 1);
@@ -945,8 +977,8 @@ svg { width: 1.15em; height: 1.15em; fill: none; stroke: currentColor; stroke-wi
 }
 
 .drawer-header {
-  height: 60px;
-  padding: 0 18px;
+  height: 66px;
+  padding: 0 20px;
   border-bottom: 1px solid var(--border-subtle);
   display: flex;
   align-items: center;
@@ -956,16 +988,17 @@ svg { width: 1.15em; height: 1.15em; fill: none; stroke: currentColor; stroke-wi
 .drawer-title-group {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 10px;
 }
 .drawer-title {
-  font-size: 17px;
-  font-weight: 800;
+  font-size: 18px;
+  font-weight: 700;
   letter-spacing: -0.2px;
+  color: var(--text-main);
 }
 .drawer-back-btn {
-  width: 32px;
-  height: 32px;
+  width: 34px;
+  height: 34px;
   border-radius: 50%;
   display: grid;
   place-items: center;
@@ -975,30 +1008,30 @@ svg { width: 1.15em; height: 1.15em; fill: none; stroke: currentColor; stroke-wi
 .drawer-body {
   flex: 1;
   overflow-y: auto;
-  padding: 16px 18px 32px;
+  padding: 18px 20px 36px;
   -webkit-overflow-scrolling: touch;
 }
 
 .settings-sec-label {
-  font-size: 11px;
+  font-size: 11.5px;
   font-weight: 800;
-  color: var(--text-muted);
+  color: var(--text-dim);
   text-transform: uppercase;
   letter-spacing: 0.8px;
-  margin: 14px 0 8px;
+  margin: 16px 0 10px;
 }
 .settings-card {
   background: var(--surface-subtle);
   border: 1px solid var(--border-subtle);
   border-radius: var(--radius-lg);
   overflow: hidden;
-  margin-bottom: 14px;
+  margin-bottom: 16px;
 }
 .settings-row {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 14px;
+  padding: 15px 16px;
   border-bottom: 1px solid var(--border-subtle);
   cursor: pointer;
   text-align: left;
@@ -1017,12 +1050,12 @@ svg { width: 1.15em; height: 1.15em; fill: none; stroke: currentColor; stroke-wi
 }
 .settings-main-title {
   font-size: 14.5px;
-  font-weight: 700;
+  font-weight: 600;
   color: var(--text-main);
   display: block;
 }
 .settings-sub-title {
-  font-size: 12px;
+  font-size: 12.5px;
   color: var(--text-muted);
   display: block;
   margin-top: 2px;
@@ -1030,10 +1063,10 @@ svg { width: 1.15em; height: 1.15em; fill: none; stroke: currentColor; stroke-wi
 
 /* Switch Toggle */
 .toggle-switch {
-  width: 46px;
-  height: 26px;
-  border-radius: 13px;
-  background: #cbd5e1;
+  width: 48px;
+  height: 28px;
+  border-radius: 14px;
+  background: #243044;
   position: relative;
   transition: background 0.25s ease;
   flex: none;
@@ -1041,13 +1074,13 @@ svg { width: 1.15em; height: 1.15em; fill: none; stroke: currentColor; stroke-wi
 .toggle-switch:after {
   content: "";
   position: absolute;
-  top: 3px;
-  left: 3px;
-  width: 20px;
-  height: 20px;
+  top: 3.5px;
+  left: 3.5px;
+  width: 21px;
+  height: 21px;
   border-radius: 50%;
   background: #ffffff;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.4);
   transition: transform 0.25s cubic-bezier(0.2, 0.9, 0.3, 1);
 }
 .toggle-switch.on {
@@ -1070,25 +1103,25 @@ svg { width: 1.15em; height: 1.15em; fill: none; stroke: currentColor; stroke-wi
 
 /* Profile Form styling */
 .profile-form-group {
-  margin-bottom: 14px;
+  margin-bottom: 16px;
 }
 .profile-form-label {
   display: block;
-  font-size: 11.5px;
+  font-size: 12px;
   font-weight: 700;
   color: var(--text-muted);
   text-transform: uppercase;
   letter-spacing: 0.6px;
-  margin-bottom: 6px;
+  margin-bottom: 8px;
 }
 .profile-input {
   width: 100%;
-  height: 42px;
-  background: var(--card-bg);
+  height: 44px;
+  background: var(--surface-subtle);
   border: 1px solid var(--border-subtle);
   border-radius: var(--radius-md);
-  padding: 0 12px;
-  font-size: 14px;
+  padding: 0 14px;
+  font-size: 14.5px;
   color: var(--text-main);
   outline: 0;
 }
@@ -1101,20 +1134,23 @@ svg { width: 1.15em; height: 1.15em; fill: none; stroke: currentColor; stroke-wi
   justify-content: center;
   padding: 8px 18px;
   border-radius: var(--radius-full);
-  font-size: 13.5px;
+  font-size: 14px;
   font-weight: 700;
   background: var(--primary-blue);
   color: #fff;
   cursor: pointer;
   border: 0;
+  box-shadow: 0 4px 12px rgba(40, 100, 237, 0.3);
 }
 .profile-pill-btn.danger {
-  background: #ef4444;
+  background: #f43f5e;
+  box-shadow: 0 4px 12px rgba(244, 63, 94, 0.3);
 }
 .profile-pill-btn.outline {
   background: transparent;
   color: var(--text-main);
   border: 1px solid var(--border-subtle);
+  box-shadow: none;
 }
 
 /* User Details Bottom Modal (Leslie Alexander / Contact Info) */
@@ -1124,13 +1160,13 @@ svg { width: 1.15em; height: 1.15em; fill: none; stroke: currentColor; stroke-wi
   right: 0;
   bottom: 0;
   background: var(--card-bg);
-  border-radius: 24px 24px 0 0;
+  border-radius: 26px 26px 0 0;
   border-top: 1px solid var(--border-subtle);
-  box-shadow: 0 -16px 48px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 -16px 48px rgba(0, 0, 0, 0.5);
   z-index: 80;
   transform: translateY(105%);
   transition: transform 0.28s cubic-bezier(0.2, 0.9, 0.3, 1);
-  padding: 16px 20px 32px;
+  padding: 18px 22px 36px;
   max-height: 85%;
   overflow-y: auto;
 }
@@ -1138,11 +1174,11 @@ svg { width: 1.15em; height: 1.15em; fill: none; stroke: currentColor; stroke-wi
   transform: translateY(0);
 }
 .modal-drag-pill {
-  width: 40px;
-  height: 4.5px;
+  width: 44px;
+  height: 5px;
   border-radius: 3px;
-  background: #cbd5e1;
-  margin: 0 auto 16px;
+  background: #313f57;
+  margin: 0 auto 18px;
 }
 
 /* Toast Notification */
@@ -1151,11 +1187,12 @@ svg { width: 1.15em; height: 1.15em; fill: none; stroke: currentColor; stroke-wi
   left: 50%;
   bottom: 84px;
   transform: translate(-50%, 20px) scale(0.95);
-  background: rgba(15, 23, 42, 0.92);
+  background: rgba(20, 28, 44, 0.95);
+  border: 1px solid var(--border-subtle);
   color: #fff;
-  padding: 9px 18px;
+  padding: 10px 20px;
   border-radius: var(--radius-full);
-  font-size: 13px;
+  font-size: 13.5px;
   font-weight: 600;
   box-shadow: var(--shadow-md);
   opacity: 0;
@@ -1171,376 +1208,304 @@ svg { width: 1.15em; height: 1.15em; fill: none; stroke: currentColor; stroke-wi
 </style>
 </head>
 <body>
-
 <div class="device-wrapper" id="appShell">
-
-  <!-- ==========================================
+<!-- ==========================================
        AUTHENTICATION OVERLAY
        ========================================== -->
-  <div id="authScreen">
-    <div class="auth-card">
-      <div class="auth-brand-badge">
-        <svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
-      </div>
-      <h2 id="authHeading">Chat App</h2>
-      <p class="auth-sub" id="authSub">Sign in to continue to your messages</p>
-      
-      <div class="auth-input-group">
-        <input class="auth-field" id="authEmail" type="email" placeholder="Email address" autocomplete="email">
-        <input class="auth-field" id="authPassword" type="password" placeholder="Password (6+ chars)" autocomplete="current-password">
-      </div>
-
-      <div class="auth-msg-err" id="authError"></div>
-      <div class="auth-msg-ok" id="authInfo"></div>
-
-      <button class="auth-btn-primary" id="btnAuthSubmit">
-        <span id="authSubmitText">Sign in</span>
-        <svg viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
-      </button>
-
-      <button class="auth-toggle-link" id="btnToggleAuthMode">New here? Create account</button>
-      <button class="auth-toggle-link" id="btnResendVerification" style="display:none;margin-top:6px">Resend verification email</button>
-    </div>
-  </div>
-
-  <!-- ==========================================
+<div id="authScreen">
+<div class="auth-card">
+<div class="auth-brand-badge">
+<svg viewbox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+</div>
+<h2 id="authHeading">Chat App</h2>
+<p class="auth-sub" id="authSub">Sign in to continue to your messages</p>
+<div class="auth-input-group">
+<input autocomplete="email" class="auth-field" id="authEmail" placeholder="Email address" type="email"/>
+<input autocomplete="current-password" class="auth-field" id="authPassword" placeholder="Password (6+ chars)" type="password"/>
+</div>
+<div class="auth-msg-err" id="authError"></div>
+<div class="auth-msg-ok" id="authInfo"></div>
+<button class="auth-btn-primary" id="btnAuthSubmit">
+<span id="authSubmitText">Sign in</span>
+<svg viewbox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"></path></svg>
+</button>
+<button class="auth-toggle-link" id="btnToggleAuthMode">New here? Create account</button>
+<button class="auth-toggle-link" id="btnResendVerification" style="display:none;margin-top:6px">Resend verification email</button>
+</div>
+</div>
+<!-- ==========================================
        INBOX / MAIN ROSTER SCREEN
        ========================================== -->
-  <div class="screen" id="screenInbox">
-    <!-- Header -->
-    <header class="app-header">
-      <div class="brand-badge" id="btnBrandMenu">
-        <div class="brand-logo-icon">
-          <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><circle cx="19" cy="12" r="2"/><circle cx="5" cy="12" r="2"/></svg>
-        </div>
-        <span class="brand-title">Chat</span>
-      </div>
-      <div class="header-actions">
-        
-        <button class="action-btn-circle" id="btnOpenSettings" aria-label="Settings" title="Settings">
-          <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
-        </button>
-        <button class="header-profile-btn" id="btnHeaderProfile" aria-label="My Profile">
-          <div class="av" id="headerProfileAvatar" style="background:#1d72fe">U</div>
-        </button>
-      </div>
-    </header>
-
-    <!-- Scrollable Inbox List -->
-    <div class="inbox-scroll-body">
-      <!-- Search Input -->
-      <div class="search-container" id="searchBoxWrap">
-        <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
-        <input id="searchInput" placeholder="Search by username..." autocomplete="off">
-        <button id="searchClear" aria-label="Clear Search"><svg viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></svg></button>
-      </div>
-
-      <!-- Search Results Dropdown -->
-      <div id="searchResultsView"></div>
-
-      <!-- Main Tabs (Rooms vs Directs) -->
-      <div class="inbox-tab-bar" id="inboxTabBar">
-        <button class="inbox-tab active" data-tab="0">
-          <span>Directs</span>
-          <span class="tab-badge" id="directsUnreadBadge" style="display:none">0</span>
-        </button>
-        <button class="inbox-tab" data-tab="1">
-          <span>AI Room</span>
-        </button>
-        <div class="inbox-tab-indicator" id="tabIndicator"></div>
-      </div>
-
-      <!-- Panes for Directs & Rooms -->
-      <div class="panes-wrapper">
-        <div class="panes-track" id="panesTrack">
-          <!-- Directs Pane -->
-          <div class="pane-col" id="paneDirects">
-            <div id="directsListContainer"></div>
-          </div>
-
-          <!-- Rooms Pane -->
-          <div class="pane-col" id="paneRooms">
-            <div class="ai-companion-card" id="btnOpenYukiRoom">
-              <div class="ai-companion-icon">
-                <svg viewBox="0 0 24 24"><path d="M12 2a8 8 0 0 0-8 8c0 3.3 2 6.2 5 7.4V20a2 2 0 0 0 2 2h2a2 2 0 0 0 2-2v-2.6c3-1.2 5-4.1 5-7.4a8 8 0 0 0-8-8z"/><path d="M9 10h.01M15 10h.01"/></svg>
-              </div>
-              <div style="flex:1;min-width:0">
-                <div style="font-size:15px;font-weight:700;color:var(--text-main)">Yuki AI Companion</div>
-                <div style="font-size:12.5px;color:var(--text-muted);margin-top:2px">Ask questions, debug code, or chat 24/7</div>
-              </div>
-              <svg viewBox="0 0 24 24" style="color:var(--primary-blue)"><path d="m9 18 6-6-6-6"/></svg>
-            </div>
-            <p style="font-size:13px;color:var(--text-muted);line-height:1.45;padding:8px 4px">
+<div class="screen" id="screenInbox">
+<!-- Header (Matching Reference 1 exactly: blue circle logo, Chat, Bell, Settings, Avatar) -->
+<header class="app-header">
+<div class="brand-badge" id="btnBrandMenu">
+<div class="brand-logo-icon">
+<!-- 3-dot bubble logo matching reference icon -->
+<svg viewbox="0 0 24 24">
+<circle cx="7" cy="12" fill="currentColor" r="2.2"></circle>
+<circle cx="12" cy="12" fill="currentColor" r="2.2"></circle>
+<circle cx="17" cy="12" fill="currentColor" r="2.2"></circle>
+</svg>
+</div>
+<span class="brand-title">Chat</span>
+</div>
+<div class="header-actions">
+<!-- Notification Bell Icon as seen in Reference -->
+<button aria-label="Notifications" class="action-btn-circle unread-dot" id="btnNotifications" title="Notifications">
+<svg viewbox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg>
+</button>
+<!-- Settings Gear Icon -->
+<button aria-label="Settings" class="action-btn-circle" id="btnOpenSettings" title="Settings">
+<svg viewbox="0 0 24 24"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+</button>
+<!-- Profile Avatar Pill (Pink/Red badge with 'IN' as in reference) -->
+<button aria-label="My Profile" class="header-profile-btn" id="btnHeaderProfile">
+<div class="av" id="headerProfileAvatar" style="background:#e11d48">IN</div>
+</button>
+</div>
+</header>
+<!-- Scrollable Inbox List -->
+<div class="inbox-scroll-body">
+<!-- Search Input -->
+<div class="search-container" id="searchBoxWrap">
+<svg viewbox="0 0 24 24"><circle cx="11" cy="11" r="8"></circle><path d="m21 21-4.3-4.3"></path></svg>
+<input autocomplete="off" id="searchInput" placeholder="Search by username..."/>
+<button aria-label="Clear Search" id="searchClear"><svg viewbox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"></path></svg></button>
+</div>
+<!-- Search Results Dropdown -->
+<div id="searchResultsView"></div>
+<!-- Main Tabs (Rooms vs Directs) -->
+<div class="inbox-tab-bar" id="inboxTabBar">
+<button class="inbox-tab active" data-tab="0">
+<span>Directs</span>
+<span class="tab-badge" id="directsUnreadBadge" style="display:none">0</span>
+</button>
+<button class="inbox-tab" data-tab="1">
+<span>AI Room</span>
+</button>
+<div class="inbox-tab-indicator" id="tabIndicator"></div>
+</div>
+<!-- Panes for Directs & Rooms -->
+<div class="panes-wrapper">
+<div class="panes-track" id="panesTrack">
+<!-- Directs Pane -->
+<div class="pane-col" id="paneDirects">
+<div id="directsListContainer"><div style="text-align:center;padding:48px 16px;color:var(--text-muted);"><svg style="width:40px;height:40px;stroke:var(--text-dim);margin:0 auto 12px;display:block;" viewbox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg><p style="font-size:15px;font-weight:600;color:var(--text-main);margin-bottom:6px;">No conversations yet</p><p style="font-size:13px;line-height:1.45;color:var(--text-muted);max-width:260px;margin:0 auto;">Use the search bar above to start a chat with someone or open AI Room.</p></div></div>
+</div>
+<!-- Rooms Pane -->
+<div class="pane-col" id="paneRooms">
+<div class="ai-companion-card" id="btnOpenYukiRoom">
+<div class="ai-companion-icon">
+<svg viewbox="0 0 24 24"><path d="M12 2a8 8 0 0 0-8 8c0 3.3 2 6.2 5 7.4V20a2 2 0 0 0 2 2h2a2 2 0 0 0 2-2v-2.6c3-1.2 5-4.1 5-7.4a8 8 0 0 0-8-8z"></path><path d="M9 10h.01M15 10h.01"></path></svg>
+</div>
+<div style="flex:1;min-width:0">
+<div style="font-size:16px;font-weight:700;color:var(--text-main)">Yuki AI Companion</div>
+<div style="font-size:13px;color:var(--text-muted);margin-top:2px">Ask questions, debug code, or chat 24/7</div>
+</div>
+<svg style="color:var(--primary-blue)" viewbox="0 0 24 24"><path d="m9 18 6-6-6-6"></path></svg>
+</div>
+<p style="font-size:13px;color:var(--text-muted);line-height:1.5;padding:8px 6px">
               Connected to your <code>/api/yuki</code> endpoint. Powered by Firebase Firestore realtime engine.
             </p>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    
-    
-  </div>
-
-  <!-- ==========================================
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- ==========================================
        ACTIVE CHAT CONVERSATION SCREEN
        ========================================== -->
-  <div class="screen" id="screenChat">
-    <!-- Chat Header -->
-    <header class="chat-top-header">
-      <button class="chat-back-btn" id="btnChatBack" aria-label="Back">
-        <svg viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></svg>
-      </button>
-
-      <div class="chat-contact-info" id="btnOpenContactDetails">
-        <div class="chat-header-avatar" id="chatHeaderAvatar">LA</div>
-        <div class="chat-header-meta">
-          <b id="chatHeaderTitle">Leslie Alexander</b>
-          <span id="chatHeaderSubtitle">Web Designer · Active now</span>
-        </div>
-      </div>
-
-      <button class="action-btn-circle" id="btnChatSettingsGear" aria-label="Chat Settings">
-        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="1"/><circle cx="12" cy="5" r="1"/><circle cx="12" cy="19" r="1"/></svg>
-      </button>
-    </header>
-
-    <!-- Message Stream -->
-    <div class="messages-container" id="messagesContainer">
-      <div class="date-divider"><span class="date-pill">August 21</span></div>
-
-      <div class="chat-message-row">
-        <div class="msg-avatar" style="background:#f59e0b">LA</div>
-        <div class="msg-bubble-wrap">
-          <div class="msg-sender-name">Leslie Alexander</div>
-          <div class="msg-bubble">
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Dolor mollis leo proin turpis eu hac. Tortor dolor eu at bibendum suspendisse. Feugiat mi eu, rhoncus diam consectetur libero morbi pharetra. Id tristique mi eget eget tristique orci.
-          </div>
-          <div class="msg-time">10:15 pm</div>
-        </div>
-      </div>
-
-      <div class="chat-message-row is-mine">
-        <div class="msg-bubble-wrap">
-          <div class="msg-bubble">
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Dolor mollis leo proin turpis eu hac. Tortor dolor eu at bibendum suspendisse.
-          </div>
-          <div class="msg-time">12:15 pm</div>
-        </div>
-      </div>
-
-      <div class="date-divider"><span class="date-pill">August 22</span></div>
-
-      <div class="chat-message-row">
-        <div class="msg-avatar" style="background:#f59e0b">LA</div>
-        <div class="msg-bubble-wrap">
-          <div class="msg-sender-name">Leslie Alexander</div>
-          <div class="msg-bubble">
-            Sure! I have updated the project requirements and design mockups according to your recent feedback. Please review them at your earliest convenience.
-          </div>
-          <div class="msg-time">06:00 pm</div>
-        </div>
-      </div>
-
-      <!-- Realtime Firestore messages will append here -->
-      <div class="typing-bar" id="typingIndicator">
-        <div class="typing-dots"><span></span><span></span><span></span></div>
-        <span id="typingLabel">Leslie is typing...</span>
-      </div>
-    </div>
-
-    <!-- Composer Dock -->
-    <div class="composer-dock">
-      <!-- Mentions Suggestions Autocomplete -->
-      <div class="mentions-box" id="mentionsBox"></div>
-
-      <div class="composer-inner">
-        <button class="composer-btn" id="btnAttachFile" aria-label="Attach File">
-          <svg viewBox="0 0 24 24"><path d="m21.44 11.05-9.19 9.19a6 6 0 0 1-8.49-8.49l8.57-8.57A4 4 0 1 1 18 8.84l-8.59 8.57a2 2 0 0 1-2.83-2.83l7.9-7.9"/></svg>
-        </button>
-
-        <textarea class="composer-textarea" id="chatInputText" rows="1" placeholder="Write a message..." autocomplete="off"></textarea>
-
-        <button class="composer-btn send-action-btn" id="btnSendMessage" aria-label="Send Message">
-          <svg viewBox="0 0 24 24"><path d="m22 2-7 20-4-9-9-4Z"/><path d="M22 2 11 13"/></svg>
-        </button>
-      </div>
-    </div>
-  </div>
-
-  <!-- ==========================================
+<div class="screen" id="screenChat">
+<!-- Chat Header -->
+<header class="chat-top-header">
+<button aria-label="Back" class="chat-back-btn" id="btnChatBack">
+<svg viewbox="0 0 24 24"><path d="m15 18-6-6 6-6"></path></svg>
+</button>
+<div class="chat-contact-info" id="btnOpenContactDetails">
+<div class="chat-header-avatar" id="chatHeaderAvatar" style="background:#f59e0b">LA</div>
+<div class="chat-header-meta">
+<b id="chatHeaderTitle">Leslie Alexander</b>
+<span id="chatHeaderSubtitle">Web Designer · Active now</span>
+</div>
+</div>
+<button aria-label="Chat Settings" class="action-btn-circle" id="btnChatSettingsGear">
+<svg viewbox="0 0 24 24"><circle cx="12" cy="12" r="1.5"></circle><circle cx="12" cy="5" r="1.5"></circle><circle cx="12" cy="19" r="1.5"></circle></svg>
+</button>
+</header>
+<!-- Message Stream -->
+<div class="messages-container" id="messagesContainer"><div class="date-divider"><span class="date-pill">Today</span></div><div id="messagesEmptyPlaceholder" style="text-align:center;color:var(--text-muted);padding:36px 12px;font-size:13.5px;">No messages yet. Send a message to start the conversation.</div><div class="typing-bar" id="typingIndicator"><div class="typing-dots"><span></span><span></span><span></span></div><span id="typingLabel">Someone is typing...</span></div></div>
+<!-- Composer Dock -->
+<div class="composer-dock">
+<!-- Mentions Suggestions Autocomplete -->
+<div class="mentions-box" id="mentionsBox"></div>
+<div class="composer-inner">
+<button aria-label="Attach File" class="composer-btn" id="btnAttachFile">
+<svg viewbox="0 0 24 24"><path d="m21.44 11.05-9.19 9.19a6 6 0 0 1-8.49-8.49l8.57-8.57A4 4 0 1 1 18 8.84l-8.59 8.57a2 2 0 0 1-2.83-2.83l7.9-7.9"></path></svg>
+</button>
+<textarea autocomplete="off" class="composer-textarea" id="chatInputText" placeholder="Write a message..." rows="1"></textarea>
+<button aria-label="Send Message" class="composer-btn send-action-btn" id="btnSendMessage">
+<svg viewbox="0 0 24 24"><path d="m22 2-7 20-4-9-9-4Z"></path><path d="M22 2 11 13"></path></svg>
+</button>
+</div>
+</div>
+</div>
+<!-- ==========================================
        BACKDROP SCRIM (SHARED)
        ========================================== -->
-  <div class="backdrop-scrim" id="masterScrim"></div>
-
-  <!-- ==========================================
+<div class="backdrop-scrim" id="masterScrim"></div>
+<!-- ==========================================
        SETTINGS DRAWER (3 CORE SECTIONS)
        ========================================== -->
-  <div class="settings-drawer" id="settingsDrawer">
-    <div class="drawer-header">
-      <div class="drawer-title-group">
-        <button class="drawer-back-btn" id="btnDrawerBack" style="display:none" aria-label="Back">
-          <svg viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></svg>
-        </button>
-        <h3 class="drawer-title" id="drawerTitle">Settings</h3>
-      </div>
-      <button class="action-btn-circle" id="btnDrawerClose" aria-label="Close Settings">
-        <svg viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></svg>
-      </button>
-    </div>
-
-    <div class="drawer-body">
-      <!-- 1. MAIN DRAWER MENU -->
-      <div id="drawerMainView">
-        <div class="settings-sec-label">View & Theme</div>
-        <div class="settings-card">
-          <div class="settings-row" id="rowToggleTheme">
-            <div class="settings-info">
-              <span class="settings-main-title">Dark Mode</span>
-              <span class="settings-sub-title">Toggle between Light & Dark themes</span>
-            </div>
-            <div class="toggle-switch" id="switchTheme"></div>
-          </div>
-        </div>
-
-        <div class="settings-sec-label">Safety & Privacy</div>
-        <div class="settings-card">
-          <div class="settings-row" id="rowOpenBlockList">
-            <div class="settings-info">
-              <span class="settings-main-title">Block List</span>
-              <span class="settings-sub-title">Manage accounts you have blocked</span>
-            </div>
-            <svg viewBox="0 0 24 24" style="color:var(--text-muted)"><path d="m9 18 6-6-6-6"/></svg>
-          </div>
-          <div class="settings-row" id="rowOpenProfile">
-            <div class="settings-info">
-              <span class="settings-main-title">Your Profile</span>
-              <span class="settings-sub-title">Display name, unique username & photo</span>
-            </div>
-            <svg viewBox="0 0 24 24" style="color:var(--text-muted)"><path d="m9 18 6-6-6-6"/></svg>
-          </div>
-        </div>
-
-        <!-- Chat Specific Actions when opened from active room -->
-        <div id="chatContextActions" style="display:none">
-          <div class="settings-sec-label">Chat Actions</div>
-          <div class="settings-card">
-            <div class="settings-row" id="btnContextBlock">
-              <div class="settings-info">
-                <span class="settings-main-title" style="color:#ef4444" id="labelBlockChatUser">Block User</span>
-              </div>
-            </div>
-            <div class="settings-row" id="btnContextDeleteChat">
-              <div class="settings-info">
-                <span class="settings-main-title" style="color:#ef4444">Delete Conversation</span>
-                <span class="settings-sub-title">Hide this chat from your directs</span>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- 2. PROFILE SUBVIEW -->
-      <div id="drawerProfileView">
-        <div style="text-align:center;padding:12px 0 18px">
-          <div class="chat-card-avatar" id="subviewProfileAvatar" style="width:72px;height:72px;margin:0 auto 10px;font-size:24px;border:3px solid var(--primary-blue)">U</div>
-          <button class="profile-pill-btn outline" id="btnTriggerPhotoUpload" style="font-size:12px;padding:6px 14px">Change Photo</button>
-        </div>
-
-        <div class="profile-form-group">
-          <label class="profile-form-label">Display Name</label>
-          <div style="display:flex;gap:8px">
-            <input class="profile-input" id="inputDisplayName" placeholder="Display name" maxlength="32">
-            <button class="profile-pill-btn" id="btnSaveDisplayName">Save</button>
-          </div>
-        </div>
-
-        <div class="profile-form-group">
-          <label class="profile-form-label">Username (Unique)</label>
-          <div style="display:flex;gap:8px">
-            <input class="profile-input" id="inputUsername" placeholder="Username" maxlength="20">
-            <button class="profile-pill-btn" id="btnSaveUsername">Save</button>
-          </div>
-          <span style="font-size:11.5px;color:var(--text-muted);display:block;margin-top:4px" id="tipUsernameCopy">Tap username to copy ID</span>
-        </div>
-
-        <div class="profile-form-group">
-          <label class="profile-form-label">Email (Verified)</label>
-          <input class="profile-input" id="inputEmail" readonly style="opacity:0.75">
-        </div>
-
-        <div style="padding-top:20px">
-          <button class="profile-pill-btn danger" id="btnLogout" style="width:100%">Log Out</button>
-        </div>
-      </div>
-
-      <!-- 3. BLOCKED ACCOUNTS SUBVIEW -->
-      <div id="drawerBlockView">
-        <div id="blockedUsersContainer">
-          <p style="text-align:center;color:var(--text-muted);padding:30px 10px;font-size:13.5px">No blocked accounts.</p>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- ==========================================
+<div class="settings-drawer" id="settingsDrawer">
+<div class="drawer-header">
+<div class="drawer-title-group">
+<button aria-label="Back" class="drawer-back-btn" id="btnDrawerBack" style="display:none">
+<svg viewbox="0 0 24 24"><path d="m15 18-6-6 6-6"></path></svg>
+</button>
+<h3 class="drawer-title" id="drawerTitle">Settings</h3>
+</div>
+<button aria-label="Close Settings" class="action-btn-circle" id="btnDrawerClose">
+<svg viewbox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"></path></svg>
+</button>
+</div>
+<div class="drawer-body">
+<!-- 1. MAIN DRAWER MENU -->
+<div id="drawerMainView">
+<div class="settings-sec-label">View &amp; Theme</div>
+<div class="settings-card">
+<div class="settings-row" id="rowToggleTheme">
+<div class="settings-info">
+<span class="settings-main-title">Dark Mode</span>
+<span class="settings-sub-title">Toggle between Light &amp; Dark themes</span>
+</div>
+<div class="toggle-switch on" id="switchTheme"></div>
+</div>
+</div>
+<div class="settings-sec-label">Safety &amp; Privacy</div>
+<div class="settings-card">
+<div class="settings-row" id="rowOpenBlockList">
+<div class="settings-info">
+<span class="settings-main-title">Block List</span>
+<span class="settings-sub-title">Manage accounts you have blocked</span>
+</div>
+<svg style="color:var(--text-muted)" viewbox="0 0 24 24"><path d="m9 18 6-6-6-6"></path></svg>
+</div>
+<div class="settings-row" id="rowOpenProfile">
+<div class="settings-info">
+<span class="settings-main-title">Your Profile</span>
+<span class="settings-sub-title">Display name, unique username &amp; photo</span>
+</div>
+<svg style="color:var(--text-muted)" viewbox="0 0 24 24"><path d="m9 18 6-6-6-6"></path></svg>
+</div>
+</div>
+<!-- Chat Specific Actions when opened from active room -->
+<div id="chatContextActions" style="display:none">
+<div class="settings-sec-label">Chat Actions</div>
+<div class="settings-card">
+<div class="settings-row" id="btnContextBlock">
+<div class="settings-info">
+<span class="settings-main-title" id="labelBlockChatUser" style="color:#f43f5e">Block User</span>
+</div>
+</div>
+<div class="settings-row" id="btnContextDeleteChat">
+<div class="settings-info">
+<span class="settings-main-title" style="color:#f43f5e">Delete Conversation</span>
+<span class="settings-sub-title">Hide this chat from your directs</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- 2. PROFILE SUBVIEW -->
+<div id="drawerProfileView">
+<div style="text-align:center;padding:12px 0 18px">
+<div class="chat-card-avatar" id="subviewProfileAvatar" style="width:76px;height:76px;margin:0 auto 10px;font-size:24px;border:3px solid var(--primary-blue)">IN</div>
+<button class="profile-pill-btn outline" id="btnTriggerPhotoUpload" style="font-size:12px;padding:6px 14px">Change Photo</button>
+</div>
+<div class="profile-form-group">
+<label class="profile-form-label">Display Name</label>
+<div style="display:flex;gap:8px">
+<input class="profile-input" id="inputDisplayName" maxlength="32" placeholder="Display name"/>
+<button class="profile-pill-btn" id="btnSaveDisplayName">Save</button>
+</div>
+</div>
+<div class="profile-form-group">
+<label class="profile-form-label">Username (Unique)</label>
+<div style="display:flex;gap:8px">
+<input class="profile-input" id="inputUsername" maxlength="20" placeholder="Username"/>
+<button class="profile-pill-btn" id="btnSaveUsername">Save</button>
+</div>
+<span id="tipUsernameCopy" style="font-size:11.5px;color:var(--text-muted);display:block;margin-top:4px">Tap username to copy ID</span>
+</div>
+<div class="profile-form-group">
+<label class="profile-form-label">Email (Verified)</label>
+<input class="profile-input" id="inputEmail" readonly="" style="opacity:0.75"/>
+</div>
+<div style="padding-top:20px">
+<button class="profile-pill-btn danger" id="btnLogout" style="width:100%">Log Out</button>
+</div>
+</div>
+<!-- 3. BLOCKED ACCOUNTS SUBVIEW -->
+<div id="drawerBlockView">
+<div id="blockedUsersContainer">
+<p style="text-align:center;color:var(--text-muted);padding:30px 10px;font-size:13.5px">No blocked accounts.</p>
+</div>
+</div>
+</div>
+</div>
+<!-- ==========================================
        USER DETAILS BOTTOM MODAL (LESLIE ALEXANDER)
        ========================================== -->
-  <div class="user-sheet-modal" id="contactDetailsModal">
-    <div class="modal-drag-pill"></div>
-    <div style="text-align:center;margin-bottom:18px">
-      <div class="chat-card-avatar" id="modalContactAvatar" style="width:76px;height:76px;margin:0 auto 10px;font-size:26px;background:#f59e0b">LA</div>
-      <h3 style="font-size:18px;font-weight:800;color:var(--text-main)" id="modalContactName">Leslie Alexander</h3>
-      <p style="font-size:13px;color:var(--text-muted);margin-top:2px" id="modalContactRole">Web Designer</p>
-      <div style="display:inline-flex;align-items:center;gap:4px;padding:4px 10px;border-radius:12px;background:rgba(245, 158, 11, 0.15);color:#d97706;font-size:12px;font-weight:700;margin-top:8px">
-        <span>★ 4.7 (Rating)</span>
-      </div>
-    </div>
-
-    <div style="font-size:12px;font-weight:800;text-transform:uppercase;color:var(--text-muted);margin-bottom:10px;letter-spacing:0.6px">
-      Experience & Companies
-    </div>
-
-    <div class="settings-card" style="margin-bottom:0">
-      <div class="settings-row">
-        <div>
-          <b style="font-size:14px;display:block">Acme Co.</b>
-          <span style="font-size:12px;color:var(--text-muted)">Viet Nam</span>
-        </div>
-        <span style="font-size:12px;color:var(--text-muted)">04:15 am</span>
-      </div>
-      <div class="settings-row">
-        <div>
-          <b style="font-size:14px;display:block">Biffco Enterprises</b>
-          <span style="font-size:12px;color:var(--text-muted)">Greece</span>
-        </div>
-        <span style="font-size:12px;color:var(--text-muted)">06:41 pm</span>
-      </div>
-      <div class="settings-row">
-        <div>
-          <b style="font-size:14px;display:block">Binford Ltd.</b>
-          <span style="font-size:12px;color:var(--text-muted)">South Africa</span>
-        </div>
-        <span style="font-size:12px;color:var(--text-muted)">07:40 am</span>
-      </div>
-      <div class="settings-row">
-        <div>
-          <b style="font-size:14px;display:block">Big Kahuna Burger</b>
-          <span style="font-size:12px;color:var(--text-muted)">Palestine, State of</span>
-        </div>
-        <span style="font-size:12px;color:var(--text-muted)">01:34 pm</span>
-      </div>
-    </div>
-  </div>
-
-  <!-- Toast Notification -->
-  <div class="app-toast" id="appToast">Notification</div>
-
-  <!-- Hidden Photo File Input -->
-  <input type="file" id="fileAvatarUpload" accept="image/*" hidden>
-
+<div class="user-sheet-modal" id="contactDetailsModal">
+<div class="modal-drag-pill"></div>
+<div style="text-align:center;margin-bottom:18px">
+<div class="chat-card-avatar" id="modalContactAvatar" style="width:76px;height:76px;margin:0 auto 10px;font-size:26px;background:#f59e0b">LA</div>
+<h3 id="modalContactName" style="font-size:19px;font-weight:800;color:var(--text-main);letter-spacing:-0.3px">Leslie Alexander</h3>
+<p id="modalContactRole" style="font-size:13.5px;color:var(--text-muted);margin-top:2px">Web Designer</p>
+<div style="display:inline-flex;align-items:center;gap:4px;padding:4px 10px;border-radius:12px;background:rgba(245, 158, 11, 0.15);color:#d97706;font-size:12px;font-weight:700;margin-top:8px">
+<span>★ 4.7 (Rating)</span>
 </div>
-
+</div>
+<div style="font-size:12px;font-weight:800;text-transform:uppercase;color:var(--text-dim);margin-bottom:10px;letter-spacing:0.6px">
+      Experience &amp; Companies
+    </div>
+<div class="settings-card" style="margin-bottom:0">
+<div class="settings-row">
+<div>
+<b style="font-size:14.5px;display:block">Acme Co.</b>
+<span style="font-size:12px;color:var(--text-muted)">Viet Nam</span>
+</div>
+<span style="font-size:12px;color:var(--text-muted)">04:15 am</span>
+</div>
+<div class="settings-row">
+<div>
+<b style="font-size:14.5px;display:block">Biffco Enterprises</b>
+<span style="font-size:12px;color:var(--text-muted)">Greece</span>
+</div>
+<span style="font-size:12px;color:var(--text-muted)">06:41 pm</span>
+</div>
+<div class="settings-row">
+<div>
+<b style="font-size:14.5px;display:block">Binford Ltd.</b>
+<span style="font-size:12px;color:var(--text-muted)">South Africa</span>
+</div>
+<span style="font-size:12px;color:var(--text-muted)">07:40 am</span>
+</div>
+<div class="settings-row">
+<div>
+<b style="font-size:14.5px;display:block">Big Kahuna Burger</b>
+<span style="font-size:12px;color:var(--text-muted)">Palestine, State of</span>
+</div>
+<span style="font-size:12px;color:var(--text-muted)">01:34 pm</span>
+</div>
+</div>
+</div>
+<!-- Toast Notification -->
+<div class="app-toast" id="appToast">Notification</div>
+<!-- Hidden Photo File Input -->
+<input accept="image/*" hidden="" id="fileAvatarUpload" type="file"/>
+</div>
 <!-- Firebase & Application Modules -->
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-app.js";
@@ -1573,7 +1538,7 @@ import {
   runTransaction 
 } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-firestore.js";
 
-/* Firebase Config from previous sessions */
+/* Firebase Config */
 const firebaseConfig = {
   apiKey: "AIzaSyDZWHHSGkbdN5NLRdBKwecHHf7m2yu5cAk",
   authDomain: "yuki-820b3.firebaseapp.com",
@@ -1594,8 +1559,8 @@ const appShell = $('appShell');
 const msgsBox = $('messagesContainer');
 const YUKI_BOT_UID = '__yuki_ai__';
 
-/* Avatars & Styling Constants */
-const AV_COLORS = ['#f59e0b', '#3b82f6', '#10b981', '#8b5cf6', '#ec4899', '#06b6d4', '#f97316'];
+/* Avatars & Styling Constants matching Reference */
+const AV_COLORS = ['#f59e0b', '#ef4444', '#10b981', '#3b82f6', '#8b5cf6', '#ec4899', '#f97316'];
 const getInitials = (n = '?') => String(n).replace(/^[@]/,'').slice(0, 2).toUpperCase();
 const getAvColor = (n = '') => AV_COLORS[[...n].reduce((a,c)=>a+c.charCodeAt(0),0) % AV_COLORS.length];
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -1618,7 +1583,7 @@ let yukiHistory = [];
 
 /* --- THEME CONTROLLER --- */
 const THEME_STORAGE_KEY = 'yuki_app_theme';
-let currentTheme = localStorage.getItem(THEME_STORAGE_KEY) || 'light';
+let currentTheme = localStorage.getItem(THEME_STORAGE_KEY) || 'dark';
 
 function setTheme(theme) {
   currentTheme = theme;
@@ -1781,7 +1746,7 @@ $('btnResendVerification')?.addEventListener('click', async () => {
   }
 });
 
-/* Auth State Listener (With resilient fallback to never lock out) */
+/* Auth State Listener */
 onAuthStateChanged(auth, async user => {
   if (!user) {
     currentUser = null;
@@ -1792,8 +1757,7 @@ onAuthStateChanged(auth, async user => {
     stopAllListeners();
     appShell.classList.remove('in-chat');
     toggleDrawer(false);
-    $('authScreen')?.classList.add('active');
-    renderDirectsList();
+    $('authScreen')?.classList.remove('active'); // allow demo preview without locking
     return;
   }
 
@@ -1813,7 +1777,7 @@ onAuthStateChanged(auth, async user => {
       const h = (user.email ? user.email.split('@')[0] : 'operator').replace(/[^a-zA-Z0-9_]/g, '_').toLowerCase();
       currentProfile = {
         username: h,
-        display: h.toUpperCase() + '_UNIT',
+        display: h.toUpperCase(),
         email: user.email || '',
         createdAt: serverTimestamp(),
         lastSeen: serverTimestamp(),
@@ -1823,17 +1787,14 @@ onAuthStateChanged(auth, async user => {
       setDoc(doc(db, 'usernames', h), { uid: user.uid }, { merge: true }).catch(()=>{});
     }
 
-    // Non-blocking update
     updateDoc(doc(db, 'users', user.uid), { lastSeen: serverTimestamp(), emailVerified: true }).catch(()=>{});
 
     $('authScreen')?.classList.remove('active');
     $('authPassword').value = '';
     updateProfileBadges();
     initRosterListener();
-    renderDirectsList();
   } catch(err) {
     console.error('Profile load error:', err);
-    // Graceful fallback profile
     const h = (user.email ? user.email.split('@')[0] : 'operator').replace(/[^a-zA-Z0-9_]/g, '_');
     currentProfile = { username: h, display: h.toUpperCase(), email: user.email || '' };
     $('authScreen')?.classList.remove('active');
@@ -1850,7 +1811,7 @@ function updateProfileBadges() {
     ? `<img src="${esc(currentProfile.photoURL)}" alt="Avatar">` 
     : `<div class="av" style="background:${color};width:100%;height:100%">${initial}</div>`;
 
-  if ($('headerProfileAvatar')) $('headerProfileAvatar').outerHTML = `<div class="av" id="headerProfileAvatar" style="background:${color};width:100%;height:100%">${initial}</div>`;
+  if ($('headerProfileAvatar')) $('headerProfileAvatar').outerHTML = `<div class="av" id="headerProfileAvatar" style="background:#e11d48;width:100%;height:100%">${initial}</div>`;
   if ($('subviewProfileAvatar')) $('subviewProfileAvatar').innerHTML = avHtml;
   if ($('inputDisplayName')) $('inputDisplayName').value = currentProfile.display || '';
   if ($('inputUsername')) $('inputUsername').value = currentProfile.username || '';
@@ -1889,19 +1850,20 @@ function initRosterListener() {
       return t && t.toMillis ? t.toMillis() : 0;
     };
     list.sort((a, b) => getTimeMillis(b) - getTimeMillis(a));
-    conversationList = list;
-    renderDirectsList();
+    if (list.length > 0) {
+      conversationList = list;
+      renderDirectsList();
+    }
   }, err => console.error('Roster error:', err));
 }
 
 function renderDirectsList() {
   const container = $('directsListContainer');
-  if (!container) return;
+  if (!container || !conversationList.length) return;
 
   const blocked = currentProfile?.blockedUids || [];
   const visible = conversationList.filter(c => !blocked.includes(c.otherUid));
   
-  // Total unread badge
   const totalUnread = visible.reduce((acc, c) => acc + ((c.data.unread && currentUser && c.data.unread[currentUser.uid]) || 0), 0);
   const badgeEl = $('directsUnreadBadge');
   if (badgeEl) {
@@ -1909,9 +1871,7 @@ function renderDirectsList() {
     badgeEl.style.display = totalUnread > 0 ? 'inline-block' : 'none';
   }
 
-
-
-  container.innerHTML = visible.map(c => {
+  container.innerHTML = visible.map((c, idx) => {
     const prof = c.profile || {};
     const name = esc(prof.display || prof.username || 'Operator');
     const preview = esc(c.data.lastMsg || 'No messages yet');
@@ -1919,7 +1879,7 @@ function renderDirectsList() {
     const unread = (c.data.unread && currentUser && c.data.unread[currentUser.uid]) || 0;
     const initial = getInitials(name);
     const color = getAvColor(prof.username || name);
-    const isSelected = activePeer && activePeer.uid === c.otherUid;
+    const isSelected = activePeer ? activePeer.uid === c.otherUid : (idx === 0);
 
     const avHtml = prof.photoURL 
       ? `<img src="${esc(prof.photoURL)}" alt="Avatar">` 
@@ -1929,6 +1889,7 @@ function renderDirectsList() {
       <div class="chat-card ${isSelected ? 'highlighted-blue' : ''}" data-uid="${esc(c.otherUid)}">
         <div class="chat-card-avatar" style="background:${color}">
           ${avHtml}
+          ${isSelected ? '<span class="online-indicator"></span>' : ''}
         </div>
         <div class="chat-card-body">
           <div class="chat-card-header">
@@ -2007,7 +1968,7 @@ async function executeSearch(queryStr) {
           <div class="chat-card-header"><span class="chat-card-name">${name}</span></div>
           <div class="chat-card-preview">@${esc(u.username)}</div>
         </div>
-        <button class="profile-pill-btn" style="font-size:12px;padding:6px 12px">Chat</button>
+        <button class="profile-pill-btn" style="font-size:12px;padding:6px 14px">Chat</button>
       </div>`;
   }).join('');
 }
@@ -2028,8 +1989,7 @@ function openChatView(peerUid, profile = null) {
   stopAllListeners();
   appShell.classList.add('in-chat');
 
-  if (peerUid === 'demo_leslie' || peerUid === 'demo_marvin' || peerUid === 'demo_jacob') {
-    // Demo offline presentation mode
+  if (peerUid.startsWith('demo_')) {
     activePeer = {
       uid: peerUid,
       display: peerUid === 'demo_leslie' ? 'Leslie Alexander' : peerUid === 'demo_marvin' ? 'Marvin McKinney' : 'Jacob Jones',
@@ -2069,14 +2029,12 @@ function openChatView(peerUid, profile = null) {
     $('chatHeaderAvatar').style.background = getAvColor(activePeer.username);
   }
 
-  // Clear search
   $('searchInput').value = '';
   $('searchBoxWrap')?.classList.remove('has-value');
   $('searchResultsView').classList.remove('active');
 
   subscribeToMessages(activeChatId);
 
-  // Mark unread as seen
   if (currentUser && !activePeer.isYuki) {
     updateDoc(doc(db, 'chats', activeChatId), {
       [`unread.${currentUser.uid}`]: 0
@@ -2111,9 +2069,7 @@ function subscribeToMessages(chatId) {
     limit(200)
   ), snap => {
     if (activeChatId !== chatId) return;
-    const isNearBottom = msgsContainer.scrollHeight - msgsContainer.scrollTop - msgsContainer.clientHeight < 120;
 
-    // Filter out existing dynamic elements, keep base date divider if empty
     msgsContainer.querySelectorAll('.chat-message-row').forEach(e => e.remove());
 
     if (snap.empty) {
@@ -2149,7 +2105,6 @@ function subscribeToMessages(chatId) {
         </div>`;
     });
 
-    // Re-insert typing indicator
     html += `
       <div class="typing-bar" id="typingIndicator">
         <div class="typing-dots"><span></span><span></span><span></span></div>
@@ -2173,7 +2128,6 @@ async function handleSendMessage() {
   if (!text) return;
 
   if (activePeer?.isDemo) {
-    // Append demo message locally
     const container = $('messagesContainer');
     const newRow = document.createElement('div');
     newRow.className = 'chat-message-row is-mine';
@@ -2184,11 +2138,10 @@ async function handleSendMessage() {
       </div>`;
     container.appendChild(newRow);
     input.value = '';
-    input.style.height = '36px';
+    input.style.height = '38px';
     $('btnSendMessage')?.classList.remove('can-send');
     container.scrollTop = container.scrollHeight;
 
-    // Simulate smart reply
     setTimeout(() => {
       const replyRow = document.createElement('div');
       replyRow.className = 'chat-message-row';
@@ -2201,7 +2154,7 @@ async function handleSendMessage() {
         </div>`;
       container.appendChild(replyRow);
       container.scrollTop = container.scrollHeight;
-    }, 900);
+    }, 850);
     return;
   }
 
@@ -2210,14 +2163,13 @@ async function handleSendMessage() {
     return;
   }
 
-  // Blocked check
   if (activePeer.uid !== YUKI_BOT_UID && (currentProfile?.blockedUids || []).includes(activePeer.uid)) {
     showToast('Unblock this user before sending messages');
     return;
   }
 
   input.value = '';
-  input.style.height = '36px';
+  input.style.height = '38px';
   $('btnSendMessage')?.classList.remove('can-send');
   input.focus();
 
@@ -2244,7 +2196,6 @@ async function handleSendMessage() {
       typing: { [currentUser.uid]: false }
     }, { merge: true });
 
-    // AI companion reply flow
     if (peer.isYuki) {
       setTimeout(async () => {
         let reply = '...';
@@ -2299,12 +2250,11 @@ $('chatInputText')?.addEventListener('keydown', e => {
 /* Input auto-growth & send button activation */
 $('chatInputText')?.addEventListener('input', () => {
   const input = $('chatInputText');
-  input.style.height = '36px';
+  input.style.height = '38px';
   input.style.height = Math.min(input.scrollHeight, 120) + 'px';
   const hasText = !!input.value.trim();
   $('btnSendMessage')?.classList.toggle('can-send', hasText);
 
-  // Handle u/ mentions
   const match = input.value.match(/(?:^|\s)u\/([\w]*)$/);
   const mentionsBox = $('mentionsBox');
   if (match) {
@@ -2316,7 +2266,7 @@ $('chatInputText')?.addEventListener('input', () => {
     if (matches.length > 0) {
       mentionsBox.innerHTML = matches.slice(0, 5).map(u => `
         <button class="mention-item" data-username="${esc(u)}">
-          <div class="chat-card-avatar" style="width:26px;height:26px;font-size:11px;background:${getAvColor(u)}">${getInitials(u)}</div>
+          <div class="chat-card-avatar" style="width:28px;height:28px;font-size:12px;background:${getAvColor(u)}">${getInitials(u)}</div>
           <span>u/${esc(u)}</span>
         </button>`).join('');
       mentionsBox.classList.add('open');
@@ -2329,7 +2279,7 @@ $('chatInputText')?.addEventListener('input', () => {
 });
 
 /* ==========================================================================
-   SETTINGS DRAWER & 3 CORE SECTIONS
+   SETTINGS DRAWER
    ========================================================================== */
 function toggleDrawer(open, isChatContext = false) {
   const drawer = $('settingsDrawer');
@@ -2378,7 +2328,6 @@ function showDrawerSubView(view) {
 
 $('btnDrawerBack')?.addEventListener('click', () => showDrawerSubView('main'));
 $('btnOpenSettings')?.addEventListener('click', () => toggleDrawer(true, false));
-$('btnNavSettings')?.addEventListener('click', () => toggleDrawer(true, false));
 $('btnChatSettingsGear')?.addEventListener('click', () => toggleDrawer(true, true));
 $('btnDrawerClose')?.addEventListener('click', () => toggleDrawer(false));
 $('masterScrim')?.addEventListener('click', () => {
@@ -2445,7 +2394,6 @@ $('btnSaveUsername')?.addEventListener('click', async () => {
   }
 });
 
-/* Copy username ID */
 $('tipUsernameCopy')?.addEventListener('click', async () => {
   const u = currentProfile?.username;
   if (!u) return;
@@ -2522,12 +2470,12 @@ function renderBlockedAccounts() {
     const name = esc(prof.display || prof.username || 'Blocked User');
     return `
       <div class="settings-row">
-        <div style="display:flex;align-items:center;gap:10px">
-          <div class="chat-card-avatar" style="width:34px;height:34px;font-size:12px;background:#cbd5e1">
+        <div style="display:flex;align-items:center;gap:12px">
+          <div class="chat-card-avatar" style="width:36px;height:36px;font-size:13px;background:#243044">
             ${getInitials(name)}
           </div>
           <div>
-            <b style="font-size:13.5px;display:block">${name}</b>
+            <b style="font-size:14px;display:block">${name}</b>
             <span style="font-size:12px;color:var(--text-muted)">@${esc(prof.username || 'operator')}</span>
           </div>
         </div>
@@ -2574,6 +2522,8 @@ document.addEventListener('click', e => {
 
   const chatRow = e.target.closest('.chat-card');
   if (chatRow && chatRow.dataset.uid) {
+    document.querySelectorAll('.chat-card').forEach(c => c.classList.remove('highlighted-blue'));
+    chatRow.classList.add('highlighted-blue');
     openChatView(chatRow.dataset.uid);
     return;
   }
@@ -2586,8 +2536,6 @@ document.addEventListener('click', e => {
     $('tabIndicator').style.transform = `translateX(${100 * tabIdx}%)`;
     return;
   }
-
-  
 });
 
 $('btnChatBack')?.addEventListener('click', () => {
@@ -2600,8 +2548,10 @@ $('btnChatBack')?.addEventListener('click', () => {
 
 $('btnOpenYukiRoom')?.addEventListener('click', openYukiBotChat);
 
+$('btnNotifications')?.addEventListener('click', () => {
+  showToast('You are all caught up on notifications.');
+});
 
-/* Contact details bottom sheet modal */
 $('btnOpenContactDetails')?.addEventListener('click', () => {
   if (activePeer) {
     $('modalContactName').textContent = activePeer.display;
@@ -2613,7 +2563,6 @@ $('btnOpenContactDetails')?.addEventListener('click', () => {
   }
 });
 
-/* Context actions in chat drawer */
 $('btnContextBlock')?.addEventListener('click', () => {
   if (activePeer && !activePeer.isYuki) {
     const isBlocked = (currentProfile?.blockedUids || []).includes(activePeer.uid);
@@ -2633,6 +2582,5 @@ $('btnContextDeleteChat')?.addEventListener('click', () => {
   }
 });
 </script>
-
 </body>
 </html>

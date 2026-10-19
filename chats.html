@@ -102,8 +102,8 @@ header{display:flex;align-items:center;gap:6px;padding:10px 8px;background:var(-
 :focus-visible{outline:2px solid var(--bl);outline-offset:2px}
 @media (prefers-reduced-motion:reduce){*{transition-duration:.01s!important;animation-duration:.01s!important}}
 #boot{display:none!important}
-#auth{position:absolute;inset:0;z-index:20;background:var(--p);display:flex;flex-direction:column;justify-content:center;gap:12px;padding:32px 28px;transition:opacity .35s,transform .35s;opacity:0;pointer-events:none;transform:translateY(16px)}
-#auth.show{opacity:1;pointer-events:auto;transform:none}
+#auth{position:absolute;inset:0;z-index:20;background:var(--p);display:flex;flex-direction:column;justify-content:center;gap:12px;padding:32px 28px;transition:opacity .35s,transform .35s,visibility .35s;opacity:0;pointer-events:none;transform:translateY(16px);visibility:hidden}
+#auth.show{opacity:1;pointer-events:auto;transform:none;visibility:visible}
 #auth h1{font-size:30px}#auth p.t{color:var(--mu);margin-bottom:8px}
 #auth input{height:46px;border:1px solid var(--ln);border-radius:10px;background:var(--bg);padding:0 14px;font-size:16px;color:var(--tx);outline:0;transition:border-color .2s,box-shadow .2s}
 #auth input:focus{border-color:var(--bl);box-shadow:0 0 0 3px #0079d322}
@@ -149,7 +149,8 @@ header{display:flex;align-items:center;gap:6px;padding:10px 8px;background:var(-
 <section class="scr" id="chat">
  <header><button class="ib" id="back" aria-label="Back"><svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg></button><div class="ht"><b id="ttl"></b><span id="sbt"></span></div><button class="ib gear" id="gear" aria-label="Settings"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M4.9 19.1L7 17M17 7l2.1-2.1"/></svg></button></header>
  <div id="msgs"><div class="typ" id="typ"></div></div>
- <div class="cmp"><div class="sug" id="sug"></div><div class="compose-row"><input id="inp" placeholder="Message" autocomplete="off" autocorrect="off" autocapitalize="sentences" spellcheck="false" enterkeyhint="send"><button class="ib" id="snd" aria-label="Send"><svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button></div>
+ <div class="cmp"><div class="sug" id="sug"></div><div class="compose-row"><input id="inp" placeholder="Message" autocomplete="off" autocorrect="off" autocapitalize="sentences" spellcheck="false" enterkeyhint="send" readonly onfocus="this.removeAttribute('readonly');" onblur="this.setAttribute('readonly', 'true');">
+<button class="ib" id="snd" aria-label="Send"><svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button></div>
 </div>
 </section>
 <div class="scrim" id="scrim"></div>

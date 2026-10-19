@@ -255,23 +255,32 @@ header{display:flex;align-items:center;gap:6px;padding:10px 12px;background:var(
 .blocked-entry button{color:var(--bl);font-weight:600;padding:5px 10px;border-radius:6px;background:var(--bg);border:1px solid var(--ln);font-size:12px}
 
 
-/* Minimal settings layout */
+/* Simplified settings: three clear options, vertical scrolling */
 #cfgNav{display:none!important}
 #cfgCatAppearance,#cfgCatPrivacy,#cfgCatAccount{display:block!important;width:100%;}
 #cfgCatChat,#cfgCatNotifications{display:none!important}
-#cfgCatAppearance>.cfg-sec-title:not(:first-child),#cfgCatAppearance>.cfg-card:not(:first-of-type){display:none!important}
+/* Keep only theme toggle in Appearance */
+#cfgCatAppearance>.cfg-sec-title:not(:first-child),
+#cfgCatAppearance>.cfg-card:not(:first-of-type),
 #cfgCatAppearance>.cfg-card:first-of-type .opt:nth-child(n+2){display:none!important}
-#cfgCatPrivacy>.cfg-sec-title,#cfgCatPrivacy>.cfg-card .opt:not(#o7),#chatActionSec,#chatActionCard{display:none!important}
-#blockedList{display:none} #blockedList.show{display:block}
-#cfgCatAccount>.cfg-sec-title:not(:first-child),#cfgCatAccount>.cfg-card:not(:first-of-type),#cfgCatAccount>p{display:none!important}
-.sheet{max-height:calc(100dvh - env(safe-area-inset-top,0px));}
-.sheet-body{overflow-y:auto;overscroll-behavior:contain;padding-bottom:calc(28px + env(safe-area-inset-bottom,0px));display:block!important}
+/* Keep only Block List button in Privacy */
+#cfgCatPrivacy>.cfg-sec-title,#cfgCatPrivacy>.cfg-card .opt:not(#o7),
+#chatActionSec,#chatActionCard{display:none!important}
+#blockedList{display:none;padding:4px 0} #blockedList.show{display:block}
+/* Profile is shown only after tapping Your Profile */
+#cfgCatAccount{display:none!important}
+#cfgCatAccount.profile-open{display:block!important}
+.sheet{max-height:calc(var(--app-vh,100dvh) - env(safe-area-inset-top,0px));}
+.sheet-body{overflow-y:auto;overscroll-behavior:contain;padding:14px 16px calc(28px + env(safe-area-inset-bottom,0px));display:block!important;-webkit-overflow-scrolling:touch}
 .cfg-panel{min-width:0;flex:none}
-#cfgCatPrivacy>.cfg-card:first-of-type{margin-bottom:14px}
+#cfgCatPrivacy>.cfg-card:first-of-type{margin-bottom:10px}
 #cfgCatAccount .profile-email{padding:0 14px 12px;color:var(--mu);font-size:13px;overflow-wrap:anywhere}
 #accAvatar{width:52px;height:52px;border-radius:50%;overflow:hidden;display:flex;align-items:center;justify-content:center;flex:none}
 #accDisplay{cursor:pointer;text-decoration:underline;text-underline-offset:3px}
 #cfgCatAccount .opt{align-items:center}
+.settings-shortcut{width:100%;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px;border:1px solid var(--ln);border-radius:12px;background:var(--surface);margin:8px 0;color:var(--tx);text-align:left}
+.settings-shortcut .shortcut-sub{display:block;color:var(--mu);font-size:12px;margin-top:3px}
+.settings-shortcut svg{width:18px;height:18px;color:var(--mu)}
 /* Toast notifications */
 .toast{position:absolute;left:50%;bottom:90px;transform:translate(-50%,20px) scale(.95);background:#1a1d22;border:1px solid var(--ln);box-shadow:0 8px 30px rgba(0,0,0,0.6);color:#fff;padding:10px 18px;border-radius:24px;font-size:13.5px;font-weight:500;opacity:0;transition:opacity .25s cubic-bezier(.3,.8,.3,1),transform .25s cubic-bezier(.3,.8,.3,1);z-index:150;pointer-events:none;white-space:nowrap;display:flex;align-items:center;gap:8px}
 .toast.on{opacity:1;transform:translate(-50%,0) scale(1)}
@@ -389,13 +398,15 @@ header{display:flex;align-items:center;gap:6px;padding:10px 12px;background:var(
  </div>
 
  <div class="sheet-body" id="sheetBody">
+  <!-- Simple settings menu -->
+  <button type="button" class="settings-shortcut" id="openProfileSettings"><span><strong>Your Profile</strong><span class="shortcut-sub">Username, email, profile photo and logout</span></span><svg viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></svg></button>
   <!-- Dynamic Category Sections -->
   <div id="cfgCatAppearance" class="cfg-panel">
    <div class="cfg-sec-title">Theme & Contrast</div>
    <div class="cfg-card">
     <div class="opt" id="o1" role="button">
      <div class="opt-info">
-      <span class="opt-label">AMOLED Dark Mode</span>
+      <span class="opt-label">Dark mode / Light mode</span>
       <span class="opt-desc">True pure black background for battery saving</span>
      </div>
      <i class="sw" id="s1"></i>
@@ -867,7 +878,7 @@ function openYuki(){
 function openChat(uid,prof){
  if(!ME||!uid)return;openCommon();rmDel(ME.uid,uid);
  const f=chans.find(c=>c.otherUid===uid);prof=prof||(f&&f.profile)||{};
- peer={uid,username:prof.username||'operator',display:prof.display||prof.username||'Operator',photoURL:prof.photoURL||''};cid=cidOf(ME.uid,uid);
+ peer={uid,username:prof.username||'operator',display:prof.display||prof.username||'Operator',photoURL:prof.photoURL||''};cid=cidOf(ME.uid,uid);painted=false;forceBottom=true;
  $('ttl').textContent=peer.display;$('sbt').textContent='@'+peer.username;$('inp').placeholder='Message';$('o3').hidden=false;
  $('q').value='';paintSearch();subMsgs(cid);
  const my=cid;uS=onSnapshot(doc(db,'chats',cid),async s=>{
@@ -888,7 +899,7 @@ function fmt(raw){
 function subMsgs(chatId){
  uM=onSnapshot(query(collection(db,'chats',chatId,'messages'),orderBy('at','asc'),limit(300)),snap=>{
   if(cid!==chatId)return;
-  const near=msgs.scrollHeight-msgs.scrollTop-msgs.clientHeight<150;const oldTop=msgs.scrollTop;
+  const near=msgs.scrollHeight-msgs.scrollTop-msgs.clientHeight<150;const oldTop=msgs.scrollTop;const initialLoad=!painted;
   msgs.querySelectorAll('.m,.emp').forEach(e=>e.remove());let h='',prev=null;
   if(snap.empty)h=`<p class="emp">${peer.isYuki?'Say hello to Yuki.':'No messages yet.<br>Send the first one.'}</p>`;
   snap.docs.forEach(d=>{
@@ -901,7 +912,7 @@ function subMsgs(chatId){
    prev=x.by;
   });
   $('typ').insertAdjacentHTML('beforebegin',h);
-  if(!painted || forceBottom || (userPrefs.autoScroll && near)){requestAnimationFrame(()=>{msgs.style.scrollBehavior='auto';msgs.scrollTop=msgs.scrollHeight;forceBottom=false})}else{requestAnimationFrame(()=>{msgs.style.scrollBehavior='auto';msgs.scrollTop=oldTop})}
+  if(initialLoad || forceBottom || (userPrefs.autoScroll && near)){requestAnimationFrame(()=>{msgs.style.scrollBehavior='auto';msgs.scrollTop=msgs.scrollHeight;requestAnimationFrame(()=>{msgs.scrollTop=msgs.scrollHeight});forceBottom=false})}else{requestAnimationFrame(()=>{msgs.style.scrollBehavior='auto';msgs.scrollTop=oldTop})}
   painted=true;markSeen(chatId);
  },e=>{console.error('Messages error',e);toast('Could not load messages')});
 }
@@ -994,6 +1005,8 @@ function sheet(on, ctx='acc'){
 
   renderBlockedList();
   if ($('blockedList')) $('blockedList').classList.remove('show');
+  $('cfgCatAccount')?.classList.remove('profile-open');
+  if ($('cfgCatAccount')) $('cfgCatAccount').style.removeProperty('display');
   
   // Set tab
   if (ctx === 'chat' || ctx === 'direct') {
@@ -1067,6 +1080,8 @@ $('cfgNav')?.addEventListener('click', (e) => {
 
 // Interactive settings controls
 $('o7')?.addEventListener('click', () => { const b=$('blockedList'); b?.classList.toggle('show'); });
+$('openProfileSettings')?.addEventListener('click',()=>{const a=$('cfgCatAccount');if(a){a.classList.add('profile-open');a.style.setProperty('display','block','important');a.scrollIntoView({behavior:'smooth',block:'start'});}});
+$('sheetClose')?.addEventListener('click',()=>{const a=$('cfgCatAccount');a?.classList.remove('profile-open');});
 $('accDisplay')?.addEventListener('click',async()=>{const u=P?.username||'';if(!u)return;try{await navigator.clipboard.writeText(u);toast('Username copied')}catch(e){const t=document.createElement('textarea');t.value=u;document.body.appendChild(t);t.select();document.execCommand('copy');t.remove();toast('Username copied')}});
 $('profileSummary')?.addEventListener('click', async () => { const name=P?.username||''; try { await navigator.clipboard.writeText(name); toast('Username copied'); } catch(e) { toast(name); } });
 $('o1')?.addEventListener('click', () => {
@@ -1232,12 +1247,15 @@ $('inp')?.addEventListener('keydown',e=>{
   }
 });
 
-function fitComposerToViewport(){const app=document.querySelector('.app'),cmp=document.querySelector('.cmp'),i=$('inp');if(!app||!cmp)return;const vh=window.visualViewport?.height||window.innerHeight;app.style.height=vh+'px';if(document.activeElement===i){requestAnimationFrame(()=>{msgs.scrollTop=msgs.scrollHeight;});}}
+function fitComposerToViewport(){const app=document.querySelector('.app'),cmp=document.querySelector('.cmp'),i=$('inp');if(!app||!cmp)return;const vv=window.visualViewport;const vh=vv?Math.round(vv.height):window.innerHeight;document.documentElement.style.setProperty('--app-vh',vh+'px');app.style.height=vh+'px';app.style.maxHeight=vh+'px';if(document.activeElement===i){requestAnimationFrame(()=>{const r=cmp.getBoundingClientRect();if(r.bottom>vh){app.style.height=vh+'px';} });}}
 window.visualViewport?.addEventListener('resize',fitComposerToViewport);
 window.visualViewport?.addEventListener('scroll',fitComposerToViewport);
 window.addEventListener('resize',fitComposerToViewport);
 $('inp')?.addEventListener('focus',()=>setTimeout(fitComposerToViewport,80));
-$('inp')?.addEventListener('blur',()=>{setTimeout(()=>{const app=document.querySelector('.app');if(app)app.style.height='100dvh';},100)});
+$('inp')?.addEventListener('blur',()=>{setTimeout(()=>{const app=document.querySelector('.app');if(app){app.style.height='100dvh';app.style.maxHeight='100dvh';}document.documentElement.style.setProperty('--app-vh','100dvh');},180)});
+fitComposerToViewport();
+
+document.addEventListener('click',async e=>{const b=e.target.closest('[data-unblock]');if(!b)return;const uid=b.dataset.unblock;if(!uid||!ME||!P)return;try{const ids=(P.blockedUids||[]).filter(x=>x!==uid);await updateDoc(doc(db,'users',ME.uid),{blockedUids:ids});P={...P,blockedUids:ids};renderBlockedList();toast('User unblocked');}catch(err){console.error(err);toast('Could not unblock user');}});
 
 // Initialize app preferences on startup
 loadPreferences();

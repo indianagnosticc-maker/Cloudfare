@@ -721,9 +721,8 @@ async function submit(){
    try{await sendEmailVerification(c.user)}catch(x){console.error(x)}
    inf.textContent='Verification email sent. Check your inbox (and spam).';await signOut(auth);
   }else{
-   // Allow existing Firebase accounts to sign in even if email verification is pending.
-   // Firebase Authentication still validates the email/password credentials.
-   await signInWithEmailAndPassword(auth,email,pw);
+   const c=await signInWithEmailAndPassword(auth,email,pw);
+   if(!c.user.emailVerified){er.textContent='Please verify your email first. Check your inbox.';$('rsd').hidden=false;await signOut(auth)}
   }
  }catch(e){console.error(e);const k=e.code;er.textContent=k==='auth/email-already-in-use'?'This email is already registered. Try signing in.':k==='auth/invalid-email'?'Invalid email address.':k==='auth/weak-password'?'Password too weak. Use 6+ characters.':/user-not-found|wrong-password|invalid-credential/.test(k)?'Invalid email or password.':'Something went wrong. Try again.'}
  finally{b.disabled=false}
@@ -736,28 +735,21 @@ $('rsd').onclick=async()=>{const email=$('em').value.trim().toLowerCase(),pw=$('
   await signOut(auth)}catch(e){$('aerr').textContent='Could not resend. Check email and password.'}};
 
 onAuthStateChanged(auth,async user=>{
- if(!user){
-   ME=P=peer=cid=null;chans=[];stop();uR&&uR();uR=null;appEl.classList.remove('open');
-   sheet(false);
-   $('auth').classList.add('show');
-   renderLists();
-   return;
- }
+ if(!user){ME=P=peer=cid=null;chans=[];stop();uR&&uR();uR=null;appEl.classList.remove('open');sheet(false);$('auth').classList.add('show');renderLists();return}
+ if(!user.emailVerified){$('auth').classList.add('show');$('aerr').textContent='Please verify your email first. Check your inbox.';$('rsd').hidden=false;return}
  ME=user;
  try{
   const u=await getDoc(doc(db,'users',user.uid));
   if(u.exists())P=u.data();else{
    const h=(user.email?user.email.split('@')[0]:'operator').replace(/[^a-zA-Z0-9_]/g,'_').toLowerCase();
    P={username:h,display:h.toUpperCase()+'_UNIT',email:user.email||'',createdAt:serverTimestamp(),lastSeen:serverTimestamp(),emailVerified:true};
-   await setDoc(doc(db,'users',user.uid),P,{merge:true});await setDoc(doc(db,'usernames',h),{uid:user.uid},{merge:true});
-  }
+   await setDoc(doc(db,'users',user.uid),P,{merge:true});await setDoc(doc(db,'usernames',h),{uid:user.uid},{merge:true})}
   if(u.exists()&&u.data().emailVerified!==true)updateDoc(doc(db,'users',user.uid),{emailVerified:true}).catch(()=>{});
   updateDoc(doc(db,'users',user.uid),{lastSeen:serverTimestamp()}).catch(()=>{});
   $('auth').classList.remove('show');$('rsd').hidden=true;$('pw').value='';
-  syncProfileUI();
-  roster();
-  renderLists();
+  syncProfileUI();roster();renderLists();
  }catch(e){console.error(e);$('auth').classList.add('show');$('aerr').textContent='Could not load your profile. Check connection and Firestore rules.'}
+ 
 });
 
 /* LISTS */

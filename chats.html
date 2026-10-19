@@ -55,7 +55,7 @@ svg{width:1em;height:1em;fill:none;stroke:currentColor;stroke-width:2;stroke-lin
 .hl{color:var(--bl);font-weight:700}
 header{display:flex;align-items:center;gap:6px;padding:10px 8px;background:var(--hd);border-bottom:1px solid var(--ln);flex:none}
 .ib{width:38px;height:38px;border-radius:50%;display:grid;place-items:center;font-size:22px;color:var(--bl);transition:background .2s,transform .3s}
-.ib:active{background:var(--ln)}.gear{color:var(--mu)}.gear:active{transform:rotate(60deg)}
+.ib:active{background:var(--ln)}.gear{color:var(--mu)}.gear svg{transition:transform .4s cubic-bezier(.3,.8,.3,1)}.gear:active svg{transform:rotate(90deg)}
 .ht{flex:1;min-width:0}.ht b{font-size:17px;display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.ht span{font-size:12px;color:var(--mu)}
 #msgs{flex:1;overflow-y:auto;padding:12px 14px 8px;scroll-behavior:smooth;display:flex;flex-direction:column}#msgs>.m:first-of-type{margin-top:auto}
 .m{display:flex;gap:10px;margin-bottom:14px}
@@ -75,7 +75,9 @@ header{display:flex;align-items:center;gap:6px;padding:10px 8px;background:var(-
 .typ i{width:6px;height:6px;border-radius:50%;background:var(--mu);animation:db 1s infinite}.typ i:nth-child(2){animation-delay:.15s}.typ i:nth-child(3){animation-delay:.3s}
 @keyframes db{50%{transform:translateY(-4px);opacity:.4}}
 .cmp{border-top:1px solid var(--ln);background:var(--hd);padding:8px 16px;flex:none;position:relative}
-.cmp input{flex:1;min-width:0;width:0;border:0;background:none;font-size:16px;color:var(--tx);outline:0;padding:6px 0;align-self:center}.cmp .tl{display:flex;align-items:center;gap:5px;min-width:0}.cmp .tl .t{flex:none}.cmp #peerTag{font-size:14px;color:var(--mu);white-space:nowrap;max-width:105px;overflow:hidden;text-overflow:ellipsis;flex:none}.cmp #snd{flex:none;margin-left:2px;width:38px}.cmp #inp{font-size:15px}.cmp .tl .ib{flex:none}.cmp .tl #smi{width:34px}.cmp .tl [data-ins]{width:30px}.cmp{padding:8px 12px}.cmp #pan{margin-bottom:6px}
+.cmp input,.cmp textarea{flex:1;min-width:0;width:0;border:0;background:none;font-size:16px;color:var(--tx);outline:0;padding:6px 0;align-self:center}
+#inp{resize:none;overflow:hidden;font-family:inherit;line-height:1.35;padding-top:11px}
+.cmp .tl{display:flex;align-items:center;gap:5px;min-width:0}.cmp .tl .t{flex:none}.cmp #peerTag{font-size:14px;color:var(--mu);white-space:nowrap;max-width:105px;overflow:hidden;text-overflow:ellipsis;flex:none}.cmp #snd{flex:none;margin-left:2px;width:38px}.cmp #inp{font-size:15px}.cmp .tl .ib{flex:none}.cmp .tl #smi{width:34px}.cmp .tl [data-ins]{width:30px}.cmp{padding:8px 12px}.cmp #pan{margin-bottom:6px}
 .tl{display:flex;align-items:center;gap:6px;color:var(--mu);font-size:22px}
 .tl .t{font-weight:700;font-size:17px;width:38px;height:36px;border-radius:50%}
 .tl .ib{color:var(--mu);width:36px;height:36px}
@@ -121,7 +123,7 @@ header{display:flex;align-items:center;gap:6px;padding:10px 8px;background:var(-
 /* Final mobile composer and settings-sheet polish */
 .cmp{padding:9px 14px calc(9px + env(safe-area-inset-bottom,0px));background:var(--hd)}
 .compose-row{display:flex;align-items:center;gap:10px;min-width:0;width:100%;min-height:42px}
-.cmp .compose-row input{display:block;flex:1;min-width:0;width:0;height:42px;padding:8px 2px;font-size:16px;line-height:1.35;align-self:auto}
+.cmp .compose-row input,.cmp .compose-row textarea{display:block;flex:1;min-width:0;width:0;height:42px;padding:8px 2px;font-size:16px;line-height:1.35;align-self:auto}
 .cmp .compose-row #snd{display:grid;place-items:center;flex:0 0 42px;width:42px;height:42px;margin:0;border-radius:50%;color:var(--mu)}
 .cmp .compose-row #snd.on{color:#fff;background:var(--bl);transform:none}
 .cmp .compose-row #snd svg{width:23px;height:23px}
@@ -142,14 +144,14 @@ header{display:flex;align-items:center;gap:6px;padding:10px 8px;background:var(-
  <p class="er" id="aerr"></p><p class="ok" id="ainf"></p>
  <button class="btn big" id="asub">Sign in</button><button class="lnk" id="rsd" hidden>Resend verification email</button><button class="lnk" id="atog">New here? Create account</button></section>
 <section class="scr" id="list">
- <div class="top"><div class="hr"><label class="sb"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.5-4.5"/></svg><input id="q" placeholder="Search by username" autocomplete="off" autocapitalize="none"><button id="clr" aria-label="Clear"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></button></label><button class="ib gear" id="acc" aria-label="Settings"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M4.9 19.1L7 17M17 7l2.1-2.1"/></svg></button></div>
+ <div class="top"><div class="hr"><label class="sb"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.5-4.5"/></svg><input id="q" placeholder="Search by username" autocomplete="off" autocapitalize="none"><button id="clr" aria-label="Clear"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></button></label><button class="ib gear" id="acc" aria-label="Settings"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg></button></div>
  <div class="tabs"><button class="tab on" data-t="0">Rooms</button><button class="tab" data-t="1">Directs<span id="b1"></span></button><i class="ind" id="ind"></i></div></div>
  <div class="body"><div class="panes" id="panes"><div class="pane" id="p0"></div><div class="pane" id="p1"></div></div><div id="srch"></div></div>
 </section>
 <section class="scr" id="chat">
- <header><button class="ib" id="back" aria-label="Back"><svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg></button><div class="ht"><b id="ttl"></b><span id="sbt"></span></div><button class="ib gear" id="gear" aria-label="Settings"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M4.9 19.1L7 17M17 7l2.1-2.1"/></svg></button></header>
+ <header><button class="ib" id="back" aria-label="Back"><svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg></button><div class="ht"><b id="ttl"></b><span id="sbt"></span></div><button class="ib gear" id="gear" aria-label="Settings"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg></button></header>
  <div id="msgs"><div class="typ" id="typ"></div></div>
- <div class="cmp"><div class="sug" id="sug"></div><div class="compose-row"><input id="inp" placeholder="Message" autocomplete="off" autocorrect="off" autocapitalize="sentences" spellcheck="false" enterkeyhint="send" readonly onfocus="this.removeAttribute('readonly');" onblur="this.setAttribute('readonly', 'true');">
+ <div class="cmp"><div class="sug" id="sug"></div><div class="compose-row"><textarea id="inp" rows="1" placeholder="Message" autocomplete="off" autocorrect="off" autocapitalize="sentences" spellcheck="false" enterkeyhint="send"></textarea>
 <button class="ib" id="snd" aria-label="Send"><svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button></div>
 </div>
 </section>
@@ -230,8 +232,8 @@ $('rsd').onclick=async()=>{const email=$('em').value.trim().toLowerCase(),pw=$('
   await signOut(auth)}catch(e){$('aerr').textContent='Could not resend. Check email and password.'}};
 
 onAuthStateChanged(auth,async user=>{
- if(!user){ME=P=peer=cid=null;chans=[];stop();uR&&uR();uR=null;appEl.classList.remove('open');sheet(false);$('auth').classList.add('show');renderLists();hideBoot();return}
- if(!user.emailVerified){$('auth').classList.add('show');$('aerr').textContent='Please verify your email first. Check your inbox.';$('rsd').hidden=false;hideBoot();return}
+ if(!user){ME=P=peer=cid=null;chans=[];stop();uR&&uR();uR=null;appEl.classList.remove('open');sheet(false);$('auth').style.display='flex';$('auth').classList.add('show');renderLists();hideBoot();return}
+ if(!user.emailVerified){$('auth').style.display='flex';$('auth').classList.add('show');$('aerr').textContent='Please verify your email first. Check your inbox.';$('rsd').hidden=false;hideBoot();return}
  ME=user;
  try{
   const u=await getDoc(doc(db,'users',user.uid));
@@ -241,9 +243,9 @@ onAuthStateChanged(auth,async user=>{
    await setDoc(doc(db,'users',user.uid),P,{merge:true});await setDoc(doc(db,'usernames',h),{uid:user.uid},{merge:true})}
   if(u.exists()&&u.data().emailVerified!==true)updateDoc(doc(db,'users',user.uid),{emailVerified:true}).catch(()=>{});
   updateDoc(doc(db,'users',user.uid),{lastSeen:serverTimestamp()}).catch(()=>{});
-  $('auth').classList.remove('show');$('rsd').hidden=true;$('pw').value='';
+  $('auth').classList.remove('show');setTimeout(()=>{$('auth').style.display='none';},350);$('rsd').hidden=true;$('pw').value='';
   roster();renderLists();
- }catch(e){console.error(e);$('auth').classList.add('show');$('aerr').textContent='Could not load your profile. Check connection and Firestore rules.'}
+ }catch(e){console.error(e);$('auth').style.display='flex';$('auth').classList.add('show');$('aerr').textContent='Could not load your profile. Check connection and Firestore rules.'}
  hideBoot();
 });
 
@@ -251,8 +253,7 @@ onAuthStateChanged(auth,async user=>{
 function renderLists(){
  const ya=peer&&peer.isYuki;
  $('p0').innerHTML='<div class="sec">AI ROOM</div><button class="room'+(ya&&appEl.classList.contains('open')?' sel':'')+'" data-y="1">'+IC+'<span>Yuki AI Companion</span></button><p class="rec" style="padding:8px 0">Ask questions or share code. Replies come from your /api/yuki endpoint.</p>';
- const blocked=P?.blockedUids||[];const visible=chans.filter(c=>!blocked.includes(c.otherUid));const un=visible.reduce((a,c)=>a+((c.data.unread&&ME&&c.data.unread[ME.uid])||0),0);$('b1').innerHTML=bd(un);
- $('p1').innerHTML=visible.length?visible.map(c=>{const p=c.profile||{};return `<button class="row" data-ch="${esc(c.otherUid)}">${avProfile(p,40)}<span class="rt"><span class="nm">${esc(p.display||p.username||'Operator')}</span><span class="sub">${esc(c.data.lastMsg||'No messages yet')}</span></span><span class="tm">${esc(ft(c.data.lastMsgAt||c.data.touchAt))}</span>${bd((c.data.unread&&ME&&c.data.unread[ME.uid])||0)}</button>`}).join(''):'<p class="emp">No chats yet.<br>Search a username above to start one.</p>';
+ const blocked=P?.blockedUids||[];const visible=chans.filter(c=>!blocked.includes(c.otherUid));const un=visible.reduce((a,c)=>a+((c.data.unread&&ME&&c.data.unread[ME.uid])||0),0);$('b1').innerHTML=bd(un);$('p1').innerHTML=visible.length?visible.map(c=>{const p=c.profile||{};return `<button class="row" data-ch="${esc(c.otherUid)}">${avProfile(p,40)}<span class="rt"><span class="nm">${esc(p.display||p.username||'Operator')}</span><span class="sub">${esc(c.data.lastMsg||'No messages yet')}</span></span><span class="tm">${esc(ft(c.data.lastMsgAt||c.data.touchAt))}</span>${bd((c.data.unread&&ME&&c.data.unread[ME.uid])||0)}</button>`}).join(''):'<p class="emp">No chats yet.<br>Search a username above to start one.</p>';
 }
 function roster(){
  uR&&uR();
@@ -267,8 +268,7 @@ function notify(){
  if(muted||!ME)return;
  for(const c of chans){const u=(c.data.unread&&c.data.unread[ME.uid])||0;
   if(u>0&&!(peer&&peer.uid===c.otherUid&&appEl.classList.contains('open'))){if(Date.now()-lp<3000)return;lp=Date.now();
-   $('bs').textContent='@'+(c.profile?.username||'operator');$('bp').textContent=c.data.lastMsg||'New message';$('ban').classList.add('on');
-   $('ban').onclick=()=>{$('ban').classList.remove('on');openChat(c.otherUid,c.profile)};clearTimeout(bt);bt=setTimeout(()=>$('ban').classList.remove('on'),5000);return}}
+   $('bs').textContent='@'+(c.profile?.username\vert{}\vert{}'operator');$('bp').textContent=c.data.lastMsg||'New message';$('ban').classList.add('on');$('ban').onclick=()=>{$('ban').classList.remove('on');openChat(c.otherUid,c.profile)};clearTimeout(bt);bt=setTimeout(()=>$('ban').classList.remove('on'),5000);return}}
 }
 
 /* SEARCH */
@@ -365,8 +365,7 @@ function typing(){
  tbt=setTimeout(()=>updateDoc(doc(db,'chats',my),{[`typing.${ME.uid}`]:false}).catch(()=>{}),3000);
 }
 function chg(){
- const v=$('inp').value,mt=v.match(/(?:^|\s)u\/([\w]*)$/),s=$('sug');typing&&v&&typing();
- $('snd').classList.toggle('on',!!v.trim());
+ const v=$('inp').value,mt=v.match(/(?:^\vert{}\s)u\/([\w]*)$/),s=$('sug');typing&&v&&typing();$('snd').classList.toggle('on',!!v.trim());
  if(mt){const k=mt[1].toLowerCase(),l=chans.map(c=>c.profile?.username).filter(u=>u&&u.toLowerCase().includes(k));
   s.innerHTML=l.slice(0,6).map(n=>`<button data-c="u/${esc(n)}">${av(n,28)}u/${esc(n)}</button>`).join('');s.classList.toggle('on',l.length>0)}else s.classList.remove('on');
 }
@@ -379,9 +378,7 @@ async function mention(n){
 /* SHEET + UI */
 function sheet(on,ctx){
  if(on){$('sh').textContent=ctx==='chat'?$('ttl').textContent:ctx==='direct'?(selectedDirect?.profile?.display||selectedDirect?.profile?.username||'Direct chat'):'Settings';
-  $('o3').style.display=ctx==='chat'&&!peer?.isYuki||ctx==='direct'?'':'none';$('o4').style.display=$('o5').style.display=ctx==='chat'||ctx==='direct'?'none':'';
-  $('o6').style.display=$('o7').style.display=ctx==='acc'?'':'none';$('blockedList').style.display=ctx==='acc'?'block':'none';$('o8').style.display=ctx==='direct'?'':'none';
-  $('o8').textContent=(P?.blockedUids||[]).includes(selectedDirect?.uid)?'Unblock user':'Block user';
+  $('o3').style.display=ctx==='chat'&&!peer?.isYuki\vert{}\vert{}ctx==='direct'?'':'none';$('o4').style.display=$('o5').style.display=ctx==='chat'\vert{}\vert{}ctx==='direct'?'none':'';$('o6').style.display=$('o7').style.display=ctx==='acc'?'':'none';$('blockedList').style.display=ctx==='acc'?'block':'none';$('o8').style.display=ctx==='direct'?'':'none';$('o8').textContent=(P?.blockedUids||[]).includes(selectedDirect?.uid)?'Unblock user':'Block user';
   $('o3').textContent='Delete chat';$('s2').classList.toggle('on',muted);if(ctx==='acc')renderBlockedList()}
  armed=null;$('o3').textContent='Delete chat';$('o5').textContent='Log out';
  $('sheet').classList.toggle('on',on);$('scrim').classList.toggle('on',on);
@@ -444,5 +441,5 @@ $('inp').addEventListener('input',chg);
 $('inp').setAttribute('data-lpignore','true');$('inp').setAttribute('data-1p-ignore','true');
 
 window.addEventListener('resize',()=>{if(appEl.classList.contains('open')){msgs.scrollTop=msgs.scrollHeight}});
-$('inp').addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();send()}});
+$('inp').addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();send()}});
 </script></body></html>

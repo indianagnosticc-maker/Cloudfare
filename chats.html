@@ -721,8 +721,9 @@ async function submit(){
    try{await sendEmailVerification(c.user)}catch(x){console.error(x)}
    inf.textContent='Verification email sent. Check your inbox (and spam).';await signOut(auth);
   }else{
-   const c=await signInWithEmailAndPassword(auth,email,pw);
-   if(!c.user.emailVerified){er.textContent='Please verify your email first. Check your inbox.';$('rsd').hidden=false;await signOut(auth)}
+   // Allow existing Firebase accounts to sign in even if email verification is pending.
+   // Firebase Authentication still validates the email/password credentials.
+   await signInWithEmailAndPassword(auth,email,pw);
   }
  }catch(e){console.error(e);const k=e.code;er.textContent=k==='auth/email-already-in-use'?'This email is already registered. Try signing in.':k==='auth/invalid-email'?'Invalid email address.':k==='auth/weak-password'?'Password too weak. Use 6+ characters.':/user-not-found|wrong-password|invalid-credential/.test(k)?'Invalid email or password.':'Something went wrong. Try again.'}
  finally{b.disabled=false}
@@ -740,12 +741,6 @@ onAuthStateChanged(auth,async user=>{
    sheet(false);
    $('auth').classList.add('show');
    renderLists();
-   return;
- }
- if(!user.emailVerified){
-   $('auth').classList.add('show');
-   $('aerr').textContent='Please verify your email first. Check your inbox.';
-   $('rsd').hidden=false;
    return;
  }
  ME=user;

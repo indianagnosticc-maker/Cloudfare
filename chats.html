@@ -1,11 +1,11 @@
 <!DOCTYPE html>
-<html lang="en"><head><meta charset="utf-8">
+<html lang="en" data-theme="dark"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Chats</title>
 <style>
-:root{--bg:#f6f7f8;--p:#fff;--tx:#1c1c1c;--mu:#7c7c7c;--ln:#e3e3e3;--bl:#0079d3;--or:#ff4500;--mine:#ebebeb;--bd:#d0d0d0;--hd:#f8f8f8;--ok:#2e9d5b;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
-@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0e1113;--p:#1a1a1b;--tx:#e8e8e8;--mu:#8f9498;--ln:#343536;--mine:#2b2d2f;--bd:#3d3f41;--hd:#161718}}
-:root[data-theme="dark"]{--bg:#0e1113;--p:#1a1a1b;--tx:#e8e8e8;--mu:#8f9498;--ln:#343536;--mine:#2b2d2f;--bd:#3d3f41;--hd:#161718}
+:root{--bg:#000000;--p:#000000;--tx:#e7e9ea;--mu:#71767b;--ln:#2f3336;--bl:#1d9bf0;--or:#f4212e;--mine:#1d9bf0;--bd:#2f3336;--hd:#000000;--ok:#00ba7c;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+:root[data-theme="light"]{--bg:#f6f7f8;--p:#ffffff;--tx:#1c1c1c;--mu:#7c7c7c;--ln:#e3e3e3;--bl:#0079d3;--or:#ff4500;--mine:#0079d3;--bd:#d0d0d0;--hd:#f8f8f8;--ok:#2e9d5b}
+:root[data-theme="dark"]{--bg:#000000;--p:#000000;--tx:#e7e9ea;--mu:#71767b;--ln:#2f3336;--bl:#1d9bf0;--mine:#1d9bf0;--bd:#2f3336;--hd:#000000;--ok:#00ba7c}
 *{box-sizing:border-box;margin:0;-webkit-tap-highlight-color:transparent}
 html,body{height:100%}
 body{background:var(--bg);color:var(--tx);font:15px -apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;overflow:hidden}
@@ -61,8 +61,10 @@ header{display:flex;align-items:center;gap:6px;padding:10px 8px;background:var(-
 .m{display:flex;gap:10px;margin-bottom:14px}
 .mb{min-width:0;max-width:calc(100% - 46px)}
 .who{font-weight:600}.who small{font-weight:400;color:var(--mu);font-size:13px;margin-left:4px}
-.b{display:table;border:1px solid var(--bd);background:var(--p);border-radius:8px;padding:9px 12px;margin-top:5px;line-height:1.35;word-break:break-word}
-.b.g{background:var(--mine);border-color:var(--mine)}
+.b{display:table;border:1px solid #2f3336;background:#16181c;color:var(--tx);border-radius:18px;padding:10px 14px;margin-top:5px;line-height:1.35;word-break:break-word}
+.b.g{background:#1d9bf0;border-color:#1d9bf0;color:#fff}
+:root[data-theme="light"] .b{background:#fff;color:#1c1c1c;border-color:#d0d0d0}
+:root[data-theme="light"] .b.g{background:#0079d3;border-color:#0079d3;color:#fff}
 .pop{animation:pop .3s cubic-bezier(.3,1.4,.5,1)}
 @keyframes pop{from{opacity:0;transform:translateY(14px) scale(.96)}}
 .mention{color:var(--bl);cursor:pointer}
@@ -115,26 +117,43 @@ header{display:flex;align-items:center;gap:6px;padding:10px 8px;background:var(-
 .ban.on{transform:none}.ban b{display:block}.ban span{color:var(--mu);font-size:14px;display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .opt[hidden],.lnk[hidden]{display:none}
 .hr{display:flex;align-items:center;gap:6px}.hr .sb{flex:1}
+
+/* Final mobile composer and settings-sheet polish */
+.cmp{padding:9px 14px calc(9px + env(safe-area-inset-bottom,0px));background:var(--hd)}
+.compose-row{display:flex;align-items:center;gap:10px;min-width:0;width:100%;min-height:42px}
+.cmp .compose-row input{display:block;flex:1;min-width:0;width:0;height:42px;padding:8px 2px;font-size:16px;line-height:1.35;align-self:auto}
+.cmp .compose-row #snd{display:grid;place-items:center;flex:0 0 42px;width:42px;height:42px;margin:0;border-radius:50%;color:var(--mu)}
+.cmp .compose-row #snd.on{color:#fff;background:var(--bl);transform:none}
+.cmp .compose-row #snd svg{width:23px;height:23px}
+.sheet{padding:10px 20px calc(22px + env(safe-area-inset-bottom,0px));border:1px solid var(--ln);border-bottom:0;box-shadow:0 -12px 40px #0002;max-height:82%;overflow-y:auto}
+.sheet .grab{margin-bottom:16px}
+.sheet h3{font-size:21px;font-weight:700;margin-bottom:12px;padding-bottom:12px;border-bottom:1px solid var(--ln)}
+.sheet .opt{min-height:48px;padding:13px 2px;border-bottom:1px solid var(--ln);font-size:15px;gap:14px}
+.sheet .opt:last-of-type{margin-bottom:4px}
+#blockedList{padding:4px 0 10px}
+.blocked-entry{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 0;border-bottom:1px solid var(--ln);font-size:14px}
+.blocked-entry button{color:var(--bl);font-weight:600;padding:8px 10px;border-radius:8px;background:var(--bg)}
+
 </style></head>
 <body><div class="app" id="app">
 
-<section id="auth" class="show"><h1>Chats</h1><p class="t" id="atag">Sign in to continue</p>
+<section id="auth"><h1>Chats</h1><p class="t" id="atag">Sign in to continue</p>
  <input id="em" type="email" placeholder="Email" autocomplete="email" autocapitalize="none"><input id="pw" type="password" placeholder="Password (6+ characters)" autocomplete="current-password">
  <p class="er" id="aerr"></p><p class="ok" id="ainf"></p>
  <button class="btn big" id="asub">Sign in</button><button class="lnk" id="rsd" hidden>Resend verification email</button><button class="lnk" id="atog">New here? Create account</button></section>
 <section class="scr" id="list">
- <div class="top"><div class="hr"><label class="sb"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.5-4.5"/></svg><input id="q" placeholder="Search by username" autocomplete="off" autocapitalize="none"><button id="clr" aria-label="Clear"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></button></label><button class="ib gear" id="acc" aria-label="Account"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg></button></div>
+ <div class="top"><div class="hr"><label class="sb"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.5-4.5"/></svg><input id="q" placeholder="Search by username" autocomplete="off" autocapitalize="none"><button id="clr" aria-label="Clear"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></button></label><button class="ib gear" id="acc" aria-label="Settings"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M4.9 19.1L7 17M17 7l2.1-2.1"/></svg></button></div>
  <div class="tabs"><button class="tab on" data-t="0">Rooms</button><button class="tab" data-t="1">Directs<span id="b1"></span></button><i class="ind" id="ind"></i></div></div>
  <div class="body"><div class="panes" id="panes"><div class="pane" id="p0"></div><div class="pane" id="p1"></div></div><div id="srch"></div></div>
 </section>
 <section class="scr" id="chat">
  <header><button class="ib" id="back" aria-label="Back"><svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg></button><div class="ht"><b id="ttl"></b><span id="sbt"></span></div><button class="ib gear" id="gear" aria-label="Settings"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M4.9 19.1L7 17M17 7l2.1-2.1"/></svg></button></header>
  <div id="msgs"><div class="typ" id="typ"></div></div>
- <div class="cmp"><div class="sug" id="sug"></div><input id="inp" name="chat-message" placeholder="Message" autocomplete="off" autocorrect="off" autocapitalize="sentences" spellcheck="false" data-form-type="other" enterkeyhint="send"><div class="tl"><button class="ib" id="snd" aria-label="Send"><svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button></div></div>
+ <div class="cmp"><div class="sug" id="sug"></div><div class="compose-row"><input id="inp" name="chat-message" placeholder="Message" autocomplete="off" autocorrect="off" autocapitalize="sentences" spellcheck="false" data-form-type="other" enterkeyhint="send"><button class="ib" id="snd" aria-label="Send"><svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button></div></div>
 </section>
 <div class="scrim" id="scrim"></div>
 <div class="sheet" id="sheet"><div class="grab"></div><h3 id="sh"></h3>
- <button class="opt" id="o1">Dark mode<i class="sw" id="s1"></i></button>
+ <button class="opt" id="o1">AMOLED dark mode<i class="sw" id="s1"></i></button>
  <button class="opt" id="o2">Mute notifications<i class="sw" id="s2"></i></button>
  <button class="opt" id="o4">Copy my ID</button>
  <button class="opt" id="o6">Change profile photo</button><button class="opt" id="o7">Blocked users</button><div id="blockedList"></div>

@@ -55,7 +55,7 @@ header{display:flex;align-items:center;gap:6px;padding:10px 8px;background:var(-
 .ib{width:38px;height:38px;border-radius:50%;display:grid;place-items:center;font-size:22px;color:var(--bl);transition:background .2s,transform .3s}
 .ib:active{background:var(--ln)}.gear{color:var(--mu)}.gear:active{transform:rotate(60deg)}
 .ht{flex:1;min-width:0}.ht b{font-size:17px;display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.ht span{font-size:12px;color:var(--mu)}
-#msgs{flex:1;overflow-y:auto;padding:12px 14px 8px;scroll-behavior:smooth}
+#msgs{flex:1;overflow-y:auto;padding:12px 14px 8px;scroll-behavior:smooth;display:flex;flex-direction:column}#msgs>.m:first-of-type{margin-top:auto}
 .m{display:flex;gap:10px;margin-bottom:14px}
 .mb{min-width:0;max-width:calc(100% - 46px)}
 .who{font-weight:600}.who small{font-weight:400;color:var(--mu);font-size:13px;margin-left:4px}
@@ -71,7 +71,7 @@ header{display:flex;align-items:center;gap:6px;padding:10px 8px;background:var(-
 .typ i{width:6px;height:6px;border-radius:50%;background:var(--mu);animation:db 1s infinite}.typ i:nth-child(2){animation-delay:.15s}.typ i:nth-child(3){animation-delay:.3s}
 @keyframes db{50%{transform:translateY(-4px);opacity:.4}}
 .cmp{border-top:1px solid var(--ln);background:var(--hd);padding:8px 16px;flex:none;position:relative}
-.cmp input{width:100%;border:0;background:none;font-size:16px;color:var(--tx);outline:0;padding:6px 0 10px}
+.cmp input{flex:1;min-width:0;width:0;border:0;background:none;font-size:16px;color:var(--tx);outline:0;padding:6px 0;align-self:center}.cmp .tl{display:flex;align-items:center;gap:5px;min-width:0}.cmp .tl .t{flex:none}.cmp #peerTag{font-size:14px;color:var(--mu);white-space:nowrap;max-width:105px;overflow:hidden;text-overflow:ellipsis;flex:none}.cmp #snd{flex:none;margin-left:2px;width:38px}.cmp #inp{font-size:15px}.cmp .tl .ib{flex:none}.cmp .tl #smi{width:34px}.cmp .tl [data-ins]{width:30px}.cmp{padding:8px 12px}.cmp #pan{margin-bottom:6px}
 .tl{display:flex;align-items:center;gap:6px;color:var(--mu);font-size:22px}
 .tl .t{font-weight:700;font-size:17px;width:38px;height:36px;border-radius:50%}
 .tl .ib{color:var(--mu);width:36px;height:36px}
@@ -128,8 +128,8 @@ header{display:flex;align-items:center;gap:6px;padding:10px 8px;background:var(-
 <section class="scr" id="chat">
  <header><button class="ib" id="back" aria-label="Back"><svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg></button><div class="ht"><b id="ttl"></b><span id="sbt"></span></div><button class="ib gear" id="gear" aria-label="Settings"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M4.9 19.1L7 17M17 7l2.1-2.1"/></svg></button></header>
  <div id="msgs"><div class="typ" id="typ"></div></div>
- <div class="cmp"><div class="sug" id="sug"></div><input id="inp" placeholder="Message" autocomplete="off" enterkeyhint="send"><div class="pan" id="pan"><button>:)</button><button>:D</button><button>;)</button><button>:P</button><button>&lt;3</button><button>xD</button></div>
- <div class="tl"><button class="ib" id="smi" aria-label="Quick faces"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M8 14c1.5 2 6.5 2 8 0M9 9h.01M15 9h.01"/></svg></button><button class="ib t" data-ins="u/">u/</button><button class="ib" id="snd" aria-label="Send"><svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button></div></div>
+ <div class="cmp"><div class="sug" id="sug"></div><div class="pan" id="pan"><button>:)</button><button>:D</button><button>;)</button><button>:P</button><button>&lt;3</button><button>xD</button></div>
+ <div class="tl"><button class="ib" id="smi" aria-label="Quick faces"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M8 14c1.5 2 6.5 2 8 0M9 9h.01M15 9h.01"/></svg></button><button class="ib t" data-ins="u/">u/</button><span id="peerTag">@operator</span><input id="inp" name="chat-message" placeholder="Message" autocomplete="new-password" autocorrect="off" autocapitalize="sentences" spellcheck="false" data-form-type="other" enterkeyhint="send"><button class="ib" id="snd" aria-label="Send"><svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button></div></div>
 </section>
 <div class="scrim" id="scrim"></div>
 <div class="sheet" id="sheet"><div class="grab"></div><h3 id="sh"></h3>
@@ -161,7 +161,7 @@ const av=(n,s=40)=>{n=String(n||'?');return `<span class="av" style="width:${s}p
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const IC='<svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c0-4 3-6 6.5-6s6.5 2 6.5 6M16 5a3.5 3.5 0 010 7M21.5 19c0-3-1.5-4.5-3.5-5.2"/></svg>';
 const CK=['<svg viewBox="0 0 24 24"><path d="M5 12l4 4 10-10"/></svg>','<svg viewBox="0 0 24 24"><path d="M2 12l4 4 8-9M10 15l2 2 9-10"/></svg>'];
-let ME=null,P=null,peer=null,cid=null,chans=[],uM=null,uS=null,uR=null,signup=false,muted=false,tab=0,painted=false,seen=new Set(),tbt=null,lt=0,lp=0,bt=null,hist=[],sd=null,sr={q:'',res:[],busy:false},armed=null;
+let ME=null,P=null,peer=null,cid=null,chans=[],uM=null,uS=null,uR=null,signup=false,muted=false,tab=0,painted=false,seen=new Set(),tbt=null,lt=0,lp=0,bt=null,hist=[],sd=null,sr={q:'',res:[],busy:false},armed=null,forceBottom=false;
 const toast=t=>{const e=$('toast');e.textContent=t;e.classList.add('on');clearTimeout(toast.k);toast.k=setTimeout(()=>e.classList.remove('on'),2200)};
 const tv=ts=>ts?(ts.toDate?ts.toDate():new Date(ts)):null;
 const ft=ts=>{const d=tv(ts);if(!d)return'';const s=(Date.now()-d)/1000|0;return s<60?'now':s<3600?(s/60|0)+'m':s<86400?(s/3600|0)+'h':d.toLocaleDateString([],{month:'short',day:'numeric'})};
@@ -268,13 +268,13 @@ function paintSearch(){
 function openCommon(){stop();painted=false;seen=new Set();msgs.querySelectorAll('.m,.emp').forEach(e=>e.remove());$('typ').classList.remove('on');$('inp').value='';chg();appEl.classList.add('open')}
 function openYuki(){
  if(!ME)return;openCommon();peer={uid:YB,username:'yuki_ai',display:'Yuki AI Companion',isYuki:true};cid=cidOf(ME.uid,YB);
- $('ttl').textContent=peer.display;$('sbt').textContent='AI companion';$('inp').placeholder='Message Yuki';$('o3').hidden=true;subMsgs(cid);renderLists();
+ $('ttl').textContent=peer.display;$('sbt').textContent='AI companion';$('inp').placeholder='Message';$('peerTag').textContent='@yuki_ai';$('o3').hidden=true;subMsgs(cid);renderLists();
 }
 function openChat(uid,prof){
  if(!ME||!uid)return;openCommon();rmDel(ME.uid,uid);
  const f=chans.find(c=>c.otherUid===uid);prof=prof||(f&&f.profile)||{};
  peer={uid,username:prof.username||'operator',display:prof.display||prof.username||'Operator'};cid=cidOf(ME.uid,uid);
- $('ttl').textContent=peer.display;$('sbt').textContent='@'+peer.username;$('inp').placeholder='Message @'+peer.username;$('o3').hidden=false;
+ $('ttl').textContent=peer.display;$('sbt').textContent='@'+peer.username;$('peerTag').textContent='@'+peer.username;$('inp').placeholder='Message';$('o3').hidden=false;
  $('q').value='';paintSearch();subMsgs(cid);
  const my=cid;uS=onSnapshot(doc(db,'chats',cid),async s=>{
   if(cid!==my||!s.exists())return;const d=s.data();
@@ -305,7 +305,7 @@ function subMsgs(chatId){
    prev=x.by;
   });
   $('typ').insertAdjacentHTML('beforebegin',h);
-  if(near||!painted){msgs.style.scrollBehavior=painted?'':'auto';msgs.scrollTop=msgs.scrollHeight;msgs.style.scrollBehavior=''}
+  if(forceBottom||near||!painted){msgs.style.scrollBehavior='auto';msgs.scrollTop=msgs.scrollHeight;requestAnimationFrame(()=>{msgs.scrollTop=msgs.scrollHeight;msgs.style.scrollBehavior=''});forceBottom=false}
   painted=true;markSeen(chatId);
  },e=>{console.error('Messages error',e);toast('Could not load messages')});
 }
@@ -318,7 +318,7 @@ async function markSeen(c){
 async function send(){
  const i=$('inp'),text=i.value.trim();if(!text||!ME||!cid||!peer)return;
  if((text.match(/\S+/g)||[]).length>5000)return toast('Max 5,000 words');
- i.value='';chg();i.focus();msgs.scrollTop=msgs.scrollHeight;const my=cid,pr=peer;
+ i.value='';chg();forceBottom=true;i.focus();msgs.scrollTop=msgs.scrollHeight;const my=cid,pr=peer;
  try{
   await addDoc(collection(db,'chats',my,'messages'),{text,by:ME.uid,at:serverTimestamp(),seen:false});
   await setDoc(doc(db,'chats',my),{users:[ME.uid,pr.uid],[`participants.${ME.uid}`]:true,[`participants.${pr.uid}`]:true,lastMsg:text.slice(0,80),lastMsgAt:serverTimestamp(),lastMsgBy:ME.uid,touchAt:serverTimestamp(),unread:pr.isYuki?{}:{[pr.uid]:increment(1),[ME.uid]:0},typing:{[ME.uid]:false}},{merge:true});
@@ -389,5 +389,8 @@ document.addEventListener('click',e=>{const g=s=>e.target.closest(s);let x;
 });
 function openChatFromRow(uid){const c=chans.find(z=>z.otherUid===uid);if(c)openChat(uid,c.profile)}
 $('inp').addEventListener('input',chg);
+// Keep the composer focused on message entry rather than browser autofill/password suggestions.
+$('inp').setAttribute('autocomplete','new-password');$('inp').setAttribute('data-lpignore','true');$('inp').setAttribute('data-1p-ignore','true');
+window.addEventListener('resize',()=>{if(appEl.classList.contains('open')){msgs.scrollTop=msgs.scrollHeight}});
 $('inp').addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();send()}});
 </script></body></html>

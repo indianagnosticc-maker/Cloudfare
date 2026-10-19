@@ -129,7 +129,7 @@ header{display:flex;align-items:center;gap:6px;padding:10px 8px;background:var(-
  <header><button class="ib" id="back" aria-label="Back"><svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg></button><div class="ht"><b id="ttl"></b><span id="sbt"></span></div><button class="ib gear" id="gear" aria-label="Settings"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M4.9 19.1L7 17M17 7l2.1-2.1"/></svg></button></header>
  <div id="msgs"><div class="typ" id="typ"></div></div>
  <div class="cmp"><div class="sug" id="sug"></div><input id="inp" placeholder="Message" autocomplete="off" enterkeyhint="send"><div class="pan" id="pan"><button>:)</button><button>:D</button><button>;)</button><button>:P</button><button>&lt;3</button><button>xD</button></div>
- <div class="tl"><button class="ib" id="smi" aria-label="Quick faces"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M8 14c1.5 2 6.5 2 8 0M9 9h.01M15 9h.01"/></svg></button><button class="ib t" data-ins="u/">u/</button><button class="ib" id="snd" aria-label="Send"><svg viewBox="0 0 24 24"><path d="M3 11l18-8-8 18-2-8z"/></svg></button></div></div>
+ <div class="tl"><button class="ib" id="smi" aria-label="Quick faces"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M8 14c1.5 2 6.5 2 8 0M9 9h.01M15 9h.01"/></svg></button><button class="ib t" data-ins="u/">u/</button><button class="ib" id="snd" aria-label="Send"><svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button></div></div>
 </section>
 <div class="scrim" id="scrim"></div>
 <div class="sheet" id="sheet"><div class="grab"></div><h3 id="sh"></h3>
@@ -298,7 +298,7 @@ function subMsgs(chatId){
   if(snap.empty)h=`<p class="emp">${peer.isYuki?'Say hello to Yuki.':'No messages yet.<br>Send the first one.'}</p>`;
   snap.docs.forEach(d=>{
    const x=d.data({serverTimestamps:'estimate'}),mine=x.by===ME.uid,nu=painted&&!seen.has(d.id);seen.add(d.id);
-   const nm=mine?P.username:peer.username,tk=mine?`<span class="tk${x.seen===true?' sn':''}">${CK[x.seen===true?1:0]}</span>`:'';
+   const nm=mine?P.username:peer.username,tk='';
    const b=`<div class="b${mine?' g':''}${nu?' pop':''}" data-id="${esc(d.id)}">${fmt(x.text||'')}${tk}</div>`;
    if(prev===x.by){h=h.replace(/<\/div><\/div>$/,b+'</div></div>')}
    else h+=`<div class="m">${av(nm,34)}<div class="mb"><div class="who">${esc(nm)}<small>${esc(clk(x.at))}</small></div>${b}</div></div>`;
@@ -318,7 +318,7 @@ async function markSeen(c){
 async function send(){
  const i=$('inp'),text=i.value.trim();if(!text||!ME||!cid||!peer)return;
  if((text.match(/\S+/g)||[]).length>5000)return toast('Max 5,000 words');
- i.value='';chg();i.focus();const my=cid,pr=peer;
+ i.value='';chg();i.focus();msgs.scrollTop=msgs.scrollHeight;const my=cid,pr=peer;
  try{
   await addDoc(collection(db,'chats',my,'messages'),{text,by:ME.uid,at:serverTimestamp(),seen:false});
   await setDoc(doc(db,'chats',my),{users:[ME.uid,pr.uid],[`participants.${ME.uid}`]:true,[`participants.${pr.uid}`]:true,lastMsg:text.slice(0,80),lastMsgAt:serverTimestamp(),lastMsgBy:ME.uid,touchAt:serverTimestamp(),unread:pr.isYuki?{}:{[pr.uid]:increment(1),[ME.uid]:0},typing:{[ME.uid]:false}},{merge:true});

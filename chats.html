@@ -1,6 +1,7 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="dark"><head><meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, interactive-widget=resizes-content">
+
+<html data-theme="dark" lang="en"><head><meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1, viewport-fit=cover, interactive-widget=resizes-content" name="viewport"/>
 <title>Chats</title>
 <style>
 :root{
@@ -55,24 +56,10 @@
   --hd:#000000;
   --ok:#00ba7c;
 }
-:root[data-bubble-style="compact"]{--chat-bubble-radius:10px;--chat-density-pad:7px 11px}
-:root[data-bubble-style="round"]{--chat-bubble-radius:24px}
-:root[data-bubble-style="classic"]{--chat-bubble-radius:18px}
-:root[data-font-size="sm"]{--chat-font-size:13px}
-:root[data-font-size="md"]{--chat-font-size:15px}
-:root[data-font-size="lg"]{--chat-font-size:17px}
-:root[data-density="compact"]{--chat-spacing:8px;--chat-density-pad:6px 10px}
-:root[data-density="comfortable"]{--chat-spacing:15px;--chat-density-pad:10px 14px}
-:root[data-reduce-motion="true"] *{transition-duration:0.01ms!important;animation-duration:0.01ms!important}
-:root[data-hide-preview="true"] .sub{filter:blur(3.5px);opacity:0.6;user-select:none}
-:root[data-hide-timestamps="true"] .who small, :root[data-hide-timestamps="true"] .tm{display:none!important}
-:root[data-bg-pattern="dots"] #msgs{background-image:radial-gradient(circle, var(--ln) 1px, transparent 1px);background-size:16px 16px}
-:root[data-bg-pattern="grid"] #msgs{background-image:linear-gradient(to right, var(--ln) 1px, transparent 1px), linear-gradient(to bottom, var(--ln) 1px, transparent 1px);background-size:20px 20px}
-:root[data-bg-pattern="clean"] #msgs{background-image:none}
 
 *{box-sizing:border-box;margin:0;-webkit-tap-highlight-color:transparent}
 html,body{height:100%;height:100dvh;overscroll-behavior:none}
-body{background:var(--bg);color:var(--tx);font:15px -apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;overflow:hidden}
+body{background:var(--bg);color:var(--tx);font:15px -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;overflow:hidden}
 button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
 svg{width:1em;height:1em;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex:none}
 .app{height:100dvh;height:100%;position:relative;max-width:560px;margin:0 auto;background:var(--p);overflow:hidden}
@@ -82,83 +69,109 @@ svg{width:1em;height:1em;fill:none;stroke:currentColor;stroke-width:2;stroke-lin
 .top{padding:12px 16px 0;flex:none}
 .sb{display:flex;align-items:center;gap:8px;background:var(--bg);border:1px solid var(--ln);border-radius:20px;padding:0 12px;height:38px;transition:border-color .2s,box-shadow .2s}
 .sb:focus-within{border-color:var(--bl);box-shadow:0 0 0 3px #0079d322}
-.sb input{flex:1;border:0;background:none;outline:0;font-size:16px;color:var(--tx);min-width:0}
+.sb input{flex:1;border:0;background:none;outline:0;font-size:15px;color:var(--tx);min-width:0}
 .sb svg{color:var(--mu);font-size:18px}
 #clr{opacity:0;transform:scale(.5);transition:.2s;pointer-events:none}.sb.has #clr{opacity:1;transform:none;pointer-events:auto}
 .tabs{display:flex;position:relative;border-bottom:1px solid var(--ln);margin-top:8px}
-.tab{flex:1;padding:12px 0;font-weight:600;color:var(--mu);font-size:16px;transition:color .2s,transform .15s}
+.tab{flex:1;padding:11px 0;font-weight:600;color:var(--mu);font-size:15px;transition:color .2s,transform .15s}
 .tab:active{transform:scale(.97)}
 .tab.on{color:var(--tx)}
 .ind{position:absolute;bottom:-1px;left:0;width:50%;height:2px;background:var(--bl);transition:transform var(--anim-speed) cubic-bezier(.3,.8,.3,1)}
-.badge{display:inline-block;min-width:18px;height:18px;line-height:18px;border-radius:9px;background:var(--or);color:#fff;font-size:11px;font-weight:700;text-align:center;padding:0 5px;margin-left:6px;vertical-align:1px;animation:bp .3s}
-@keyframes bp{from{transform:scale(0)}}
+.badge{display:inline-block;min-width:18px;height:18px;line-height:18px;border-radius:9px;background:var(--or);color:#fff;font-size:11px;font-weight:700;text-align:center;padding:0 5px;margin-left:6px;vertical-align:1px}
 .body{flex:1;position:relative;overflow:hidden}
 .panes{display:flex;width:200%;height:100%;transition:transform var(--anim-speed) cubic-bezier(.3,.8,.3,1)}
 .pane{width:50%;overflow-y:auto;padding:0 16px 24px}
 #srch{position:absolute;inset:0;background:var(--p);overflow-y:auto;padding:0 16px 24px;opacity:0;pointer-events:none;transform:translateY(8px);transition:.25s}
 #srch.on{opacity:1;pointer-events:auto;transform:none}
 .sec{font-size:12px;font-weight:700;color:var(--mu);letter-spacing:.08em;padding:16px 0 8px;border-bottom:1px solid var(--ln);margin-bottom:6px}
-.row{display:flex;align-items:center;gap:12px;padding:8px 0;width:100%;text-align:left;transition:opacity .25s,transform .25s,max-height .3s;max-height:90px;overflow:hidden}
+.row{display:flex;align-items:center;gap:12px;padding:8px 0;width:100%;text-align:left;transition:opacity .25s,transform .25s,max-height .3s;max-height:90px;overflow:hidden;touch-action:pan-y}
 .row.out{opacity:0;transform:translateX(40px);max-height:0;padding:0}
 .row:active{opacity:.6}
 .rt{flex:1;min-width:0}
-.sub{font-size:13px;color:var(--mu);display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;transition:filter .2s,opacity .2s}
-.nm{font-weight:500;display:block}
+.sub{font-size:13px;color:var(--mu);display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.nm{font-weight:500;display:block;font-size:14.5px}
 .av{border-radius:50%;display:grid;place-items:center;color:#fff;font-weight:700;flex:none}.av.photo{display:block;border:1px solid var(--ln)}
-.row{touch-action:pan-y}
 .btn{padding:6px 14px;border-radius:18px;font-size:13px;font-weight:600;background:var(--bl);color:#fff;transition:transform .15s,filter .2s;display:inline-flex;align-items:center;justify-content:center;gap:6px}
 .btn:hover{filter:brightness(1.08)}
 .btn:active{transform:scale(.94)}
 .btn.gh{background:var(--bg);color:var(--mu);border:1px solid var(--ln)}
 .btn.danger{background:#dc2626;color:#fff}
 .btn.danger:hover{background:#b91c1c}
-.more{color:var(--bl);font-size:14px;padding:6px 0}
-.cm{display:flex;align-items:center;gap:12px;padding:14px 0 6px;color:var(--mu)}
-.room{display:flex;align-items:center;gap:8px;margin:0 -16px;padding:9px 16px 9px 20px;width:calc(100% + 32px);font-size:16px;font-weight:500;text-align:left;transition:background .25s,color .25s}
+.room{display:flex;align-items:center;gap:8px;margin:0 -16px;padding:9px 16px 9px 20px;width:calc(100% + 32px);font-size:15px;font-weight:500;text-align:left;transition:background .25s,color .25s}
 .room:active{background:var(--bg)}
 .room.sel{background:var(--bl);color:#fff}.room.lk{color:var(--mu)}.room.sel.lk{color:#fff}
 .room svg{opacity:.7;font-size:14px}.room .badge{margin-left:auto}
-.rec{color:var(--mu);font-size:14px;padding:2px 0 8px}
+.rec{color:var(--mu);font-size:13px;padding:2px 0 8px}
 .emp{text-align:center;color:var(--mu);padding:40px 12px;line-height:1.5}
-.hl{color:var(--bl);font-weight:700}
 
-/* Header & Reliable Settings Button */
-header{display:flex;align-items:center;gap:6px;padding:10px 12px;background:var(--hd);border-bottom:1px solid var(--ln);flex:none;position:relative;z-index:2}
-.ib{width:40px;height:40px;border-radius:50%;display:grid;place-items:center;font-size:21px;color:var(--bl);transition:background .2s,transform .2s,color .2s;position:relative;-webkit-appearance:none;touch-action:manipulation}
+/* Header & Refined Chat Title */
+header{display:flex;align-items:center;gap:10px;padding:10px 14px;background:var(--hd);border-bottom:1px solid var(--ln);flex:none;position:relative;z-index:2}
+.ib{width:38px;height:38px;border-radius:50%;display:grid;place-items:center;font-size:20px;color:var(--bl);transition:background .2s,transform .2s,color .2s;position:relative;-webkit-appearance:none;touch-action:manipulation;flex:none}
 .ib:hover{background:var(--surface-hover)}
 .ib:active{background:var(--ln);transform:scale(.92)}
-.ib:focus-visible{outline:2px solid var(--bl);outline-offset:2px}
 .gear{color:var(--mu)}
 .gear svg{transition:transform .4s cubic-bezier(.34,1.56,.64,1)}
 .gear:hover svg{transform:rotate(30deg);color:var(--tx)}
-.gear:active svg,.gear.rotating svg{transform:rotate(90deg);color:var(--bl)}
-.ht{flex:1;min-width:0;padding-left:4px}.ht b{font-size:17px;display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.ht span{font-size:12px;color:var(--mu)}
+.gear.rotating svg{transform:rotate(90deg);color:var(--bl)}
 
-/* Messages area & customizable layout */
+/* Chat Header Details with Avatar, clean balanced typography */
+.header-profile{display:flex;align-items:center;gap:10px;flex:1;min-width:0}
+#headerAv{flex:none;display:flex;align-items:center;justify-content:center}
+#headerAv .av{border-radius:50%;object-fit:cover}
+.ht{flex:1;min-width:0;display:flex;flex-direction:column;justify-content:center}
+.ht b{font-size:15.5px;font-weight:600;display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1.3;color:var(--tx);letter-spacing:-0.01em}
+.ht span{font-size:12px;font-weight:400;color:var(--mu);display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1.3;margin-top:1px}
+
+/* Messages area */
 #msgs{flex:1;overflow-y:auto;padding:12px 14px 8px;scroll-behavior:smooth;display:flex;flex-direction:column;font-size:var(--chat-font-size)}
 #msgs>.m:first-of-type{margin-top:auto}
 .m{display:flex;gap:10px;margin-bottom:var(--chat-spacing);animation:pop .25s cubic-bezier(.3,1.3,.5,1)}
 .mb{min-width:0;max-width:calc(100% - 46px)}
-.who{font-weight:600;font-size:.95em}.who small{font-weight:400;color:var(--mu);font-size:12px;margin-left:6px}
-.b{display:table;border:1px solid var(--ln);background:#16181c;color:var(--tx);border-radius:var(--chat-bubble-radius);padding:var(--chat-density-pad);margin-top:5px;line-height:1.4;word-break:break-word;transition:border-radius .2s,padding .2s,background .2s}
+.who{font-weight:600;font-size:.92em}.who small{font-weight:400;color:var(--mu);font-size:12px;margin-left:6px}
+.b{display:table;border:1px solid var(--ln);background:#16181c;color:var(--tx);border-radius:var(--chat-bubble-radius);padding:var(--chat-density-pad);margin-top:5px;line-height:1.42;word-break:break-word;transition:border-radius .2s,padding .2s,background .2s}
 .b.g{background:var(--mine);border-color:var(--mine);color:#fff}
 :root[data-theme="light"] .b{background:#fff;color:#1c1c1c;border-color:#d0d0d0}
 :root[data-theme="light"] .b.g{background:#0079d3;border-color:#0079d3;color:#fff}
 .pop{animation:pop .3s cubic-bezier(.3,1.4,.5,1)}
 @keyframes pop{from{opacity:0;transform:translateY(12px) scale(.97)}}
-.mention{color:var(--bl);cursor:pointer}
-.src{display:flex;align-items:center;gap:8px;color:var(--mu);font-size:14px;margin-bottom:6px}.src s{width:18px;height:18px;border-radius:50%;background:var(--or)}
-.bird{width:56px;margin:0 0 10px 44px;animation:pop .5s}
 .typ{height:0;opacity:0;overflow:hidden;color:var(--mu);font-size:13px;display:flex;align-items:center;gap:8px;transition:.25s;padding-left:44px}
 .typ.on{height:24px;opacity:1}
 .typ i{width:6px;height:6px;border-radius:50%;background:var(--mu);animation:db 1s infinite}.typ i:nth-child(2){animation-delay:.15s}.typ i:nth-child(3){animation-delay:.3s}
 @keyframes db{50%{transform:translateY(-4px);opacity:.4}}
 
-/* Composer */
+/* Composer - Fixed to remove vertical line / scrollbar line on right */
 .cmp{border-top:1px solid var(--ln);background:var(--hd);padding:8px 12px calc(8px + env(safe-area-inset-bottom,0px));flex:none;position:relative;z-index:5}
 .compose-row{display:flex;align-items:center;gap:8px;min-width:0;width:100%;min-height:42px}
-.cmp .compose-row input,.cmp .compose-row textarea{display:block;flex:1;min-width:0;height:42px;min-height:42px;max-height:120px;padding:10px 14px;background:var(--surface);border:1px solid var(--ln);border-radius:21px;font:inherit;font-size:15px;line-height:1.35;color:var(--tx);outline:0;resize:none;overflow-y:auto;transition:border-color .2s,box-shadow .2s}
-.cmp .compose-row input:focus,.cmp .compose-row textarea:focus{border-color:var(--bl);box-shadow:0 0 0 3px #1d9bf022}
+.cmp .compose-row textarea{
+  display:block;
+  flex:1;
+  min-width:0;
+  height:42px;
+  min-height:42px;
+  max-height:120px;
+  padding:10px 14px;
+  background:var(--surface);
+  border:1px solid var(--ln);
+  border-radius:21px;
+  font:inherit;
+  font-size:15px;
+  line-height:1.35;
+  color:var(--tx);
+  outline:0;
+  resize:none;
+  overflow-y:auto;
+  overflow-x:hidden;
+  scrollbar-width:none; /* Firefox */
+  -ms-overflow-style:none; /* IE/Edge */
+  transition:border-color .2s,box-shadow .2s;
+  box-sizing:border-box;
+}
+.cmp .compose-row textarea::-webkit-scrollbar{
+  display:none; /* Chrome, Safari, Opera */
+  width:0;
+  height:0;
+}
+.cmp .compose-row textarea:focus{border-color:var(--bl);box-shadow:0 0 0 3px #1d9bf022}
 .cmp .compose-row #snd{display:grid;place-items:center;flex:0 0 40px;width:40px;height:40px;border-radius:50%;color:var(--mu);background:transparent;transition:background .2s,color .2s,transform .2s}
 .cmp .compose-row #snd.on{color:#fff;background:var(--bl);transform:scale(1.05)}
 .cmp .compose-row #snd svg{width:20px;height:20px}
@@ -168,457 +181,428 @@ header{display:flex;align-items:center;gap:6px;padding:10px 12px;background:var(
 .sug button:hover{background:var(--surface-hover)}
 
 /* Scrim / Backdrop */
-.scrim{position:absolute;inset:0;background:rgba(0,0,0,0.65);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);opacity:0;pointer-events:none;transition:opacity .3s cubic-bezier(.3,.8,.3,1);z-index:90}
+.scrim{position:fixed;inset:0;background:rgba(0,0,0,0.55);backdrop-filter:blur(3px);-webkit-backdrop-filter:blur(3px);opacity:0;pointer-events:none;transition:opacity .25s ease;z-index:90}
 .scrim.on{opacity:1;pointer-events:auto}
 
-/* Redesigned Modern Settings Sheet / Modal */
+/* Settings as an Independent Side Panel (Desktop: side panel beside chat; Mobile: slide-in drawer) */
 .sheet{
-  position:absolute;
-  left:0;
+  position:fixed;
+  top:0;
   right:0;
   bottom:0;
+  width:100%;
+  max-width:390px;
   background:var(--p);
-  border-top:1px solid var(--ln);
-  border-radius:22px 22px 0 0;
-  box-shadow:0 -12px 48px rgba(0,0,0,0.6);
+  border-left:1px solid var(--ln);
+  box-shadow:-8px 0 32px rgba(0,0,0,0.5);
   z-index:100;
-  transform:translateY(105%);
-  transition:transform .35s cubic-bezier(.25,1,.3,1),opacity .2s;
+  transform:translateX(105%);
+  transition:transform .3s cubic-bezier(.2,.8,.2,1);
   display:flex;
   flex-direction:column;
-  max-height:88%;
+  height:100%;
+  height:100dvh;
   overflow:hidden;
+  box-sizing:border-box;
 }
-.sheet.on{transform:none}
-@media (min-width:600px){
-  .sheet{
-    left:50%;
-    right:auto;
-    bottom:auto;
-    top:50%;
-    width:520px;
-    max-height:82vh;
-    border-radius:20px;
-    border:1px solid var(--ln);
-    transform:translate(-50%,-46%) scale(.96);
-    opacity:0;
-    pointer-events:none;
-  }
-  .sheet.on{
-    transform:translate(-50%,-50%) scale(1);
-    opacity:1;
-    pointer-events:auto;
-  }
-  .sheet-handle{display:none!important}
-}
-.sheet-handle{width:40px;height:4.5px;border-radius:3px;background:var(--ln);margin:10px auto 4px;flex:none}
-.sheet-header{display:flex;align-items:center;justify-content:space-between;padding:12px 20px;border-bottom:1px solid var(--ln);flex:none;background:var(--hd)}
+.sheet.on{transform:translateX(0)}
+.sheet-header{display:flex;align-items:center;justify-content:space-between;padding:14px 18px;border-bottom:1px solid var(--ln);flex:none;background:var(--hd);min-height:56px}
 .sheet-header-left{display:flex;align-items:center;gap:10px}
-.sheet-title{font-size:19px;font-weight:700;letter-spacing:-.01em}
+.sheet-back{display:none;width:34px;height:34px;border-radius:50%;place-items:center;color:var(--tx);transition:background .2s}
+.sheet-back.show{display:grid}
+.sheet-back:hover{background:var(--surface-hover)}
+.sheet-title{font-size:17px;font-weight:600;letter-spacing:-.01em;color:var(--tx)}
 .sheet-close{width:34px;height:34px;border-radius:50%;display:grid;place-items:center;color:var(--mu);transition:background .2s,color .2s}
 .sheet-close:hover{background:var(--surface-hover);color:var(--tx)}
-.sheet-close:active{transform:scale(.92)}
 
-/* Settings navigation tabs */
-.cfg-nav{display:none!important}
-
-.sheet-body{flex:1;overflow-y:auto;padding:16px 20px 28px;-webkit-overflow-scrolling:touch}
-.cfg-sec-title{font-size:11px;font-weight:700;color:var(--mu);text-transform:uppercase;letter-spacing:.08em;margin:16px 0 8px;padding-left:2px}
+/* Independent Settings Scrolling Body */
+.sheet-body{
+  flex:1 1 auto;
+  min-height:0;
+  overflow-y:auto;
+  overflow-x:hidden;
+  -webkit-overflow-scrolling:touch;
+  padding:16px 18px calc(24px + env(safe-area-inset-bottom,0px));
+}
+.cfg-sec-title{font-size:11.5px;font-weight:600;color:var(--mu);text-transform:uppercase;letter-spacing:.06em;margin:16px 0 8px;padding-left:2px}
 .cfg-sec-title:first-child{margin-top:0}
 .cfg-card{background:var(--surface);border:1px solid var(--ln);border-radius:14px;overflow:hidden;margin-bottom:14px}
-.opt{display:flex;align-items:center;justify-content:space-between;padding:13px 14px;width:100%;text-align:left;border-bottom:1px solid var(--ln);transition:background .15s;gap:12px;font-size:14px}
+.opt{display:flex;align-items:center;justify-content:space-between;padding:12px 14px;width:100%;text-align:left;border-bottom:1px solid var(--ln);transition:background .15s;gap:12px;font-size:14px}
 .opt:last-child{border-bottom:0}
 .opt:hover{background:var(--surface-hover)}
 .opt-info{flex:1;min-width:0}
-.opt-label{font-weight:500;display:block;color:var(--tx)}
+.opt-label{font-weight:500;display:block;color:var(--tx);font-size:14px}
 .opt-desc{font-size:12px;color:var(--mu);display:block;margin-top:2px;line-height:1.35}
 .opt.red .opt-label{color:#ef4444}
 .opt.red:hover{background:#ef444415}
 
 /* Smooth switch component */
-.sw{width:46px;height:26px;border-radius:13px;background:var(--ln);position:relative;transition:background .25s cubic-bezier(.3,.8,.3,1);flex:none;cursor:pointer}
-.sw:after{content:"";position:absolute;top:3px;left:3px;width:20px;height:20px;border-radius:50%;background:#fff;transition:transform .25s cubic-bezier(.34,1.56,.64,1);box-shadow:0 1px 4px rgba(0,0,0,0.4)}
+.sw{width:44px;height:24px;border-radius:12px;background:var(--ln);position:relative;transition:background .2s cubic-bezier(.3,.8,.3,1);flex:none;cursor:pointer}
+.sw:after{content:"";position:absolute;top:2px;left:2px;width:20px;height:20px;border-radius:50%;background:#fff;transition:transform .2s cubic-bezier(.34,1.56,.64,1);box-shadow:0 1px 3px rgba(0,0,0,0.35)}
 .sw.on{background:var(--bl)}
 .sw.on:after{transform:translateX(20px)}
 
-/* Select and inputs inside settings */
-.cfg-select{background:var(--bg);color:var(--tx);border:1px solid var(--ln);border-radius:8px;padding:6px 10px;font-size:13px;outline:0;cursor:pointer;transition:border-color .2s}
-.cfg-select:focus{border-color:var(--bl)}
+/* Subviews inside Settings (Main, Profile, BlockList) */
+.settings-view{display:none}
+.settings-view.active{display:block}
 
-/* Blocked list & chips */
-#blockedList{padding:4px 0}
-.blocked-entry{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 14px;border-bottom:1px solid var(--ln);font-size:14px}
-.blocked-entry button{color:var(--bl);font-weight:600;padding:5px 10px;border-radius:6px;background:var(--bg);border:1px solid var(--ln);font-size:12px}
+/* Profile Form Elements */
+.profile-card-top{display:flex;align-items:center;gap:14px;padding:16px 14px;border-bottom:1px solid var(--ln)}
+#accAvatar{width:56px;height:56px;border-radius:50%;overflow:hidden;display:flex;align-items:center;justify-content:center;flex:none;background:var(--bg);border:1px solid var(--ln)}
+.profile-input-group{padding:12px 14px;border-bottom:1px solid var(--ln)}
+.profile-input-label{display:block;font-size:12px;font-weight:600;color:var(--mu);margin-bottom:6px;text-transform:uppercase;letter-spacing:.05em}
+.profile-input{width:100%;height:38px;padding:0 10px;background:var(--bg);border:1px solid var(--ln);border-radius:8px;font:inherit;font-size:14px;color:var(--tx);outline:none;transition:border-color .2s}
+.profile-input:focus{border-color:var(--bl)}
+.profile-input-hint{font-size:11.5px;color:var(--mu);margin-top:5px;line-height:1.3}
+.profile-input-err{font-size:12px;color:#ef4444;margin-top:5px;min-height:0;display:none}
+.profile-input-err.show{display:block}
+.profile-save-row{padding:12px 14px;display:flex;justify-content:flex-end;gap:8px}
 
-/* Simplified settings: three clear options, vertical scrolling */
-#cfgCatAppearance,#cfgCatPrivacy,#cfgCatAccount{display:block!important;width:100%;}
-#cfgCatChat,#cfgCatNotifications{display:none!important}
-/* Keep only theme toggle in Appearance */
-#cfgCatAppearance>.cfg-sec-title:not(:first-child),
-#cfgCatAppearance>.cfg-card:not(:first-of-type),
-#cfgCatAppearance>.cfg-card:first-of-type .opt:nth-child(n+2){display:none!important}
-/* Keep only Block List button in Privacy */
-#cfgCatPrivacy>.cfg-sec-title,#cfgCatPrivacy>.cfg-card .opt:not(#o7),
-#chatActionSec,#chatActionCard{display:none!important}
-#blockedList{display:none;padding:4px 0} #blockedList.show{display:block}
-/* Profile is shown only after tapping Your Profile */
-#cfgCatAccount{display:none!important}
-#cfgCatAccount.profile-open{display:block!important}
-.sheet{max-height:calc(var(--app-vh,100dvh) - env(safe-area-inset-top,0px));}
-.sheet-body{overflow-y:auto;overscroll-behavior:contain;padding:14px 16px calc(28px + env(safe-area-inset-bottom,0px));display:block!important;-webkit-overflow-scrolling:touch}
-.cfg-panel{min-width:0;flex:none}
-#cfgCatPrivacy>.cfg-card:first-of-type{margin-bottom:10px}
-#cfgCatAccount .profile-email{padding:0 14px 12px;color:var(--mu);font-size:13px;overflow-wrap:anywhere}
-#accAvatar{width:52px;height:52px;border-radius:50%;overflow:hidden;display:flex;align-items:center;justify-content:center;flex:none}
-#accDisplay{cursor:pointer;text-decoration:underline;text-underline-offset:3px}
-#cfgCatAccount .opt{align-items:center}
-.settings-shortcut{width:100%;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px;border:1px solid var(--ln);border-radius:12px;background:var(--surface);margin:8px 0;color:var(--tx);text-align:left}
-.settings-shortcut .shortcut-sub{display:block;color:var(--mu);font-size:12px;margin-top:3px}
-.settings-shortcut svg{width:18px;height:18px;color:var(--mu)}
+/* Blocked list entries */
+.blocked-entry{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 14px;border-bottom:1px solid var(--ln);font-size:13.5px}
+.blocked-entry:last-child{border-bottom:0}
+.blocked-entry button{color:var(--bl);font-weight:600;padding:4px 10px;border-radius:6px;background:var(--bg);border:1px solid var(--ln);font-size:12px}
+
 /* Toast notifications */
-.toast{position:absolute;left:50%;bottom:90px;transform:translate(-50%,20px) scale(.95);background:#1a1d22;border:1px solid var(--ln);box-shadow:0 8px 30px rgba(0,0,0,0.6);color:#fff;padding:10px 18px;border-radius:24px;font-size:13.5px;font-weight:500;opacity:0;transition:opacity .25s cubic-bezier(.3,.8,.3,1),transform .25s cubic-bezier(.3,.8,.3,1);z-index:150;pointer-events:none;white-space:nowrap;display:flex;align-items:center;gap:8px}
+.toast{position:fixed;left:50%;bottom:80px;transform:translate(-50%,20px) scale(.95);background:#1a1d22;border:1px solid var(--ln);box-shadow:0 8px 30px rgba(0,0,0,0.6);color:#fff;padding:9px 16px;border-radius:22px;font-size:13px;font-weight:500;opacity:0;transition:opacity .2s ease,transform .2s ease;z-index:150;pointer-events:none;white-space:nowrap;display:flex;align-items:center;gap:8px}
+:root[data-theme="light"] .toast{background:#ffffff;color:#1c1c1c;box-shadow:0 6px 20px rgba(0,0,0,0.15)}
 .toast.on{opacity:1;transform:translate(-50%,0) scale(1)}
 
 /* Confirmation dialog */
-.conf-dialog{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%) scale(.92);width:min(90%,380px);background:var(--surface);border:1px solid var(--ln);box-shadow:0 20px 60px rgba(0,0,0,0.7);border-radius:18px;padding:22px;z-index:200;opacity:0;pointer-events:none;transition:opacity .25s,transform .25s}
+.conf-dialog{position:fixed;left:50%;top:50%;transform:translate(-50%,-50%) scale(.94);width:min(90%,360px);background:var(--surface);border:1px solid var(--ln);box-shadow:0 20px 60px rgba(0,0,0,0.7);border-radius:16px;padding:20px;z-index:200;opacity:0;pointer-events:none;transition:opacity .2s,transform .2s}
 .conf-dialog.on{opacity:1;transform:translate(-50%,-50%) scale(1);pointer-events:auto}
-.conf-dialog h4{font-size:18px;font-weight:700;margin-bottom:8px}
+.conf-dialog h4{font-size:17px;font-weight:600;margin-bottom:8px}
 .conf-dialog p{font-size:13.5px;color:var(--mu);line-height:1.45;margin-bottom:18px}
 .conf-actions{display:flex;justify-content:flex-end;gap:10px}
 
-/* Auth modal preserved */
+/* Auth screen */
 #auth{position:absolute;inset:0;z-index:20;background:var(--p);display:flex;flex-direction:column;justify-content:center;gap:12px;padding:32px 28px;transition:opacity .35s,transform .35s,visibility .35s;opacity:0;pointer-events:none;transform:translateY(16px);visibility:hidden}
 #auth.show{opacity:1;pointer-events:auto;transform:none;visibility:visible}
-#auth h1{font-size:30px}#auth p.t{color:var(--mu);margin-bottom:8px}
-#auth input{height:46px;border:1px solid var(--ln);border-radius:10px;background:var(--bg);padding:0 14px;font-size:16px;color:var(--tx);outline:0;transition:border-color .2s,box-shadow .2s}
+#auth h1{font-size:26px;font-weight:700;letter-spacing:-0.02em}#auth p.t{color:var(--mu);margin-bottom:8px;font-size:14px}
+#auth input{height:44px;border:1px solid var(--ln);border-radius:10px;background:var(--bg);padding:0 14px;font-size:15px;color:var(--tx);outline:0;transition:border-color .2s,box-shadow .2s}
 #auth input:focus{border-color:var(--bl);box-shadow:0 0 0 3px #0079d322}
-.er{color:#d93a2b;font-size:14px;min-height:0}.ok{color:var(--ok);font-size:14px}
-.big{height:46px;border-radius:23px;font-size:16px}.big:disabled{opacity:.5}
-.lnk{color:var(--bl);font-size:14px;padding:6px}
+.er{color:#d93a2b;font-size:13px;min-height:0}.ok{color:var(--ok);font-size:13px}
+.big{height:44px;border-radius:22px;font-size:15px}.big:disabled{opacity:.5}
+.lnk{color:var(--bl);font-size:13.5px;padding:6px}
 .b pre{background:var(--bg);border-radius:6px;padding:8px;margin-top:6px;overflow-x:auto;font-size:13px}.b code{background:var(--bg);padding:1px 4px;border-radius:4px}
 .tm{color:var(--mu);font-size:12px;flex:none}
-.ban{position:absolute;left:12px;right:12px;top:calc(8px + env(safe-area-inset-top,0px));background:var(--surface);border:1px solid var(--ln);box-shadow:0 8px 30px #0006;border-radius:14px;padding:12px 16px;z-index:80;transform:translateY(-140%);transition:transform .35s cubic-bezier(.3,.8,.3,1);text-align:left}
-.ban.on{transform:none}.ban b{display:block}.ban span{color:var(--mu);font-size:14px;display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ban{position:fixed;left:14px;right:14px;top:calc(10px + env(safe-area-inset-top,0px));background:var(--surface);border:1px solid var(--ln);box-shadow:0 8px 30px #0006;border-radius:14px;padding:12px 16px;z-index:80;transform:translateY(-140%);transition:transform .3s cubic-bezier(.2,.8,.2,1);text-align:left}
+.ban.on{transform:none}.ban b{display:block;font-size:14px}.ban span{color:var(--mu);font-size:13px;display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .hr{display:flex;align-items:center;gap:6px}.hr .sb{flex:1}
 </style>
 </head>
 <body>
 <div class="app" id="app">
-
 <!-- Authentication Screen (Preserved) -->
 <section id="auth">
- <h1>Chats</h1>
- <p class="t" id="atag">Sign in to continue</p>
- <input id="em" type="email" placeholder="Email" autocomplete="email" autocapitalize="none">
- <input id="pw" type="password" placeholder="Password (6+ characters)" autocomplete="current-password">
- <p class="er" id="aerr"></p><p class="ok" id="ainf"></p>
- <button class="btn big" id="asub">Sign in</button>
- <button class="lnk" id="rsd" hidden>Resend verification email</button>
- <button class="lnk" id="atog">New here? Create account</button>
+<h1>Chats</h1>
+<p class="t" id="atag">Sign in to continue</p>
+<input autocapitalize="none" autocomplete="email" id="em" placeholder="Email" type="email"/>
+<input autocomplete="current-password" id="pw" placeholder="Password (6+ characters)" type="password"/>
+<p class="er" id="aerr"></p><p class="ok" id="ainf"></p>
+<button class="btn big" id="asub">Sign in</button>
+<button class="lnk" hidden="" id="rsd">Resend verification email</button>
+<button class="lnk" id="atog">New here? Create account</button>
 </section>
-
 <!-- Main Conversation List Screen -->
-<section class="scr" id="list">
- <div class="top">
-  <div class="hr">
-   <label class="sb">
-    <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.5-4.5"/></svg>
-    <input id="q" placeholder="Search by username" autocomplete="off" autocapitalize="none">
-    <button id="clr" aria-label="Clear"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
-   </label>
-   <!-- Settings Button on main list -->
-   <button class="ib gear" id="acc" aria-label="Settings" title="Settings">
-    <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M4.9 19.1L7 17M17 7l2.1-2.1"/></svg>
-   </button>
-  </div>
-  <div class="tabs">
-   <button class="tab on" data-t="0">Rooms</button>
-   <button class="tab" data-t="1">Directs<span id="b1"></span></button>
-   <i class="ind" id="ind"></i>
-  </div>
- </div>
- <div class="body">
-  <div class="panes" id="panes"><div class="pane" id="p0"></div><div class="pane" id="p1"></div></div>
-  <div id="srch"></div>
- </div>
-</section>
+<style id="reddit-theme-styles">
+:root{
+  --rd-orange:#ff4500;
+  --rd-orange-hover:#e03d00;
+  --rd-bg-dark:#0e1113;
+  --rd-surface-dark:#1a1a1b;
+  --rd-surface-hover-dark:#272729;
+  --rd-border-dark:#343536;
+  --rd-text-dark:#d7dadc;
+  --rd-sub-dark:#818384;
+}
+:root[data-theme="dark"]{
+  --bg:#0e1113;
+  --p:#0e1113;
+  --surface:#1a1a1b;
+  --surface-hover:#272729;
+  --tx:#d7dadc;
+  --mu:#818384;
+  --ln:#343536;
+  --bl:#ff4500;
+  --mine:#ff4500;
+  --bd:#343536;
+  --hd:#0e1113;
+  --ok:#24a0ed;
+}
+:root[data-theme="light"]{
+  --bg:#ffffff;
+  --p:#ffffff;
+  --surface:#f6f7f8;
+  --surface-hover:#eaedef;
+  --tx:#1c1c1c;
+  --mu:#7c7c7c;
+  --ln:#edeff1;
+  --bl:#ff4500;
+  --mine:#ff4500;
+  --bd:#e2e5e7;
+  --hd:#ffffff;
+  --ok:#24a0ed;
+}
 
-<!-- Active Chat View -->
-<section class="scr" id="chat">
- <header>
-  <button class="ib" id="back" aria-label="Back">
-   <svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg>
-  </button>
-  <div class="ht"><b id="ttl"></b><span id="sbt"></span></div>
-  <!-- Settings Button on chat view -->
-  <button class="ib gear" id="gear" aria-label="Settings" title="Chat Settings">
-   <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M4.9 19.1L7 17M17 7l2.1-2.1"/></svg>
-  </button>
- </header>
- <div id="msgs"><div class="typ" id="typ"></div></div>
- <div class="cmp">
-  <div class="sug" id="sug"></div>
-  <div class="compose-row">
-   <textarea id="inp" rows="1" placeholder="Message" autocomplete="off" autocorrect="off" autocapitalize="sentences" spellcheck="false" enterkeyhint="send" data-lpignore="true" data-1p-ignore="true"></textarea>
-   <button class="ib" id="snd" aria-label="Send">
-    <svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
-   </button>
-  </div>
- </div>
-</section>
+/* Reddit-styled Top bar & Search */
+#list .top{padding:14px 16px 0;background:var(--hd);border-bottom:1px solid var(--ln)}
+#list .hr{gap:10px}
+#list .sb{background:var(--surface);border:1px solid var(--ln);border-radius:9999px;height:40px;padding:0 14px;transition:border-color .2s,background .2s,box-shadow .2s}
+#list .sb:hover{background:var(--surface-hover);border-color:var(--mu)}
+#list .sb:focus-within{background:var(--p);border-color:var(--rd-orange);box-shadow:0 0 0 1px var(--rd-orange)}
+#list .sb input{font-size:14px;font-weight:400;color:var(--tx)}
+#list .sb input::placeholder{color:var(--mu)}
+#acc{background:transparent;border:1px solid transparent;border-radius:9999px;transition:background .2s,border-color .2s,color .2s}
+#acc:hover{background:var(--surface-hover);border-color:var(--ln);color:var(--tx)}
 
-<!-- Scrim for modal overlays -->
-<div class="scrim" id="scrim"></div>
+/* Reddit-style Feed / Navigation Tabs */
+#list .tabs{border-bottom:0;margin-top:10px;padding:0 4px 6px;gap:8px}
+#list .tab{flex:none;padding:7px 16px;border-radius:9999px;font-size:13.5px;font-weight:700;color:var(--mu);background:transparent;transition:background .15s,color .15s;text-align:center}
+#list .tab:hover{background:var(--surface-hover);color:var(--tx)}
+#list .tab.on{background:var(--surface-hover);color:var(--tx)}
+:root[data-theme="dark"] #list .tab.on{background:#272729;color:#ffffff}
+:root[data-theme="light"] #list .tab.on{background:#eaedef;color:#000000}
+#list .ind{display:none}
 
-<!-- Redesigned Modern Settings Interface -->
-<div class="sheet" id="sheet">
- <div class="sheet-handle"></div>
- <div class="sheet-header">
-  <div class="sheet-header-left">
-   <h3 class="sheet-title" id="sh">Settings</h3>
-  </div>
-  <button class="sheet-close" id="sheetClose" aria-label="Close Settings">
-   <svg viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12"/></svg>
-  </button>
- </div>
+/* Reddit-styled Chat Rows & AI Room */
+#list .body{padding-top:4px}
+#list .pane{padding:6px 12px 24px}
+#list .sec{font-size:11px;font-weight:800;letter-spacing:.08em;color:var(--mu);text-transform:uppercase;padding:12px 6px 6px;border-bottom:0}
+#list .room{border-radius:12px;padding:10px 12px;margin:0;width:100%;font-size:14px;font-weight:600;color:var(--tx);transition:background .15s}
+#list .room:hover{background:var(--surface-hover)}
+#list .room.sel{background:var(--surface-hover);color:var(--tx)}
+#list .room svg{color:var(--rd-orange);opacity:1;width:20px;height:20px}
+#list .row{border-radius:12px;padding:9px 12px;margin:2px 0;transition:background .15s,opacity .25s;gap:12px}
+#list .row:hover{background:var(--surface-hover)}
+#list .row:active{background:var(--surface-hover);opacity:.9}
+#list .nm{font-weight:600;font-size:14px;color:var(--tx);letter-spacing:-0.01em}
+#list .sub{font-size:12.5px;color:var(--mu);margin-top:2px}
+#list .tm{font-size:11.5px;color:var(--mu);font-weight:500}
+.badge{background:var(--rd-orange);font-weight:700}
 
- <!-- Categorized Navigation for Settings (Hidden for simplified 3-item UI) -->
- <div class="cfg-nav" id="cfgNav">
-  <button class="cfg-tab active" data-cfg="appearance">Appearance</button>
-  <button class="cfg-tab" data-cfg="chat">Chat Experience</button>
-  <button class="cfg-tab" data-cfg="privacy">Privacy</button>
-  <button class="cfg-tab" data-cfg="notifications">Notifications</button>
-  <button class="cfg-tab" data-cfg="account">Account</button>
- </div>
+/* Reddit Pill Button standard */
+.btn{background:var(--rd-orange);border-radius:9999px;font-weight:700;letter-spacing:-0.01em}
+.btn:hover{background:var(--rd-orange-hover);filter:none}
+.btn.gh{background:transparent;border:1px solid var(--ln);color:var(--tx)}
+.btn.gh:hover{background:var(--surface-hover);border-color:var(--mu)}
 
- <div class="sheet-body" id="sheetBody">
-  <!-- Simple settings menu: 1. Dark/Light Mode, 2. Block List, 3. Your Profile -->
-  <button type="button" class="settings-shortcut" id="openProfileSettings"><span><strong>Your Profile</strong><span class="shortcut-sub">Username, email, profile photo and logout</span></span><svg viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></svg></button>
-  
-  <!-- Dynamic Category Sections -->
-  <div id="cfgCatAppearance" class="cfg-panel">
-   <div class="cfg-sec-title">Theme & Contrast</div>
-   <div class="cfg-card">
-    <div class="opt" id="o1" role="button">
-     <div class="opt-info">
-      <span class="opt-label">Dark mode / Light mode</span>
-      <span class="opt-desc">True pure black background for battery saving</span>
-     </div>
-     <i class="sw" id="s1"></i>
-    </div>
-    <div class="opt">
-     <div class="opt-info">
-      <span class="opt-label">Reduce UI Animations</span>
-      <span class="opt-desc">Minimize motion and transitions for performance</span>
-     </div>
-     <i class="sw" id="swReduceMotion"></i>
-    </div>
-   </div>
+/* Reddit Settings Drawer styling */
+.sheet{max-width:410px;background:var(--p);border-left:1px solid var(--ln);box-shadow:-12px 0 40px rgba(0,0,0,0.6)}
+.sheet-header{padding:14px 20px;min-height:60px;background:var(--hd);border-bottom:1px solid var(--ln)}
+.sheet-title{font-size:16px;font-weight:700;letter-spacing:-0.01em;color:var(--tx)}
+.sheet-close,.sheet-back{border-radius:9999px;transition:background .2s,color .2s}
+.sheet-close:hover,.sheet-back:hover{background:var(--surface-hover);color:var(--tx)}
+.sheet-body{padding:16px 20px calc(24px + env(safe-area-inset-bottom,0px))}
 
-   <div class="cfg-sec-title">Chat Typography & Layout</div>
-   <div class="cfg-card">
-    <div class="opt">
-     <div class="opt-info">
-      <span class="opt-label">Message Bubble Style</span>
-      <span class="opt-desc">Geometry of received and sent bubbles</span>
-     </div>
-     <select class="cfg-select" id="selBubbleStyle">
-      <option value="classic">Classic Rounded</option>
-      <option value="compact">Subtle Minimal</option>
-      <option value="round">Pill Full-Round</option>
-     </select>
-    </div>
-    <div class="opt">
-     <div class="opt-info">
-      <span class="opt-label">Chat Font Size</span>
-      <span class="opt-desc">Adjust reading scale for all conversations</span>
-     </div>
-     <select class="cfg-select" id="selFontSize">
-      <option value="sm">Small (13px)</option>
-      <option value="md" selected>Default (15px)</option>
-      <option value="lg">Large (17px)</option>
-     </select>
-    </div>
-    <div class="opt">
-     <div class="opt-info">
-      <span class="opt-label">Chat Density</span>
-      <span class="opt-desc">Vertical spacing between bubbles</span>
-     </div>
-     <select class="cfg-select" id="selDensity">
-      <option value="comfortable" selected>Comfortable</option>
-      <option value="compact">Compact</option>
-     </select>
-    </div>
-    <div class="opt">
-     <div class="opt-info">
-      <span class="opt-label">Chat Wallpaper Pattern</span>
-      <span class="opt-desc">Subtle procedural canvas texture</span>
-     </div>
-     <select class="cfg-select" id="selBgPattern">
-      <option value="clean" selected>Pure AMOLED (None)</option>
-      <option value="dots">Subtle Dots</option>
-      <option value="grid">Minimal Grid</option>
-     </select>
-    </div>
-   </div>
+/* Reddit Category Titles & Options Card */
+.cfg-sec-title{font-size:11px;font-weight:800;color:var(--mu);text-transform:uppercase;letter-spacing:.08em;margin:20px 0 8px 4px}
+.cfg-card{background:var(--surface);border:1px solid var(--ln);border-radius:16px;overflow:hidden;margin-bottom:16px}
+.opt{padding:14px 16px;border-bottom:1px solid var(--ln);transition:background .15s;font-size:14px}
+.opt:last-child{border-bottom:0}
+.opt:hover{background:var(--surface-hover)}
+.opt-label{font-weight:600;font-size:13.5px;color:var(--tx)}
+.opt-desc{font-size:12px;color:var(--mu);margin-top:2px}
 
-   <div class="cfg-card">
-    <button class="opt" id="btnResetAppearance">
-     <div class="opt-info">
-      <span class="opt-label">Reset Appearance Settings</span>
-      <span class="opt-desc">Revert visual options to default without touching chats</span>
-     </div>
-     <svg viewBox="0 0 24 24"><path d="M3 12a9 9 0 109-9 9.75 9.75 0 00-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
-    </button>
-   </div>
-  </div>
+/* Reddit-style Toggle Switch */
+.sw{width:46px;height:26px;border-radius:9999px;background:var(--ln);transition:background .2s ease}
+.sw:after{width:22px;height:22px;top:2px;left:2px;border-radius:50%;box-shadow:0 1px 4px rgba(0,0,0,0.35);transition:transform .2s cubic-bezier(.34,1.56,.64,1)}
+.sw.on{background:var(--rd-orange)}
+.sw.on:after{transform:translateX(20px)}
 
-  <div id="cfgCatChat" class="cfg-panel" style="display:none">
-   <div class="cfg-sec-title">Input & Behavior</div>
-   <div class="cfg-card">
-    <div class="opt">
-     <div class="opt-info">
-      <span class="opt-label">Send with Enter Key</span>
-      <span class="opt-desc">Press Enter to send message, Shift+Enter for newline</span>
-     </div>
-     <i class="sw" id="swEnterSend"></i>
-    </div>
-    <div class="opt">
-     <div class="opt-info">
-      <span class="opt-label">Auto-Scroll to Latest</span>
-      <span class="opt-desc">Smoothly jump to bottom on new incoming messages</span>
-     </div>
-     <i class="sw" id="swAutoScroll"></i>
-    </div>
-    <div class="opt">
-     <div class="opt-info">
-      <span class="opt-label">Message Timestamps</span>
-      <span class="opt-desc">Display relative send time next to usernames</span>
-     </div>
-     <i class="sw" id="swTimestamps"></i>
-    </div>
-   </div>
-  </div>
-
-  <div id="cfgCatPrivacy" class="cfg-panel" style="display:none">
-   <div class="cfg-sec-title">Local Privacy Controls</div>
-   <div class="cfg-card">
-    <div class="opt">
-     <div class="opt-info">
-      <span class="opt-label">Hide Message Previews</span>
-      <span class="opt-desc">Blurs chat previews in the conversation list</span>
-     </div>
-     <i class="sw" id="swHidePreview"></i>
-    </div>
-    <button class="opt" id="o7">
-     <div class="opt-info">
-      <span class="opt-label">Blocked Users</span>
-      <span class="opt-desc">Manage operators blocked on your account</span>
-     </div>
-     <svg viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"/></svg>
-    </button>
-    <div id="blockedList"></div>
-   </div>
-
-   <div class="cfg-sec-title" id="chatActionSec" style="display:none">Current Conversation Action</div>
-   <div class="cfg-card" id="chatActionCard" style="display:none">
-    <button class="opt red" id="o8" style="display:none">
-     <div class="opt-info"><span class="opt-label" id="o8Label">Block user</span></div>
-    </button>
-    <button class="opt red" id="o3">
-     <div class="opt-info"><span class="opt-label">Delete chat</span><span class="opt-desc">Hide this conversation from your list</span></div>
-    </button>
-   </div>
-  </div>
-
-  <div id="cfgCatNotifications" class="cfg-panel" style="display:none">
-   <div class="cfg-sec-title">Alerts & In-App Banners</div>
-   <div class="cfg-card">
-    <div class="opt" id="o2">
-     <div class="opt-info">
-      <span class="opt-label">Mute In-App Notifications</span>
-      <span class="opt-desc">Silence top banner alerts for incoming messages</span>
-     </div>
-     <i class="sw" id="s2"></i>
-    </div>
-    <div class="opt">
-     <div class="opt-info">
-      <span class="opt-label">Audio Chime</span>
-      <span class="opt-desc">Play a subtle ping when receiving messages</span>
-     </div>
-     <i class="sw" id="swSoundAlert"></i>
-    </div>
-   </div>
-  </div>
-
-  <div id="cfgCatAccount" class="cfg-panel" style="display:none">
-   <div class="cfg-sec-title">Your Profile</div>
-   <div class="cfg-card">
-    <div class="opt" style="gap:12px">
-     <div id="accAvatar"> </div>
-     <div class="opt-info" style="min-width:0">
-      <span class="opt-label" id="accDisplay" role="button" title="Tap to copy username">Username</span>
-      <span class="opt-desc" id="accHandle">@username</span>
-     </div>
-    </div>
-    <div class="profile-email" id="accEmail">Email not available</div>
-    <button class="opt" id="o4">
-     <div class="opt-info">
-      <span class="opt-label">Copy My ID</span>
-      <span class="opt-desc">Copy your username to clipboard</span>
-     </div>
-     <svg viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
-    </button>
-    <button class="opt" id="o6">
-     <div class="opt-info">
-      <span class="opt-label">Change Profile Photo</span>
-      <span class="opt-desc">Upload a custom avatar for all rooms</span>
-     </div>
-     <svg viewBox="0 0 24 24"><path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z"/><circle cx="12" cy="13" r="4"/></svg>
-    </button>
-   </div>
-
-   <div class="cfg-sec-title">System & Security</div>
-   <div class="cfg-card">
-    <button class="opt" id="btnRestoreAllDefaults">
-     <div class="opt-info">
-      <span class="opt-label">Restore Default Preferences</span>
-      <span class="opt-desc">Reset all local app configurations to factory settings</span>
-     </div>
-    </button>
-    <button class="opt red" id="o5">
-     <div class="opt-info">
-      <span class="opt-label">Log Out</span>
-      <span class="opt-desc">Safely end your session</span>
-     </div>
-     <svg viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9"/></svg>
-    </button>
-   </div>
-   <p style="font-size:12px;color:var(--mu);text-align:center;padding:12px 0 4px">Chats Client v2.4 · Yuki Hybrid Protocol</p>
-  </div>
- </div>
+/* Reddit-style Profile & Form Inputs in Settings */
+.profile-card-top{padding:16px 16px;border-bottom:1px solid var(--ln);background:transparent}
+.profile-input-group{padding:14px 16px;border-bottom:1px solid var(--ln)}
+.profile-input-label{font-size:11.5px;font-weight:700;color:var(--mu);letter-spacing:.06em}
+.profile-input{border-radius:12px;height:42px;padding:0 12px;font-size:14px;background:var(--p);border:1px solid var(--ln);transition:border-color .2s,box-shadow .2s}
+.profile-input:focus{border-color:var(--rd-orange);box-shadow:0 0 0 1px var(--rd-orange)}
+.profile-save-row{padding:14px 16px}
+#accAvatar{border:2px solid var(--ln);box-shadow:0 2px 8px rgba(0,0,0,0.15)}
+</style><section class="scr" id="list">
+<div class="top">
+<div class="hr">
+<label class="sb">
+<svg viewbox="0 0 24 24"><circle cx="11" cy="11" r="7"></circle><path d="M21 21l-4.5-4.5"></path></svg>
+<input autocapitalize="none" autocomplete="off" id="q" placeholder="Search by username"/>
+<button aria-label="Clear" id="clr"><svg viewbox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"></path></svg></button>
+</label>
+<!-- Settings Button on main list -->
+<button aria-label="Settings" class="ib gear" id="acc" title="Settings">
+<svg viewbox="0 0 24 24"><circle cx="12" cy="12" r="3"></circle><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M4.9 19.1L7 17M17 7l2.1-2.1"></path></svg>
+</button>
 </div>
-
+<div class="tabs">
+<button class="tab on" data-t="0">Rooms</button>
+<button class="tab" data-t="1">Directs<span id="b1"></span></button>
+<i class="ind" id="ind"></i>
+</div>
+</div>
+<div class="body">
+<div class="panes" id="panes"><div class="pane" id="p0"></div><div class="pane" id="p1"></div></div>
+<div id="srch"></div>
+</div>
+</section>
+<!-- Active Chat View with Refined Balanced Header & DP -->
+<section class="scr" id="chat">
+<header>
+<button aria-label="Back" class="ib" id="back">
+<svg viewbox="0 0 24 24"><path d="M15 18l-6-6 6-6"></path></svg>
+</button>
+<div class="header-profile" id="headerProfile">
+<div id="headerAv"></div>
+<div class="ht">
+<b id="ttl"></b>
+<span id="sbt"></span>
+</div>
+</div>
+<!-- Settings Button on chat view -->
+<button aria-label="Settings" class="ib gear" id="gear" title="Chat Settings">
+<svg viewbox="0 0 24 24"><circle cx="12" cy="12" r="3"></circle><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M4.9 19.1L7 17M17 7l2.1-2.1"></path></svg>
+</button>
+</header>
+<div id="msgs"><div class="typ" id="typ"></div></div>
+<div class="cmp">
+<div class="sug" id="sug"></div>
+<div class="compose-row">
+<textarea autocapitalize="sentences" autocomplete="off" autocorrect="off" data-1p-ignore="true" data-lpignore="true" enterkeyhint="send" id="inp" placeholder="Message" rows="1" spellcheck="false"></textarea>
+<button aria-label="Send" class="ib" id="snd">
+<svg viewbox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"></path></svg>
+</button>
+</div>
+</div>
+</section>
+</div>
+<!-- Scrim for Settings Side Panel and Modals -->
+<div class="scrim" id="scrim"></div>
+<!-- Independent Settings Side Panel -->
+<aside aria-label="Settings Side Panel" class="sheet" id="sheet">
+<div class="sheet-header">
+<div class="sheet-header-left">
+<button aria-label="Back to main settings" class="sheet-back" id="sheetBack">
+<svg viewbox="0 0 24 24"><path d="M15 18l-6-6 6-6"></path></svg>
+</button>
+<h3 class="sheet-title" id="sh">Settings</h3>
+</div>
+<button aria-label="Close Settings" class="sheet-close" id="sheetClose">
+<svg viewbox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12"></path></svg>
+</button>
+</div>
+<div class="sheet-body" id="sheetBody">
+<!-- View 1: Main Settings (3 Core Options) -->
+<div class="settings-view active" id="viewSettingsMain">
+<div class="cfg-sec-title">PREFERENCES</div>
+<div class="cfg-card">
+<div class="opt" id="o1" role="button">
+<div class="opt-info">
+<span class="opt-label">Dark Mode / Light Mode</span>
+<span class="opt-desc" id="themeStatusDesc">Switch between dark and light themes</span>
+</div>
+<i class="sw" id="s1"></i>
+</div>
+</div>
+<div class="cfg-sec-title">ACCOUNT &amp; PRIVACY</div>
+<div class="cfg-card">
+<button class="opt" id="btnOpenProfile" type="button">
+<div class="opt-info">
+<span class="opt-label">Your Profile</span>
+<span class="opt-desc">Edit display name, username, photo, and account</span>
+</div>
+<svg viewbox="0 0 24 24"><path d="M9 18l6-6-6-6"></path></svg>
+</button>
+<button class="opt" id="btnOpenBlockList" type="button">
+<div class="opt-info">
+<span class="opt-label">Block List</span>
+<span class="opt-desc">View and manage blocked users</span>
+</div>
+<svg viewbox="0 0 24 24"><path d="M9 18l6-6-6-6"></path></svg>
+</button>
+</div>
+<div class="cfg-sec-title" id="chatActionSec" style="display:none">CHAT ACTIONS</div>
+<div class="cfg-card" id="chatActionCard" style="display:none">
+<button class="opt red" id="o8" style="display:none">
+<div class="opt-info"><span class="opt-label" id="o8Label">Block user</span></div>
+</button>
+<button class="opt red" id="o3">
+<div class="opt-info"><span class="opt-label">Delete chat</span><span class="opt-desc">Hide this conversation from your list</span></div>
+</button>
+</div>
+</div>
+<!-- View 2: Your Profile & Editing (Display Name + Unique Username) -->
+<div class="settings-view" id="viewSettingsProfile">
+<div class="cfg-sec-title">Profile Info</div>
+<div class="cfg-card">
+<div class="profile-card-top">
+<div id="accAvatar"></div>
+<div class="opt-info">
+<button class="btn gh" id="o6" style="padding:6px 12px;font-size:12.5px" type="button">Change Photo</button>
+<span class="opt-desc" style="margin-top:4px">Upload a custom profile image</span>
+</div>
+</div>
+<!-- Edit Display Name (Duplicate allowed) -->
+<div class="profile-input-group">
+<label class="profile-input-label" for="editDisplayName">Display Name</label>
+<input class="profile-input" id="editDisplayName" maxlength="32" placeholder="e.g. Alex Operator" type="text"/>
+<div class="profile-input-hint">Visible to everyone in rooms and chats. Multiple users can share this name.</div>
+</div>
+<!-- Edit Username (Unique constraint) -->
+<div class="profile-input-group">
+<label class="profile-input-label" for="editUsername">Username (@unique)</label>
+<input autocapitalize="none" autocomplete="off" class="profile-input" id="editUsername" maxlength="20" placeholder="e.g. alex_ops" spellcheck="false" type="text"/>
+<div class="profile-input-hint">Unique identifier used for search and mentions. Letters, numbers, and underscores only.</div>
+<div class="profile-input-err" id="usernameErr"></div>
+</div>
+<!-- Email (Firebase Authenticated Email, Read-Only) -->
+<div class="profile-input-group">
+<span class="profile-input-label">Account Email</span>
+<div id="accEmail" style="font-size:13.5px;color:var(--mu);padding:4px 0">Loading...</div>
+</div>
+<div class="profile-save-row">
+<button class="btn" id="btnSaveProfile" type="button">Save Changes</button>
+</div>
+</div>
+<div class="cfg-sec-title">Quick Actions</div>
+<div class="cfg-card">
+<button class="opt" id="o4" type="button">
+<div class="opt-info">
+<span class="opt-label">Copy Username</span>
+<span class="opt-desc" id="accHandle">@username</span>
+</div>
+<svg viewbox="0 0 24 24"><rect height="13" rx="2" ry="2" width="13" x="9" y="9"></rect><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"></path></svg>
+</button>
+<button class="opt red" id="o5" type="button">
+<div class="opt-info">
+<span class="opt-label">Log Out</span>
+<span class="opt-desc">Safely end your current session</span>
+</div>
+<svg viewbox="0 0 24 24"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9"></path></svg>
+</button>
+</div>
+</div>
+<!-- View 3: Block List Subview -->
+<div class="settings-view" id="viewSettingsBlockList">
+<div class="cfg-sec-title">Blocked Operators</div>
+<div class="cfg-card" id="blockedListContainer">
+<div id="blockedList"></div>
+</div>
+</div>
+</div>
+</aside>
 <!-- Confirmation Modal Dialog -->
 <div class="conf-dialog" id="confDialog">
- <h4 id="confTitle">Are you sure?</h4>
- <p id="confMsg">This action cannot be undone.</p>
- <div class="conf-actions">
-  <button class="btn gh" id="confCancel">Cancel</button>
-  <button class="btn danger" id="confConfirm">Confirm</button>
- </div>
+<h4 id="confTitle">Are you sure?</h4>
+<p id="confMsg">This action cannot be undone.</p>
+<div class="conf-actions">
+<button class="btn gh" id="confCancel">Cancel</button>
+<button class="btn danger" id="confConfirm">Confirm</button>
 </div>
-
+</div>
 <button class="ban" id="ban"><b id="bs"></b><span id="bp"></span></button>
-<input id="photoFile" type="file" accept="image/*" hidden>
+<input accept="image/*" hidden="" id="photoFile" type="file"/>
 <div class="toast" id="toast"></div>
-
-</div>
-
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-app.js";
 import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged, setPersistence, browserLocalPersistence, sendEmailVerification } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-auth.js";
-import { getFirestore, doc, getDoc, setDoc, updateDoc, addDoc, collection, query, where, orderBy, limit, onSnapshot, serverTimestamp, getDocs, increment } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-firestore.js";
+import { getFirestore, doc, getDoc, setDoc, updateDoc, addDoc, collection, query, where, orderBy, limit, onSnapshot, serverTimestamp, getDocs, increment, runTransaction } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-firestore.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyDZWHHSGkbdN5NLRdBKwecHHf7m2yu5cAk",
@@ -640,101 +624,21 @@ const IC='<svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 
 
 let ME=null,P=null,peer=null,cid=null,chans=[],uM=null,uS=null,uP=null,uR=null,signup=false,muted=false,tab=0,painted=false,seen=new Set(),tbt=null,lt=0,lp=0,bt=null,hist=[],sd=null,sr={q:'',res:[],busy:false},armed=null,forceBottom=false,selectedDirect=null,longPressTimer=null,longPressTriggered=false;
 
-/* --- PREFERENCES SYSTEM (LOCAL STORAGE SAFE) --- */
-const PREF_KEY='yuki_chat_user_prefs_v2';
-const DEFAULT_PREFS = {
-  theme: 'dark',
-  reduceMotion: false,
-  bubbleStyle: 'classic',
-  fontSize: 'md',
-  density: 'comfortable',
-  bgPattern: 'clean',
-  enterToSend: true,
-  autoScroll: true,
-  timestamps: true,
-  hidePreview: false,
-  soundAlert: false,
-  muted: false
-};
-let userPrefs = { ...DEFAULT_PREFS };
+/* --- THEME RESTORATION & PERSISTENCE --- */
+const THEME_KEY = 'yuki_app_theme';
+let currentTheme = localStorage.getItem(THEME_KEY) || 'dark';
 
-function loadPreferences() {
-  try {
-    const raw = localStorage.getItem(PREF_KEY);
-    if (raw) {
-      const parsed = JSON.parse(raw);
-      userPrefs = { ...DEFAULT_PREFS, ...parsed };
-    }
-  } catch(e) {
-    userPrefs = { ...DEFAULT_PREFS };
-  }
-  applyPreferences(false);
+function applyTheme(theme, notify = false) {
+  currentTheme = theme === 'light' ? 'light' : 'dark';
+  document.documentElement.setAttribute('data-theme', currentTheme);
+  try { localStorage.setItem(THEME_KEY, currentTheme); } catch(e) {}
+  const sw = $('s1');
+  if (sw) sw.classList.toggle('on', currentTheme === 'dark');
+  const desc = $('themeStatusDesc');
+  if (desc) desc.textContent = currentTheme === 'dark' ? 'Dark theme active' : 'Light theme active';
+  if (notify) toast(currentTheme === 'dark' ? 'Dark mode enabled' : 'Light mode enabled');
 }
-
-function savePreferences() {
-  try {
-    localStorage.setItem(PREF_KEY, JSON.stringify(userPrefs));
-  } catch(e) {
-    console.warn('Could not persist preferences', e);
-  }
-}
-
-function applyPreferences(showToastNotice = true) {
-  const root = document.documentElement;
-  // Theme
-  root.dataset.theme = userPrefs.theme;
-  $('s1')?.classList.toggle('on', userPrefs.theme === 'dark');
-  
-  // Customization tokens
-  root.dataset.reduceMotion = String(userPrefs.reduceMotion);
-  $('swReduceMotion')?.classList.toggle('on', !!userPrefs.reduceMotion);
-
-  root.dataset.bubbleStyle = userPrefs.bubbleStyle;
-  if ($('selBubbleStyle')) $('selBubbleStyle').value = userPrefs.bubbleStyle;
-
-  root.dataset.fontSize = userPrefs.fontSize;
-  if ($('selFontSize')) $('selFontSize').value = userPrefs.fontSize;
-
-  root.dataset.density = userPrefs.density;
-  if ($('selDensity')) $('selDensity').value = userPrefs.density;
-
-  root.dataset.bgPattern = userPrefs.bgPattern;
-  if ($('selBgPattern')) $('selBgPattern').value = userPrefs.bgPattern;
-
-  root.dataset.hidePreview = String(userPrefs.hidePreview);
-  $('swHidePreview')?.classList.toggle('on', !!userPrefs.hidePreview);
-
-  root.dataset.hideTimestamps = String(!userPrefs.timestamps);
-  $('swTimestamps')?.classList.toggle('on', !!userPrefs.timestamps);
-
-  $('swEnterSend')?.classList.toggle('on', !!userPrefs.enterToSend);
-  $('swAutoScroll')?.classList.toggle('on', !!userPrefs.autoScroll);
-  $('swSoundAlert')?.classList.toggle('on', !!userPrefs.soundAlert);
-
-  muted = !!userPrefs.muted;
-  $('s2')?.classList.toggle('on', muted);
-
-  if (showToastNotice) toast('Settings updated');
-}
-
-// Subtle audio chime synthesis without external assets
-function playMessageChime() {
-  if (!userPrefs.soundAlert) return;
-  try {
-    const ctx = new (window.AudioContext || window.webkitAudioContext)();
-    const osc = ctx.createOscillator();
-    const gain = ctx.createGain();
-    osc.type = 'sine';
-    osc.frequency.setValueAtTime(587.33, ctx.currentTime); // D5
-    osc.frequency.exponentialRampToValueAtTime(880, ctx.currentTime + 0.12); // A5
-    gain.gain.setValueAtTime(0.08, ctx.currentTime);
-    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.22);
-    osc.connect(gain);
-    gain.connect(ctx.destination);
-    osc.start();
-    osc.stop(ctx.currentTime + 0.23);
-  } catch(e) {}
-}
+applyTheme(currentTheme, false);
 
 const toast=t=>{const e=$('toast');e.textContent=t;e.classList.add('on');clearTimeout(toast.k);toast.k=setTimeout(()=>e.classList.remove('on'),2200)};
 const tv=ts=>ts?(ts.toDate?ts.toDate():new Date(ts)):null;
@@ -793,7 +697,7 @@ async function submit(){
    const c=await signInWithEmailAndPassword(auth,email,pw);
    if(!c.user.emailVerified){er.textContent='Please verify your email first. Check your inbox.';$('rsd').hidden=false;await signOut(auth)}
   }
- }catch(e){console.error('Submit error:', e);const k=e.code;er.textContent=k==='auth/email-already-in-use'?'This email is already registered. Try signing in.':k==='auth/invalid-email'?'Invalid email address.':k==='auth/weak-password'?'Password too weak. Use 6+ characters.':/user-not-found|wrong-password|invalid-credential/.test(k)?'Invalid email or password.':'Something went wrong. Try again.'}
+ }catch(e){console.error(e);const k=e.code;er.textContent=k==='auth/email-already-in-use'?'This email is already registered. Try signing in.':k==='auth/invalid-email'?'Invalid email address.':k==='auth/weak-password'?'Password too weak. Use 6+ characters.':/user-not-found|wrong-password|invalid-credential/.test(k)?'Invalid email or password.':'Something went wrong. Try again.'}
  finally{b.disabled=false}
 }
 $('rsd').onclick=async()=>{const email=$('em').value.trim().toLowerCase(),pw=$('pw').value;$('aerr').textContent=$('ainf').textContent='';
@@ -809,40 +713,36 @@ onAuthStateChanged(auth,async user=>{
  ME=user;
  try{
   const u=await getDoc(doc(db,'users',user.uid));
-  if(u.exists()){
-    P=u.data();
-  } else {
-    // Missing profile fallback: populate in-memory representation first to never lock existing accounts out
-    const h=(user.email?user.email.split('@')[0]:'operator').replace(/[^a-zA-Z0-9_]/g,'_').toLowerCase();
-    P={username:h,display:h.toUpperCase()+'_UNIT',email:user.email||'',createdAt:serverTimestamp(),lastSeen:serverTimestamp(),emailVerified:true};
-    // Non-destructive background persistence that won't abort login if rules restrict creation
-    setDoc(doc(db,'users',user.uid),P,{merge:true}).catch(err=>console.warn('Profile sync warning:', err));
-    setDoc(doc(db,'usernames',h),{uid:user.uid},{merge:true}).catch(err=>console.warn('Username map warning:', err));
+  if(u.exists())P=u.data();else{
+   const h=(user.email?user.email.split('@')[0]:'operator').replace(/[^a-zA-Z0-9_]/g,'_').toLowerCase();
+   P={username:h,display:h.toUpperCase()+'_UNIT',email:user.email||'',createdAt:serverTimestamp(),lastSeen:serverTimestamp(),emailVerified:true};
+   setDoc(doc(db,'users',user.uid),P,{merge:true}).catch(()=>{});
+   setDoc(doc(db,'usernames',h),{uid:user.uid},{merge:true}).catch(()=>{});
   }
-  
-  // Non-blocking metadata updates: never reject or crash login if rules prevent write
-  if(u.exists()&&u.data().emailVerified!==true) {
-    updateDoc(doc(db,'users',user.uid),{emailVerified:true}).catch(err=>console.warn('emailVerified update ignored:', err));
-  }
-  updateDoc(doc(db,'users',user.uid),{lastSeen:serverTimestamp()}).catch(err=>console.warn('lastSeen update ignored:', err));
-  
-  // Clear auth screen and transition to chat interface
-  $('auth').classList.remove('show');
-  $('rsd').hidden=true;
-  $('pw').value='';
-  if($('accDisplay')) $('accDisplay').textContent = P.display || P.username || 'Operator';
-  if($('accHandle')) $('accHandle').textContent = '@' + (P.username || 'operator');
-  if($('accEmail')) $('accEmail').textContent = ME.email || P.email || 'Email not available';
-  if($('accAvatar')) $('accAvatar').innerHTML = P.photoURL ? `<img src="${esc(P.photoURL)}" alt="Profile" style="width:100%;height:100%;object-fit:cover">` : avProfile(P,44);
-
-  roster();
-  renderLists();
+  if(u.exists()&&u.data().emailVerified!==true)updateDoc(doc(db,'users',user.uid),{emailVerified:true}).catch(()=>{});
+  updateDoc(doc(db,'users',user.uid),{lastSeen:serverTimestamp()}).catch(()=>{});
+  $('auth').classList.remove('show');$('rsd').hidden=true;$('pw').value='';
+  syncProfileUI();
+  roster();renderLists();
  }catch(e){
-  console.error('onAuthStateChanged profile loading error:', e);
-  $('auth').classList.add('show');
-  $('aerr').textContent='Could not load your profile. Check connection and Firestore rules. (' + (e.message || e.code || 'unknown error') + ')';
+  console.error('Profile load warning', e);
+  const h=(user.email?user.email.split('@')[0]:'operator').replace(/[^a-zA-Z0-9_]/g,'_').toLowerCase();
+  P={username:h,display:h.toUpperCase()+'_UNIT',email:user.email||'',createdAt:serverTimestamp(),lastSeen:serverTimestamp(),emailVerified:true};
+  $('auth').classList.remove('show');
+  syncProfileUI();
+  roster();renderLists();
  }
 });
+
+function syncProfileUI(){
+  if (!P) return;
+  if ($('accAvatar')) $('accAvatar').innerHTML = avProfile(P, 56);
+  if ($('accHandle')) $('accHandle').textContent = '@' + (P.username || 'operator');
+  if ($('accEmail')) $('accEmail').textContent = ME?.email || P.email || 'Email not available';
+  if ($('editDisplayName')) $('editDisplayName').value = P.display || P.username || '';
+  if ($('editUsername')) $('editUsername').value = P.username || '';
+  if ($('usernameErr')) { $('usernameErr').textContent = ''; $('usernameErr').classList.remove('show'); }
+}
 
 /* LISTS */
 function renderLists(){
@@ -853,7 +753,7 @@ function renderLists(){
 }
 function roster(){
  uR&&uR();
- uR=onSnapshot(query(collection(db,'chats'),where('users','array-contains',ME.uid)),async snap=>{
+ uR=onSnapshot(query(collection(db,'chats',where('users','array-contains',ME.uid))),async snap=>{
   const list=[];snap.docs.forEach(d=>{const data=d.data(),o=(data.users||[]).find(u=>u!==ME.uid);if(!o||o===YB||gd(ME.uid).includes(o))return;list.push({chatId:d.id,data,otherUid:o})});
   await Promise.all(list.map(async it=>{try{const u=await getDoc(doc(db,'users',it.otherUid));it.profile=u.exists()?u.data():{username:'operative',display:'Operative'}}catch(e){it.profile={username:'operative',display:'Operative'}}}));
   const ms=i=>{const t=i.data.lastMsgAt||i.data.touchAt;return t&&t.toMillis?t.toMillis():0};
@@ -864,8 +764,7 @@ function notify(){
  if(muted||!ME)return;
  for(const c of chans){const u=(c.data.unread&&c.data.unread[ME.uid])||0;
   if(u>0&&!(peer&&peer.uid===c.otherUid&&appEl.classList.contains('open'))){if(Date.now()-lp<3000)return;lp=Date.now();
-   playMessageChime();
-   $('bs').textContent='@'+(c.profile?.username||'operator');$('bp').textContent=userPrefs.hidePreview?'New message':(c.data.lastMsg||'New message');$('ban').classList.add('on');
+   $('bs').textContent='@'+(c.profile?.username||'operator');$('bp').textContent=c.data.lastMsg||'New message';$('ban').classList.add('on');
    $('ban').onclick=()=>{$('ban').classList.remove('on');openChat(c.otherUid,c.profile)};clearTimeout(bt);bt=setTimeout(()=>$('ban').classList.remove('on'),5000);return}}
 }
 
@@ -890,20 +789,20 @@ function paintSearch(){
 function openCommon(){stop();painted=false;seen=new Set();msgs.querySelectorAll('.m,.emp').forEach(e=>e.remove());$('typ').classList.remove('on');$('inp').value='';chg();appEl.classList.add('open')}
 function openYuki(){
  if(!ME)return;openCommon();peer={uid:YB,username:'yuki_ai',display:'Yuki AI Companion',isYuki:true};cid=cidOf(ME.uid,YB);
- $('ttl').textContent=peer.display;$('sbt').textContent='AI companion';$('inp').placeholder='Message';$('o3').hidden=true;subMsgs(cid);renderLists();
+ $('ttl').textContent=peer.display;$('sbt').textContent='AI companion';$('headerAv').innerHTML=avProfile(peer,36);$('inp').placeholder='Message';$('o3').hidden=true;subMsgs(cid);renderLists();
 }
 function openChat(uid,prof){
  if(!ME||!uid)return;openCommon();rmDel(ME.uid,uid);
  const f=chans.find(c=>c.otherUid===uid);prof=prof||(f&&f.profile)||{};
  peer={uid,username:prof.username||'operator',display:prof.display||prof.username||'Operator',photoURL:prof.photoURL||''};cid=cidOf(ME.uid,uid);painted=false;forceBottom=true;
- $('ttl').textContent=peer.display;$('sbt').textContent='@'+peer.username;$('inp').placeholder='Message';$('o3').hidden=false;
+ $('ttl').textContent=peer.display;$('sbt').textContent='@'+peer.username;$('headerAv').innerHTML=avProfile(peer,36);$('inp').placeholder='Message';$('o3').hidden=false;
  $('q').value='';paintSearch();subMsgs(cid);
  const my=cid;uS=onSnapshot(doc(db,'chats',cid),async s=>{
   if(cid!==my||!s.exists())return;const d=s.data();
   if(d.typing&&d.typing[uid]===true){$('sbt').textContent='typing…';return}
-  try{const u=await getDoc(doc(db,'users',uid));if(cid===my&&u.exists()){const x=u.data();peer.username=x.username;peer.display=x.display||x.username;peer.photoURL=x.photoURL||'';$('ttl').textContent=peer.display;$('sbt').textContent=x.lastSeen?`@${x.username} · last active ${ft(x.lastSeen)}`:'@'+x.username}}catch(e){}
+  try{const u=await getDoc(doc(db,'users',uid));if(cid===my&&u.exists()){const x=u.data();peer.username=x.username;peer.display=x.display||x.username;peer.photoURL=x.photoURL||'';$('ttl').textContent=peer.display;$('sbt').textContent=x.lastSeen?`@${x.username} · last active ${ft(x.lastSeen)}`:'@'+x.username;$('headerAv').innerHTML=avProfile(peer,36);}}catch(e){}
  });
- uP=onSnapshot(doc(db,'users',uid),s=>{if(!s.exists()||peer?.uid!==uid)return;const x=s.data();peer.username=x.username||peer.username;peer.display=x.display||x.username||peer.display;peer.photoURL=x.photoURL||'';$('ttl').textContent=peer.display;msgs.querySelectorAll('.m').forEach(el=>{const who=el.querySelector('.who');if(who&&who.firstChild?.textContent===peer.username){const old=el.firstElementChild;if(old)old.outerHTML=avProfile(peer,34)}})});
+ uP=onSnapshot(doc(db,'users',uid),s=>{if(!s.exists()||peer?.uid!==uid)return;const x=s.data();peer.username=x.username||peer.username;peer.display=x.display||x.username||peer.display;peer.photoURL=x.photoURL||'';$('ttl').textContent=peer.display;$('headerAv').innerHTML=avProfile(peer,36);msgs.querySelectorAll('.m').forEach(el=>{const who=el.querySelector('.who');if(who&&who.firstChild?.textContent===peer.username){const old=el.firstElementChild;if(old)old.outerHTML=avProfile(peer,34)}})});
  markSeen(cid);
  setDoc(doc(db,'chats',cid),{users:[ME.uid,uid],[`participants.${ME.uid}`]:true,[`participants.${uid}`]:true,touchAt:serverTimestamp()},{merge:true}).catch(()=>{});
  renderLists();
@@ -921,7 +820,6 @@ function subMsgs(chatId){
   if(snap.empty)h=`<p class="emp">${peer.isYuki?'Say hello to Yuki.':'No messages yet.<br>Send the first one.'}</p>`;
   snap.docs.forEach(d=>{
    const x=d.data({serverTimestamps:'estimate'}),mine=x.by===ME.uid,nu=painted&&!seen.has(d.id);seen.add(d.id);
-   if(nu&&!mine) playMessageChime();
    const nm=mine?P.username:peer.username,tk='';
    const b=`<div class="b${mine?' g':''}${nu?' pop':''}" data-id="${esc(d.id)}">${fmt(x.text||'')}${tk}</div>`;
    if(prev===x.by){h=h.replace(/<\/div><\/div>$/,b+'</div></div>')}
@@ -929,7 +827,7 @@ function subMsgs(chatId){
    prev=x.by;
   });
   $('typ').insertAdjacentHTML('beforebegin',h);
-  if(initialLoad || forceBottom || (userPrefs.autoScroll && near)){requestAnimationFrame(()=>{msgs.style.scrollBehavior='auto';msgs.scrollTop=msgs.scrollHeight;requestAnimationFrame(()=>{msgs.scrollTop=msgs.scrollHeight});forceBottom=false})}else{requestAnimationFrame(()=>{msgs.style.scrollBehavior='auto';msgs.scrollTop=oldTop})}
+  if(initialLoad || forceBottom || near){requestAnimationFrame(()=>{msgs.style.scrollBehavior='auto';msgs.scrollTop=msgs.scrollHeight;requestAnimationFrame(()=>{msgs.scrollTop=msgs.scrollHeight});forceBottom=false})}else{requestAnimationFrame(()=>{msgs.style.scrollBehavior='auto';msgs.scrollTop=oldTop})}
   painted=true;markSeen(chatId);
  },e=>{console.error('Messages error',e);toast('Could not load messages')});
 }
@@ -975,30 +873,35 @@ async function mention(n){
   const u=await getDoc(doc(db,'users',ud.data().uid));openChat(ud.data().uid,u.exists()?u.data():null)}catch(e){toast('User not found')}
 }
 
-/* SETTINGS SHEET CONTROLLER */
-let activeContext = 'acc';
-function switchSettingsTab(category) {
-  document.querySelectorAll('.cfg-tab').forEach(b => {
-    b.classList.toggle('active', b.dataset.cfg === category);
-  });
-  const panels = {
-    appearance: $('cfgCatAppearance'),
-    chat: $('cfgCatChat'),
-    privacy: $('cfgCatPrivacy'),
-    notifications: $('cfgCatNotifications'),
-    account: $('cfgCatAccount')
-  };
-  Object.keys(panels).forEach(k => {
-    if (panels[k]) panels[k].style.display = (k === category) ? 'block' : 'none';
-  });
+/* SETTINGS SIDE PANEL CONTROLLER */
+let activeSettingsView = 'main'; // 'main', 'profile', 'blocklist'
+
+function setSettingsView(v) {
+  activeSettingsView = v;
+  $('viewSettingsMain').classList.toggle('active', v === 'main');
+  $('viewSettingsProfile').classList.toggle('active', v === 'profile');
+  $('viewSettingsBlockList').classList.toggle('active', v === 'blocklist');
+
+  const backBtn = $('sheetBack');
+  const title = $('sh');
+  if (v === 'main') {
+    backBtn.classList.remove('show');
+    title.textContent = 'Settings';
+  } else if (v === 'profile') {
+    backBtn.classList.add('show');
+    title.textContent = 'Your Profile';
+    syncProfileUI();
+  } else if (v === 'blocklist') {
+    backBtn.classList.add('show');
+    title.textContent = 'Block List';
+    renderBlockedList();
+  }
 }
 
 function sheet(on, ctx='acc'){
- activeContext = ctx;
  if(on){
-  $('sh').textContent = ctx === 'chat' ? ($('ttl').textContent || 'Chat Settings') : ctx === 'direct' ? (selectedDirect?.profile?.display || selectedDirect?.profile?.username || 'Direct Chat') : 'Settings';
-  
-  // Configure conversation-specific actions inside Privacy tab
+  setSettingsView('main');
+  // Configure conversation-specific actions
   const hasChatAction = (ctx==='chat' && !peer?.isYuki) || ctx==='direct';
   if ($('chatActionSec')) $('chatActionSec').style.display = hasChatAction ? 'block' : 'none';
   if ($('chatActionCard')) $('chatActionCard').style.display = hasChatAction ? 'block' : 'none';
@@ -1008,67 +911,124 @@ function sheet(on, ctx='acc'){
     const isBlocked = (P?.blockedUids||[]).includes(targetUid);
     $('o8Label').textContent = isBlocked ? 'Unblock user' : 'Block user';
   }
-  if ($('o3')) {
-    $('o3').style.display = hasChatAction ? 'flex' : 'none';
-  }
+  if ($('o3')) $('o3').style.display = hasChatAction ? 'flex' : 'none';
 
-  // Update profile badges in Account tab
-  if (P) {
-    if ($('accDisplay')) $('accDisplay').textContent = P.display || P.username || 'Operator';
-    if ($('accHandle')) $('accHandle').textContent = '@' + (P.username || 'operator');
-    if ($('accEmail')) $('accEmail').textContent = ME?.email || P.email || 'Email not available';
-    if ($('accAvatar')) $('accAvatar').innerHTML = P.photoURL ? `<img src="${esc(P.photoURL)}" alt="Profile" style="width:100%;height:100%;object-fit:cover">` : avProfile(P,44);
-  }
-
-  renderBlockedList();
-  if ($('blockedList')) $('blockedList').classList.remove('show');
-  $('cfgCatAccount')?.classList.remove('profile-open');
-  if ($('cfgCatAccount')) $('cfgCatAccount').style.removeProperty('display');
-  
-  // Set tab
-  if (ctx === 'chat' || ctx === 'direct') {
-    switchSettingsTab('privacy');
-  } else {
-    switchSettingsTab('appearance');
-  }
+  syncProfileUI();
+  $('s1')?.classList.toggle('on', currentTheme === 'dark');
  }
  armed=null;
- if ($('o3')) $('o3').querySelector('.opt-label').textContent = 'Delete chat';
- if ($('o5')) $('o5').querySelector('.opt-label').textContent = 'Log out';
  $('sheet').classList.toggle('on',on);
  $('scrim').classList.toggle('on',on);
 }
 
 function renderBlockedList(){
- const box=$('blockedList'),ids=P?.blockedUids||[];if(!ids.length){box.innerHTML='<p class="sub" style="padding:10px 14px">No blocked users.</p>';return}
+ const box=$('blockedList'),ids=P?.blockedUids||[];if(!ids.length){box.innerHTML='<p class="emp" style="padding:24px 14px;font-size:13.5px">No blocked users.</p>';return}
  box.innerHTML=ids.map(id=>{const c=chans.find(x=>x.otherUid===id),p=c?.profile||{};return `<div class="blocked-entry"><span>${esc(p.display||p.username||id.slice(0,12))}</span><button data-unblock="${esc(id)}">Unblock</button></div>`}).join('');
 }
+
 async function changePhoto(file){
  if(!file||!ME)return;if(!file.type.startsWith('image/'))return toast('Choose an image file');
  try{const data=await new Promise((resolve,reject)=>{const r=new FileReader();r.onload=()=>resolve(r.result);r.onerror=reject;r.readAsDataURL(file)});
   const img=await new Promise((resolve,reject)=>{const im=new Image();im.onload=()=>resolve(im);im.onerror=reject;im.src=data});
   const c=document.createElement('canvas'),scale=Math.min(1,320/Math.max(img.width,img.height));c.width=Math.max(1,Math.round(img.width*scale));c.height=Math.max(1,Math.round(img.height*scale));c.getContext('2d').drawImage(img,0,0,c.width,c.height);
   const photoURL=c.toDataURL('image/jpeg',.68);if(photoURL.length>850000)return toast('Image too large. Choose a smaller photo');
-  await updateDoc(doc(db,'users',ME.uid),{photoURL});P={...P,photoURL};renderLists();toast('Profile photo updated');sheet(false);
+  await updateDoc(doc(db,'users',ME.uid),{photoURL});P={...P,photoURL};renderLists();syncProfileUI();toast('Profile photo updated');
  }catch(e){console.error(e);toast('Could not update photo. Check Firestore rules')}
 }
+
 async function toggleBlock(uid,block){
  if(!uid||!ME||uid===YB)return;const ids=new Set(P?.blockedUids||[]);block?ids.add(uid):ids.delete(uid);const blockedUids=[...ids];
- try{await updateDoc(doc(db,'users',ME.uid),{blockedUids});P={...P,blockedUids};renderLists();if(block&&peer?.uid===uid)toast('User blocked on your account');else toast(block?'User blocked':'User unblocked');renderBlockedList();}
+ try{await updateDoc(doc(db,'users',ME.uid),{blockedUids});P={...P,blockedUids};renderLists();if(block&&peer?.uid===uid)toast('User blocked');else toast(block?'User blocked':'User unblocked');renderBlockedList();}
  catch(e){console.error(e);toast('Could not update block list')}
+}
+
+/* PROFILE SAVING (DISPLAY NAME + UNIQUE USERNAME ATOMIC UPDATE) */
+async function saveProfileEdits() {
+  const dispInput = $('editDisplayName'), userInput = $('editUsername'), errEl = $('usernameErr');
+  errEl.textContent = ''; errEl.classList.remove('show');
+  
+  const newDisplay = dispInput.value.trim() || P.username || 'Operator';
+  const rawUser = userInput.value.trim().toLowerCase().replace(/^@/,'');
+  
+  if (!rawUser) {
+    errEl.textContent = 'Username cannot be blank.';
+    errEl.classList.add('show');
+    return;
+  }
+  if (!/^[a-z0-9_]{3,20}$/.test(rawUser)) {
+    errEl.textContent = 'Username must be 3-20 characters (letters, numbers, underscores).';
+    errEl.classList.add('show');
+    return;
+  }
+
+  const oldUsername = (P.username || '').toLowerCase();
+  const saveBtn = $('btnSaveProfile');
+  saveBtn.disabled = true;
+  saveBtn.textContent = 'Saving…';
+
+  try {
+    if (rawUser === oldUsername) {
+      // Only display name changed
+      await updateDoc(doc(db, 'users', ME.uid), { display: newDisplay });
+      P.display = newDisplay;
+      toast('Profile updated');
+      syncProfileUI();
+      renderLists();
+      setSettingsView('main');
+    } else {
+      // Username change requested - check uniqueness atomically with transaction
+      await runTransaction(db, async (tx) => {
+        const newRef = doc(db, 'usernames', rawUser);
+        const newDocSnap = await tx.get(newRef);
+        if (newDocSnap.exists() && newDocSnap.data().uid !== ME.uid) {
+          throw new Error('USERNAME_TAKEN');
+        }
+        // Claim new username
+        tx.set(newRef, { uid: ME.uid });
+        // Update user record
+        tx.update(doc(db, 'users', ME.uid), {
+          username: rawUser,
+          display: newDisplay
+        });
+        // Remove old username reservation if valid
+        if (oldUsername && oldUsername !== rawUser) {
+          const oldRef = doc(db, 'usernames', oldUsername);
+          tx.delete(oldRef);
+        }
+      });
+
+      P.username = rawUser;
+      P.display = newDisplay;
+      toast('Username and profile updated!');
+      syncProfileUI();
+      renderLists();
+      setSettingsView('main');
+    }
+  } catch (err) {
+    console.error('Profile update error:', err);
+    if (err.message === 'USERNAME_TAKEN') {
+      errEl.textContent = `@${rawUser} is already taken. Please pick another username.`;
+      errEl.classList.add('show');
+    } else {
+      errEl.textContent = 'Could not update profile: ' + (err.message || 'Check connection.');
+      errEl.classList.add('show');
+    }
+  } finally {
+    saveBtn.disabled = false;
+    saveBtn.textContent = 'Save Changes';
+  }
 }
 
 function tabTo(n){tab=n;document.querySelectorAll('.tab').forEach((t,i)=>t.classList.toggle('on',i===n));$('panes').style.transform=`translateX(${-50*n}%)`;$('ind').style.transform=`translateX(${100*n}%)`}
 function back(){appEl.classList.remove('open');peer&&!peer.isYuki&&cid&&updateDoc(doc(db,'chats',cid),{[`typing.${ME.uid}`]:false}).catch(()=>{});stop();peer=cid=null;renderLists()}
 
-/* --- RELIABLE EVENT LISTENERS & ROTATING GEAR --- */
 function triggerGearAnimation(btn) {
   if (!btn) return;
   btn.classList.add('rotating');
   setTimeout(() => btn.classList.remove('rotating'), 450);
 }
 
-// Gear button click bindings
+// Gear buttons open Settings side panel
 $('acc')?.addEventListener('click', (e) => {
   e.stopPropagation();
   triggerGearAnimation($('acc'));
@@ -1080,125 +1040,30 @@ $('gear')?.addEventListener('click', (e) => {
   sheet(true, 'chat');
 });
 
-// Close sheet
+// Close sheet and backdrop click
 $('sheetClose')?.addEventListener('click', () => sheet(false));
 $('scrim')?.addEventListener('click', () => {
   hideConfirmation();
   sheet(false);
 });
 
-// Settings category tab click
-$('cfgNav')?.addEventListener('click', (e) => {
-  const tabBtn = e.target.closest('.cfg-tab');
-  if (tabBtn && tabBtn.dataset.cfg) {
-    switchSettingsTab(tabBtn.dataset.cfg);
-  }
-});
+// Subviews navigation inside Settings
+$('btnOpenProfile')?.addEventListener('click', () => setSettingsView('profile'));
+$('btnOpenBlockList')?.addEventListener('click', () => setSettingsView('blocklist'));
+$('sheetBack')?.addEventListener('click', () => setSettingsView('main'));
 
-// Interactive settings controls
-$('o7')?.addEventListener('click', () => { const b=$('blockedList'); b?.classList.toggle('show'); });
-$('openProfileSettings')?.addEventListener('click',()=>{const a=$('cfgCatAccount');if(a){a.classList.add('profile-open');a.style.setProperty('display','block','important');a.scrollIntoView({behavior:'smooth',block:'start'});}});
-$('sheetClose')?.addEventListener('click',()=>{const a=$('cfgCatAccount');a?.classList.remove('profile-open');});
-$('accDisplay')?.addEventListener('click',async()=>{const u=P?.username||'';if(!u)return;try{await navigator.clipboard.writeText(u);toast('Username copied')}catch(e){const t=document.createElement('textarea');t.value=u;document.body.appendChild(t);t.select();document.execCommand('copy');t.remove();toast('Username copied')}});
-$('profileSummary')?.addEventListener('click', async () => { const name=P?.username||''; try { await navigator.clipboard.writeText(name); toast('Username copied'); } catch(e) { toast(name); } });
+// Theme Toggle
 $('o1')?.addEventListener('click', () => {
-  userPrefs.theme = (userPrefs.theme === 'dark') ? 'light' : 'dark';
-  savePreferences();
-  applyPreferences();
+  const nextTheme = currentTheme === 'dark' ? 'light' : 'dark';
+  applyTheme(nextTheme, true);
 });
 
-$('swReduceMotion')?.closest('.opt')?.addEventListener('click', () => {
-  userPrefs.reduceMotion = !userPrefs.reduceMotion;
-  savePreferences();
-  applyPreferences();
-});
+// Profile Editing
+$('btnSaveProfile')?.addEventListener('click', saveProfileEdits);
+$('editUsername')?.addEventListener('keydown', e => { if (e.key === 'Enter') saveProfileEdits(); });
+$('editDisplayName')?.addEventListener('keydown', e => { if (e.key === 'Enter') saveProfileEdits(); });
 
-$('selBubbleStyle')?.addEventListener('change', (e) => {
-  userPrefs.bubbleStyle = e.target.value;
-  savePreferences();
-  applyPreferences();
-});
-
-$('selFontSize')?.addEventListener('change', (e) => {
-  userPrefs.fontSize = e.target.value;
-  savePreferences();
-  applyPreferences();
-});
-
-$('selDensity')?.addEventListener('change', (e) => {
-  userPrefs.density = e.target.value;
-  savePreferences();
-  applyPreferences();
-});
-
-$('selBgPattern')?.addEventListener('change', (e) => {
-  userPrefs.bgPattern = e.target.value;
-  savePreferences();
-  applyPreferences();
-});
-
-$('swEnterSend')?.closest('.opt')?.addEventListener('click', () => {
-  userPrefs.enterToSend = !userPrefs.enterToSend;
-  savePreferences();
-  applyPreferences();
-});
-
-$('swAutoScroll')?.closest('.opt')?.addEventListener('click', () => {
-  userPrefs.autoScroll = !userPrefs.autoScroll;
-  savePreferences();
-  applyPreferences();
-});
-
-$('swTimestamps')?.closest('.opt')?.addEventListener('click', () => {
-  userPrefs.timestamps = !userPrefs.timestamps;
-  savePreferences();
-  applyPreferences();
-});
-
-$('swHidePreview')?.closest('.opt')?.addEventListener('click', () => {
-  userPrefs.hidePreview = !userPrefs.hidePreview;
-  savePreferences();
-  applyPreferences();
-});
-
-$('o2')?.addEventListener('click', () => {
-  userPrefs.muted = !userPrefs.muted;
-  savePreferences();
-  applyPreferences();
-  toast(userPrefs.muted ? 'Banner notifications muted' : 'Notifications unmuted');
-});
-
-$('swSoundAlert')?.closest('.opt')?.addEventListener('click', () => {
-  userPrefs.soundAlert = !userPrefs.soundAlert;
-  savePreferences();
-  applyPreferences();
-  if (userPrefs.soundAlert) playMessageChime();
-});
-
-$('btnResetAppearance')?.addEventListener('click', () => {
-  showConfirmation('Reset Appearance?', 'This will revert themes, fonts, and bubbles to default styling.', 'Reset', false, () => {
-    userPrefs.theme = DEFAULT_PREFS.theme;
-    userPrefs.bubbleStyle = DEFAULT_PREFS.bubbleStyle;
-    userPrefs.fontSize = DEFAULT_PREFS.fontSize;
-    userPrefs.density = DEFAULT_PREFS.density;
-    userPrefs.bgPattern = DEFAULT_PREFS.bgPattern;
-    userPrefs.reduceMotion = DEFAULT_PREFS.reduceMotion;
-    savePreferences();
-    applyPreferences();
-    toast('Appearance reset to defaults');
-  });
-});
-
-$('btnRestoreAllDefaults')?.addEventListener('click', () => {
-  showConfirmation('Restore Factory Defaults?', 'Reset all settings to default. Your chats, accounts, and messages will remain intact.', 'Restore Defaults', true, () => {
-    userPrefs = { ...DEFAULT_PREFS };
-    savePreferences();
-    applyPreferences();
-    toast('All settings restored to defaults');
-  });
-});
-
-// Preserved core document interactions
+// Document-level interactions
 document.addEventListener('click',e=>{
  const g=s=>e.target.closest(s);let x;
  if(x=g('.tab'))tabTo(+x.dataset.t);
@@ -1208,9 +1073,8 @@ document.addEventListener('click',e=>{
  else if(x=g('.mention'))mention(x.dataset.m);
  else if(g('#clr')){$('q').value='';sr.q='';paintSearch();$('q').focus()}
  else if(g('#back'))back();
- else if(g('#o4')){if(P?.username)navigator.clipboard.writeText(P.username).then(()=>toast('ID copied: '+P.username)).catch(()=>toast('Could not copy'))}
+ else if(g('#o4')){if(P?.username)navigator.clipboard.writeText(P.username).then(()=>toast('Username copied: @'+P.username)).catch(()=>toast('Could not copy'))}
  else if(g('#o6'))$('photoFile').click();
- else if(g('#o7')){switchSettingsTab('privacy')}
  else if(x=g('[data-unblock]'))toggleBlock(x.dataset.unblock,false);
  else if(g('#o8')){
    const uid=selectedDirect?.uid || (peer&&!peer.isYuki?peer.uid:null);
@@ -1257,25 +1121,11 @@ $('inp')?.addEventListener('input',()=>{
   chg();
 });
 $('inp')?.addEventListener('keydown',e=>{
-  if(e.key==='Enter'){
-    if(userPrefs.enterToSend){
-      if(!e.shiftKey){e.preventDefault();send()}
-    }
+  if(e.key==='Enter'&&!e.shiftKey){
+    e.preventDefault();
+    send();
   }
 });
-
-function fitComposerToViewport(){const app=document.querySelector('.app'),cmp=document.querySelector('.cmp'),i=$('inp');if(!app||!cmp)return;const vv=window.visualViewport;const vh=vv?Math.round(vv.height):window.innerHeight;document.documentElement.style.setProperty('--app-vh',vh+'px');app.style.height=vh+'px';app.style.maxHeight=vh+'px';if(document.activeElement===i){requestAnimationFrame(()=>{const r=cmp.getBoundingClientRect();if(r.bottom>vh){app.style.height=vh+'px';} });}}
-window.visualViewport?.addEventListener('resize',fitComposerToViewport);
-window.visualViewport?.addEventListener('scroll',fitComposerToViewport);
-window.addEventListener('resize',fitComposerToViewport);
-$('inp')?.addEventListener('focus',()=>setTimeout(fitComposerToViewport,80));
-$('inp')?.addEventListener('blur',()=>{setTimeout(()=>{const app=document.querySelector('.app');if(app){app.style.height='100dvh';app.style.maxHeight='100dvh';}document.documentElement.style.setProperty('--app-vh','100dvh');},180)});
-fitComposerToViewport();
-
-document.addEventListener('click',async e=>{const b=e.target.closest('[data-unblock]');if(!b)return;const uid=b.dataset.unblock;if(!uid||!ME||!P)return;try{const ids=(P.blockedUids||[]).filter(x=>x!==uid);await updateDoc(doc(db,'users',ME.uid),{blockedUids:ids});P={...P,blockedUids:ids};renderBlockedList();toast('User unblocked');}catch(err){console.error(err);toast('Could not unblock user');}});
-
-// Initialize app preferences on startup
-loadPreferences();
 </script>
 </body>
 </html>

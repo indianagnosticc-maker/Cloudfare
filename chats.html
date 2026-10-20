@@ -3,7 +3,11 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, interactive-widget=resizes-content">
-<title>Chat App</title>
+<title>Yuki</title>
+<link rel="icon" href="https://lh3.googleusercontent.com/aida-public/AB6AXuB4sBVUR8Nz47PlRnmU7Mn9yBzGxjtHQbmswmVJ8g5JBLmgwhevUrlEWaiPvzu5NGe_l3mKI1oWJzedHAZUWp_1iqSxEfaynl9A6aduhVIbZY_4KOtC4c22tAzKQJYC1E7gQtuq_k0JbQTLEPWTB2buOrT_ts7cIa-kfTMx_dbvLkbqkM7D00p3E_VLcpHPW49Vuv8tc_TAMxQCZGc2hpKdGpIkXY9j6A6mDYHzquEG8yWXaVh_tMpOUw">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
 <style>
 :root {
   --bg-canvas: #e8effa;
@@ -36,6 +40,7 @@
   --radius-md: 12px;
   --radius-full: 9999px;
   --anim-speed: 0.28s;
+  --glow-blue: 0 1px 3px rgba(29, 114, 254, 0.12), 0 6px 18px -6px rgba(29, 114, 254, 0.22), 0 12px 28px -12px rgba(29, 114, 254, 0.14);
   box-sizing: border-box;
 }
 
@@ -65,6 +70,7 @@
   --nav-active: #3b82f6;
   --nav-inactive: #94a3b8;
   --scrim-bg: rgba(0, 0, 0, 0.7);
+  --glow-blue: 0 1px 3px rgba(59, 130, 246, 0.14), 0 6px 18px -6px rgba(59, 130, 246, 0.26), 0 12px 28px -12px rgba(59, 130, 246, 0.16);
 }
 
 * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
@@ -107,6 +113,8 @@ svg { width: 1.15em; height: 1.15em; fill: none; stroke: currentColor; stroke-wi
   transition: transform var(--anim-speed) cubic-bezier(0.25, 1, 0.3, 1), opacity var(--anim-speed) ease;
   z-index: 10;
   overflow: hidden;
+  will-change: transform, opacity;
+  backface-visibility: hidden;
 }
 #screenChat {
   transform: translateX(100%);
@@ -157,7 +165,7 @@ svg { width: 1.15em; height: 1.15em; fill: none; stroke: currentColor; stroke-wi
 .brand-logo-icon svg { width: 22px; height: 22px; stroke-width: 2.2; }
 .brand-title {
   font-size: 19px;
-  font-weight: 800;
+  font-weight: 600;
   letter-spacing: -0.4px;
   color: var(--text-main);
 }
@@ -177,7 +185,7 @@ svg { width: 1.15em; height: 1.15em; fill: none; stroke: currentColor; stroke-wi
   place-items: center;
   color: var(--text-muted);
   box-shadow: var(--shadow-sm);
-  transition: all 0.15s ease;
+  transition: transform 0.2s cubic-bezier(0.22, 1, 0.36, 1), background-color 0.2s ease;
   position: relative;
 }
 .action-btn-circle:active {
@@ -212,7 +220,7 @@ svg { width: 1.15em; height: 1.15em; fill: none; stroke: currentColor; stroke-wi
   object-fit: cover;
   display: grid;
   place-items: center;
-  font-weight: 700;
+  font-weight: 600;
   color: #fff;
 }
 
@@ -222,6 +230,7 @@ svg { width: 1.15em; height: 1.15em; fill: none; stroke: currentColor; stroke-wi
 .inbox-scroll-body {
   flex: 1;
   overflow-y: auto;
+  overflow-x: hidden;
   -webkit-overflow-scrolling: touch;
   padding: 14px 16px 90px;
 }
@@ -258,7 +267,7 @@ svg { width: 1.15em; height: 1.15em; fill: none; stroke: currentColor; stroke-wi
   opacity: 0;
   transform: scale(0.6);
   pointer-events: none;
-  transition: all 0.2s ease;
+  transition: opacity 0.2s ease, transform 0.2s cubic-bezier(0.22, 1, 0.36, 1);
   color: var(--text-muted);
 }
 .search-container.has-value #searchClear {
@@ -285,7 +294,7 @@ svg { width: 1.15em; height: 1.15em; fill: none; stroke: currentColor; stroke-wi
   gap: 6px;
   padding: 10px 0;
   font-size: 14.5px;
-  font-weight: 700;
+  font-weight: 600;
   color: var(--text-muted);
   position: relative;
   transition: color 0.2s ease;
@@ -312,7 +321,7 @@ svg { width: 1.15em; height: 1.15em; fill: none; stroke: currentColor; stroke-wi
   background: var(--accent-red);
   color: #fff;
   font-size: 10.5px;
-  font-weight: 800;
+  font-weight: 600;
   text-align: center;
   padding: 0 5px;
 }
@@ -320,17 +329,24 @@ svg { width: 1.15em; height: 1.15em; fill: none; stroke: currentColor; stroke-wi
 /* Roster Views (Rooms and Directs sliding container) */
 .panes-wrapper {
   position: relative;
-  overflow: hidden;
+  overflow: visible;
   width: 100%;
 }
 .panes-track {
   display: flex;
   width: 200%;
   transition: transform 0.25s cubic-bezier(0.25, 1, 0.3, 1);
+  will-change: transform;
 }
 .pane-col {
   width: 50%;
-  overflow: hidden;
+  overflow: visible;
+}
+/* hide the off-screen pane so nothing leaks at the screen edge */
+.panes-track[data-active="0"] #paneRooms,
+.panes-track[data-active="1"] #paneDirects {
+  visibility: hidden;
+  transition: visibility 0s linear 0.26s;
 }
 
 /* Directs / Channels Cards */
@@ -344,25 +360,29 @@ svg { width: 1.15em; height: 1.15em; fill: none; stroke: currentColor; stroke-wi
   border: 1px solid var(--border-subtle);
   margin-bottom: 10px;
   box-shadow: var(--shadow-sm);
-  transition: all 0.18s ease;
+  transition: background-color 0.18s ease, box-shadow 0.18s ease;
   cursor: pointer;
   text-align: left;
   width: 100%;
 }
 .chat-card:active {
+  position: relative;
+  z-index: 2;
   transform: scale(0.98);
   background: var(--primary-blue);
   border-color: var(--primary-blue);
-  box-shadow: 0 8px 20px rgba(29, 114, 254, 0.3);
+  box-shadow: var(--glow-blue);
 }
 .chat-card:active .chat-card-name { color: #ffffff; }
 .chat-card:active .chat-card-preview { color: rgba(255, 255, 255, 0.85); }
 .chat-card:active .chat-card-time { color: rgba(255, 255, 255, 0.75); }
 .chat-card.highlighted-blue {
+  position: relative;
+  z-index: 2;
   background: var(--primary-blue);
   border-color: var(--primary-blue);
   color: #ffffff;
-  box-shadow: 0 8px 20px rgba(29, 114, 254, 0.3);
+  box-shadow: var(--glow-blue);
 }
 .chat-card.highlighted-blue .chat-card-name { color: #ffffff; }
 .chat-card.highlighted-blue .chat-card-preview { color: rgba(255, 255, 255, 0.85); }
@@ -377,7 +397,7 @@ svg { width: 1.15em; height: 1.15em; fill: none; stroke: currentColor; stroke-wi
   background: #cbd5e1;
   display: grid;
   place-items: center;
-  font-weight: 700;
+  font-weight: 600;
   color: #ffffff;
   position: relative;
 }
@@ -404,7 +424,7 @@ svg { width: 1.15em; height: 1.15em; fill: none; stroke: currentColor; stroke-wi
 }
 .chat-card-name {
   font-size: 15px;
-  font-weight: 700;
+  font-weight: 600;
   color: var(--text-main);
   white-space: nowrap;
   overflow: hidden;
@@ -435,7 +455,7 @@ svg { width: 1.15em; height: 1.15em; fill: none; stroke: currentColor; stroke-wi
   border-radius: var(--radius-lg);
   margin-bottom: 12px;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: transform 0.2s cubic-bezier(0.22, 1, 0.36, 1), background-color 0.2s ease;
   width: 100%;
   text-align: left;
 }
@@ -481,7 +501,7 @@ svg { width: 1.15em; height: 1.15em; fill: none; stroke: currentColor; stroke-wi
   background: var(--primary-blue);
   color: #fff;
   font-size: 14px;
-  font-weight: 700;
+  font-weight: 600;
   box-shadow: 0 8px 24px rgba(29, 114, 254, 0.4);
   display: flex;
   align-items: center;
@@ -541,7 +561,7 @@ svg { width: 1.15em; height: 1.15em; fill: none; stroke: currentColor; stroke-wi
   background: #cbd5e1;
   display: grid;
   place-items: center;
-  font-weight: 700;
+  font-weight: 600;
   color: #fff;
   flex: none;
 }
@@ -552,7 +572,7 @@ svg { width: 1.15em; height: 1.15em; fill: none; stroke: currentColor; stroke-wi
 }
 .chat-header-meta b {
   font-size: 15.5px;
-  font-weight: 700;
+  font-weight: 600;
   color: var(--text-main);
   display: block;
   white-space: nowrap;
@@ -581,6 +601,13 @@ svg { width: 1.15em; height: 1.15em; fill: none; stroke: currentColor; stroke-wi
 .messages-container > .chat-message-row:first-of-type {
   margin-top: auto;
 }
+/* push the whole conversation to the bottom (like WhatsApp), still scrolls normally */
+.messages-container::before {
+  content: "";
+  flex: 1 0 0;
+  min-height: 0;
+}
+.messages-container > * { flex-shrink: 0; }
 
 .date-divider {
   display: flex;
@@ -594,7 +621,7 @@ svg { width: 1.15em; height: 1.15em; fill: none; stroke: currentColor; stroke-wi
   background: var(--card-bg);
   border: 1px solid var(--border-subtle);
   font-size: 11.5px;
-  font-weight: 700;
+  font-weight: 600;
   color: var(--text-muted);
   box-shadow: var(--shadow-sm);
 }
@@ -613,14 +640,6 @@ svg { width: 1.15em; height: 1.15em; fill: none; stroke: currentColor; stroke-wi
   flex-direction: row-reverse;
 }
 
-/* Keep avatars only on incoming messages; outgoing messages stay right-aligned. */
-.chat-message-row.is-mine .msg-avatar {
-  display: none !important;
-}
-.chat-message-row.is-mine .msg-bubble-wrap {
-  max-width: 100%;
-}
-
 .msg-avatar {
   width: 32px;
   height: 32px;
@@ -631,7 +650,7 @@ svg { width: 1.15em; height: 1.15em; fill: none; stroke: currentColor; stroke-wi
   display: grid;
   place-items: center;
   font-size: 13px;
-  font-weight: 700;
+  font-weight: 600;
   color: #fff;
   align-self: flex-end;
 }
@@ -648,7 +667,7 @@ svg { width: 1.15em; height: 1.15em; fill: none; stroke: currentColor; stroke-wi
 }
 .msg-sender-name {
   font-size: 11.5px;
-  font-weight: 700;
+  font-weight: 600;
   color: var(--text-muted);
   margin-bottom: 3px;
   padding: 0 4px;
@@ -679,6 +698,44 @@ svg { width: 1.15em; height: 1.15em; fill: none; stroke: currentColor; stroke-wi
   margin-top: 4px;
   padding: 0 4px;
 }
+
+/* Short messages no longer stretch to the sender-name width */
+.msg-bubble {
+  width: fit-content;
+  max-width: 100%;
+  align-self: flex-start;
+  text-wrap: pretty;
+}
+.chat-message-row.is-mine .msg-bubble { align-self: flex-end; }
+
+/* Smooth message animations (only for NEW messages) */
+.chat-message-row { contain: layout style; }
+.chat-message-row:not(.is-mine) {
+  animation: msgInLeft 0.34s cubic-bezier(0.2, 0.9, 0.3, 1) backwards;
+  transform-origin: left bottom;
+}
+.chat-message-row.is-mine {
+  animation: msgInRight 0.34s cubic-bezier(0.2, 0.9, 0.3, 1) backwards;
+  transform-origin: right bottom;
+}
+.chat-message-row.no-anim { animation: none !important; }
+@keyframes msgInLeft {
+  from { opacity: 0; transform: translateY(16px) scale(0.94); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes msgInRight {
+  from { opacity: 0; transform: translateY(16px) scale(0.94); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+@keyframes cardIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: none; }
+}
+.date-divider { animation: fadeIn 0.35s ease backwards; }
+.chat-card.card-enter { animation: cardIn 0.34s cubic-bezier(0.2, 0.9, 0.3, 1) backwards; }
+#searchResultsView.active { animation: fadeIn 0.25s ease; }
+.settings-drawer, .user-sheet-modal { will-change: transform; }
 
 /* Typing Indicator */
 .typing-bar {
@@ -761,7 +818,7 @@ svg { width: 1.15em; height: 1.15em; fill: none; stroke: currentColor; stroke-wi
   display: grid;
   place-items: center;
   color: var(--text-muted);
-  transition: all 0.15s ease;
+  transition: transform 0.2s cubic-bezier(0.22, 1, 0.36, 1), color 0.2s ease, background-color 0.2s ease;
   flex: none;
 }
 .composer-btn:active { transform: scale(0.9); }
@@ -807,7 +864,7 @@ svg { width: 1.15em; height: 1.15em; fill: none; stroke: currentColor; stroke-wi
   text-align: left;
   border-bottom: 1px solid var(--border-subtle);
   font-size: 13.5px;
-  font-weight: 600;
+  font-weight: 500;
   color: var(--text-main);
 }
 .mention-item:hover, .mention-item:active {
@@ -824,7 +881,8 @@ svg { width: 1.15em; height: 1.15em; fill: none; stroke: currentColor; stroke-wi
   z-index: 100;
   display: flex;
   flex-direction: column;
-  justify-content: center;
+  justify-content: flex-start;
+  overflow-y: auto;
   padding: 28px 24px;
   transition: opacity 0.3s ease, visibility 0.3s ease;
   opacity: 0;
@@ -837,6 +895,7 @@ svg { width: 1.15em; height: 1.15em; fill: none; stroke: currentColor; stroke-wi
   pointer-events: auto;
 }
 .auth-card {
+  margin: auto 0;
   background: var(--card-bg);
   border: 1px solid var(--border-subtle);
   border-radius: var(--radius-xl);
@@ -858,7 +917,7 @@ svg { width: 1.15em; height: 1.15em; fill: none; stroke: currentColor; stroke-wi
 .auth-brand-badge svg { width: 28px; height: 28px; }
 .auth-card h2 {
   font-size: 24px;
-  font-weight: 800;
+  font-weight: 600;
   margin-bottom: 6px;
   letter-spacing: -0.3px;
 }
@@ -889,6 +948,18 @@ svg { width: 1.15em; height: 1.15em; fill: none; stroke: currentColor; stroke-wi
   border-color: var(--primary-blue);
   box-shadow: 0 0 0 3px rgba(29, 114, 254, 0.15);
 }
+/* Name + username fields (visible only while creating an account) */
+.auth-extra { display: none; }
+.auth-extra.show {
+  display: block;
+  animation: authFieldIn 0.32s cubic-bezier(0.2, 0.9, 0.3, 1) backwards;
+}
+.auth-extra.show + .auth-extra.show { animation-delay: 0.05s; }
+@keyframes authFieldIn {
+  from { opacity: 0; transform: translateY(-8px); }
+  to { opacity: 1; transform: none; }
+}
+#authScreen.active .auth-card { animation: cardIn 0.4s cubic-bezier(0.2, 0.9, 0.3, 1) backwards; }
 .auth-btn-primary {
   width: 100%;
   height: 48px;
@@ -896,7 +967,7 @@ svg { width: 1.15em; height: 1.15em; fill: none; stroke: currentColor; stroke-wi
   background: var(--primary-blue);
   color: #fff;
   font-size: 15.5px;
-  font-weight: 700;
+  font-weight: 600;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -911,7 +982,7 @@ svg { width: 1.15em; height: 1.15em; fill: none; stroke: currentColor; stroke-wi
 .auth-toggle-link {
   font-size: 13.5px;
   color: var(--primary-blue);
-  font-weight: 600;
+  font-weight: 500;
   margin-top: 14px;
   display: inline-block;
 }
@@ -973,7 +1044,7 @@ svg { width: 1.15em; height: 1.15em; fill: none; stroke: currentColor; stroke-wi
 }
 .drawer-title {
   font-size: 17px;
-  font-weight: 800;
+  font-weight: 600;
   letter-spacing: -0.2px;
 }
 .drawer-back-btn {
@@ -994,7 +1065,7 @@ svg { width: 1.15em; height: 1.15em; fill: none; stroke: currentColor; stroke-wi
 
 .settings-sec-label {
   font-size: 11px;
-  font-weight: 800;
+  font-weight: 600;
   color: var(--text-muted);
   text-transform: uppercase;
   letter-spacing: 0.8px;
@@ -1030,7 +1101,7 @@ svg { width: 1.15em; height: 1.15em; fill: none; stroke: currentColor; stroke-wi
 }
 .settings-main-title {
   font-size: 14.5px;
-  font-weight: 700;
+  font-weight: 600;
   color: var(--text-main);
   display: block;
 }
@@ -1088,7 +1159,7 @@ svg { width: 1.15em; height: 1.15em; fill: none; stroke: currentColor; stroke-wi
 .profile-form-label {
   display: block;
   font-size: 11.5px;
-  font-weight: 700;
+  font-weight: 600;
   color: var(--text-muted);
   text-transform: uppercase;
   letter-spacing: 0.6px;
@@ -1115,7 +1186,7 @@ svg { width: 1.15em; height: 1.15em; fill: none; stroke: currentColor; stroke-wi
   padding: 8px 18px;
   border-radius: var(--radius-full);
   font-size: 13.5px;
-  font-weight: 700;
+  font-weight: 600;
   background: var(--primary-blue);
   color: #fff;
   cursor: pointer;
@@ -1169,7 +1240,7 @@ svg { width: 1.15em; height: 1.15em; fill: none; stroke: currentColor; stroke-wi
   padding: 9px 18px;
   border-radius: var(--radius-full);
   font-size: 13px;
-  font-weight: 600;
+  font-weight: 500;
   box-shadow: var(--shadow-md);
   opacity: 0;
   pointer-events: none;
@@ -1182,16 +1253,255 @@ svg { width: 1.15em; height: 1.15em; fill: none; stroke: currentColor; stroke-wi
   transform: translate(-50%, 0) scale(1);
 }
 
-/* Targeted fixes: compact bubbles, real avatars, softer blue glow and smoother transitions */
-.msg-bubble-wrap { width: fit-content; max-width: calc(100% - 74px); min-width: 0; }
-.chat-message-row.is-mine .msg-bubble-wrap { max-width: 100%; }
-.msg-bubble { width: fit-content; max-width: 100%; min-width: 0; flex: 0 1 auto; }
-.msg-avatar img, .chat-card-avatar img, .chat-header-avatar img, .header-profile-btn img { display:block; width:100%; height:100%; object-fit:cover; border-radius:inherit; }
-.chat-card.highlighted-blue { box-shadow: 0 0 22px rgba(37,99,235,.18), 0 10px 28px rgba(37,99,235,.14); }
-.chat-card:active { box-shadow: 0 0 24px rgba(37,99,235,.22), 0 8px 20px rgba(29,114,254,.22); }
-.screen, .chat-card, .msg-bubble, .composer-inner, .action-btn-circle { will-change: transform; }
-.chat-message-row { animation-duration: .16s; }
-@media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; scroll-behavior: auto !important; } }
+/* ==========================================================================
+   Telegram-style continuous chat list (no gaps, thin dividers)
+   ========================================================================== */
+#directsListContainer {
+  margin: 0 -16px;
+  border-top: 1px solid var(--border-subtle);
+  border-bottom: 1px solid var(--border-subtle);
+  background: var(--card-bg);
+}
+.chat-card {
+  position: relative;
+  margin-bottom: 0;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+  background: var(--card-bg);
+  padding: 12px 16px;
+  transition: background 0.18s ease, box-shadow 0.18s ease;
+}
+.chat-card::after {
+  content: "";
+  position: absolute;
+  left: 72px;
+  right: 0;
+  bottom: 0;
+  height: 1px;
+  background: var(--border-subtle);
+}
+.chat-card:last-child::after,
+.chat-card.highlighted-blue::after,
+.chat-card:active::after { display: none; }
+.chat-card:active { transform: none; }
+#searchResultsView { margin: 0 -16px; }
+#searchResultsView .settings-sec-label { padding: 0 16px; }
+
+/* ==========================================================================
+   Smoothness: no expensive blur on moving layers, no mass color transitions
+   while switching theme
+   ========================================================================== */
+.backdrop-scrim { backdrop-filter: none; -webkit-backdrop-filter: none; will-change: opacity; }
+.app-header, .chat-top-header, .composer-dock { backdrop-filter: none; -webkit-backdrop-filter: none; }
+.no-theme-anim, .no-theme-anim *, .no-theme-anim *::before, .no-theme-anim *::after { transition: none !important; }
+.no-theme-anim .toggle-switch { transition: background 0.25s ease !important; }
+.no-theme-anim .toggle-switch:after { transition: transform 0.25s cubic-bezier(0.2, 0.9, 0.3, 1) !important; }
+
+/* ==========================================================================
+   TYPOGRAPHY  (lighter, cleaner, professional)
+   ========================================================================== */
+html, body {
+  font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+input, textarea, button { font-family: inherit; }
+b, strong { font-weight: 600; }
+h1, h2, h3 { font-weight: 600; }
+.brand-title { font-size: 18px; font-weight: 600; letter-spacing: -0.2px; }
+.chat-card-name { font-size: 15px; font-weight: 600; letter-spacing: -0.1px; }
+.chat-card-preview { font-size: 13.5px; font-weight: 400; }
+.chat-card-time { font-weight: 400; }
+.inbox-tab { font-size: 14px; font-weight: 500; }
+.inbox-tab.active { font-weight: 600; }
+.tab-badge { font-weight: 600; }
+.chat-header-meta b { font-size: 15px; font-weight: 600; letter-spacing: -0.1px; }
+.msg-sender-name { font-weight: 500; }
+.date-pill { font-weight: 500; }
+.msg-bubble { font-weight: 400; }
+.auth-card h2 { font-size: 22px; font-weight: 600; letter-spacing: -0.2px; }
+.auth-btn-primary { font-weight: 600; }
+.profile-pill-btn { font-weight: 500; }
+.app-toast { font-weight: 500; }
+
+/* ==========================================================================
+   SETTINGS  (clean grouped list)
+   ========================================================================== */
+.settings-drawer { background: var(--app-bg); }
+.drawer-header { height: 58px; background: var(--card-bg); }
+.drawer-title { font-size: 17px; font-weight: 600; letter-spacing: -0.1px; }
+.drawer-body { padding: 8px 16px 32px; overscroll-behavior: contain; }
+.settings-sec-label {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-muted);
+  text-transform: none;
+  letter-spacing: 0.1px;
+  margin: 20px 0 8px 4px;
+}
+.settings-card {
+  background: var(--card-bg);
+  border: 1px solid var(--border-subtle);
+  border-radius: 14px;
+  box-shadow: none;
+  margin-bottom: 0;
+}
+.settings-row {
+  gap: 12px;
+  padding: 12px 14px;
+  min-height: 58px;
+  justify-content: space-between;
+  transition: background-color 0.15s ease;
+}
+.settings-row:hover { background: transparent; }
+.settings-row:active { background: var(--card-hover); }
+.settings-icon {
+  width: 34px;
+  height: 34px;
+  border-radius: 10px;
+  display: grid;
+  place-items: center;
+  flex: none;
+  background: var(--primary-blue-light);
+  color: var(--primary-blue);
+}
+.settings-icon svg { width: 18px; height: 18px; stroke-width: 1.9; }
+.settings-icon.danger { background: rgba(239, 68, 68, 0.12); color: #ef4444; }
+.settings-main-title { font-size: 15px; font-weight: 500; letter-spacing: -0.1px; }
+.settings-sub-title { font-size: 12.5px; font-weight: 400; margin-top: 2px; line-height: 1.35; }
+.settings-chevron { color: var(--text-muted); opacity: 0.7; width: 18px; height: 18px; }
+#chatContextActions .settings-main-title { font-weight: 500; }
+
+/* profile sub view */
+.profile-form-group { margin-bottom: 16px; }
+.profile-form-label {
+  font-size: 12px;
+  font-weight: 500;
+  text-transform: none;
+  letter-spacing: 0.1px;
+  margin: 0 0 6px 2px;
+}
+.profile-input {
+  height: 44px;
+  border-radius: 12px;
+  font-size: 14.5px;
+  font-weight: 400;
+  background: var(--card-bg);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+.profile-input:focus { border-color: var(--primary-blue); box-shadow: 0 0 0 3px rgba(29, 114, 254, 0.14); }
+.profile-pill-btn { transition: transform 0.2s cubic-bezier(0.22, 1, 0.36, 1), filter 0.2s ease, background-color 0.2s ease; }
+.profile-pill-btn:active { transform: scale(0.96); }
+.profile-pill-btn.danger { background: rgba(239, 68, 68, 0.1); color: #ef4444; height: 44px; font-weight: 500; }
+#subviewProfileAvatar { box-shadow: 0 0 0 3px var(--card-bg), 0 0 0 5px var(--primary-blue); border: 0 !important; }
+
+/* switch */
+.toggle-switch {
+  width: 48px;
+  height: 28px;
+  border-radius: 14px;
+  margin-left: auto;
+  background: #cbd5e1;
+  transition: background-color 0.25s ease;
+}
+:root[data-theme="dark"] .toggle-switch { background: #334155; }
+.toggle-switch.on { background: var(--primary-blue); }
+.toggle-switch:after {
+  top: 3px;
+  left: 3px;
+  width: 22px;
+  height: 22px;
+  transition: transform 0.35s cubic-bezier(0.34, 1.4, 0.64, 1);
+}
+.toggle-switch.on:after { transform: translateX(20px); }
+.toggle-switch:active:after { transform: scaleX(1.18); }
+.toggle-switch.on:active:after { transform: translateX(16px) scaleX(1.18); }
+.no-theme-anim .toggle-switch { transition: background-color 0.25s ease !important; }
+.no-theme-anim .toggle-switch:after { transition: transform 0.35s cubic-bezier(0.34, 1.4, 0.64, 1) !important; }
+
+/* ==========================================================================
+   TRANSFORMATION / SWITCH ANIMATIONS  (transform + opacity only = GPU smooth)
+   ========================================================================== */
+@keyframes drawerItemIn {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes subViewIn {
+  from { opacity: 0; transform: translateX(22px); }
+  to { opacity: 1; transform: none; }
+}
+.settings-drawer.active #drawerMainView:not(.hidden) > * {
+  animation: drawerItemIn 0.42s cubic-bezier(0.22, 1, 0.36, 1) backwards;
+}
+.settings-drawer.active #drawerMainView:not(.hidden) > *:nth-child(1) { animation-delay: 0.05s; }
+.settings-drawer.active #drawerMainView:not(.hidden) > *:nth-child(2) { animation-delay: 0.08s; }
+.settings-drawer.active #drawerMainView:not(.hidden) > *:nth-child(3) { animation-delay: 0.11s; }
+.settings-drawer.active #drawerMainView:not(.hidden) > *:nth-child(4) { animation-delay: 0.14s; }
+.settings-drawer.active #drawerMainView:not(.hidden) > *:nth-child(5) { animation-delay: 0.17s; }
+.settings-drawer.active #drawerMainView:not(.hidden) > *:nth-child(6) { animation-delay: 0.2s; }
+.settings-drawer.active #drawerMainView:not(.hidden) > *:nth-child(7) { animation-delay: 0.23s; }
+#drawerProfileView.active, #drawerBlockView.active { animation: subViewIn 0.34s cubic-bezier(0.22, 1, 0.36, 1) backwards; }
+
+.screen {
+  transition: transform 0.38s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.38s ease;
+}
+.settings-drawer { transition: transform 0.38s cubic-bezier(0.22, 1, 0.36, 1); }
+.user-sheet-modal { transition: transform 0.38s cubic-bezier(0.22, 1, 0.36, 1); }
+.backdrop-scrim { transition: opacity 0.3s ease; }
+.panes-track { transition: transform 0.36s cubic-bezier(0.22, 1, 0.36, 1); }
+.inbox-tab-indicator { transition: transform 0.36s cubic-bezier(0.22, 1, 0.36, 1); }
+.inbox-tab { transition: color 0.25s ease, transform 0.2s cubic-bezier(0.22, 1, 0.36, 1); }
+.inbox-tab:active { transform: scale(0.96); }
+.pane-col { opacity: 1; transition: opacity 0.3s ease; }
+.panes-track[data-active="0"] #paneRooms,
+.panes-track[data-active="1"] #paneDirects {
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.22s ease, visibility 0s linear 0.37s;
+}
+.composer-btn, .send-action-btn { transition: transform 0.25s cubic-bezier(0.34, 1.4, 0.64, 1), background-color 0.2s ease, box-shadow 0.2s ease, color 0.2s ease; }
+.chat-card-avatar img, .msg-avatar img { animation: fadeIn 0.3s ease; }
+
+/* theme cross-fade (View Transitions) */
+::view-transition-old(root), ::view-transition-new(root) { animation-duration: 0.3s; animation-timing-function: ease; }
+
+/* scroll areas: no rubber-band chaining, touch friendly */
+.inbox-scroll-body, .messages-container { overscroll-behavior: contain; }
+button, .chat-card, .settings-row, .inbox-tab { touch-action: manipulation; }
+
+/* ==========================================================================
+   LOGO + TAP / SMOOTH ANIMATIONS (additions)
+   ========================================================================== */
+:root { --spring: cubic-bezier(0.34, 1.4, 0.64, 1); --smooth: cubic-bezier(0.22, 1, 0.36, 1); }
+.brand-logo { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; display: block; }
+.brand-logo-icon, .auth-brand-badge { background: transparent; box-shadow: none; overflow: hidden; }
+
+.brand-badge, .chat-contact-info, .header-profile-btn, .drawer-back-btn, .mention-item,
+.auth-toggle-link, .msg-bubble, .msg-avatar, .chat-card-avatar, .chat-header-avatar, .settings-row {
+  transition: transform 0.28s var(--spring), background-color 0.2s ease, box-shadow 0.2s ease, opacity 0.2s ease;
+}
+.brand-badge:active, .chat-contact-info:active, .header-profile-btn:active, .drawer-back-btn:active,
+.mention-item:active, .auth-toggle-link:active { transform: scale(0.94); }
+.settings-row:active { transform: scale(0.985); }
+.msg-bubble:active { transform: scale(0.97); }
+.msg-avatar:active, .chat-card-avatar:active, .chat-header-avatar:active { transform: scale(0.9); }
+.chat-card:active .chat-card-avatar { transform: scale(0.92); }
+
+.user-sheet-modal { transition: transform 0.45s var(--smooth); }
+.user-sheet-modal.active .settings-row { animation: drawerItemIn 0.4s var(--smooth) backwards; }
+.user-sheet-modal.active .settings-row:nth-child(2) { animation-delay: 0.06s; }
+.user-sheet-modal.active .profile-form-group,
+.user-sheet-modal.active .profile-pill-btn { animation: drawerItemIn 0.4s var(--smooth) 0.05s backwards; }
+#drawerBlockView.active .settings-row { animation: drawerItemIn 0.35s var(--smooth) backwards; }
+.mentions-box.open .mention-item { animation: drawerItemIn 0.25s var(--smooth) backwards; }
+.app-toast { transition: opacity 0.25s ease, transform 0.35s var(--spring); }
+.auth-field, .profile-input, .composer-textarea { transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease; }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+}
 </style>
 </head>
 <body>
@@ -1203,15 +1513,13 @@ svg { width: 1.15em; height: 1.15em; fill: none; stroke: currentColor; stroke-wi
        ========================================== -->
   <div id="authScreen">
     <div class="auth-card">
-      <div class="auth-brand-badge">
-        <svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
-      </div>
-      <h2 id="authHeading">Chat App</h2>
+      <div class="auth-brand-badge"><img class="brand-logo" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB4sBVUR8Nz47PlRnmU7Mn9yBzGxjtHQbmswmVJ8g5JBLmgwhevUrlEWaiPvzu5NGe_l3mKI1oWJzedHAZUWp_1iqSxEfaynl9A6aduhVIbZY_4KOtC4c22tAzKQJYC1E7gQtuq_k0JbQTLEPWTB2buOrT_ts7cIa-kfTMx_dbvLkbqkM7D00p3E_VLcpHPW49Vuv8tc_TAMxQCZGc2hpKdGpIkXY9j6A6mDYHzquEG8yWXaVh_tMpOUw" alt="logo"></div>
+      <h2 id="authHeading">Yuki</h2>
       <p class="auth-sub" id="authSub">Sign in to continue to your messages</p>
       
       <div class="auth-input-group">
-        <input class="auth-field" id="authDisplayName" type="text" placeholder="Your display name" maxlength="32" autocomplete="name" style="display:none">
-        <input class="auth-field" id="authUsername" type="text" placeholder="Choose username (3-20 characters)" maxlength="20" autocomplete="username" style="display:none">
+        <input class="auth-field auth-extra" id="authName" type="text" placeholder="Your name" maxlength="32" autocomplete="name">
+        <input class="auth-field auth-extra" id="authUsername" type="text" placeholder="Username (3-20: a-z, 0-9, _)" maxlength="20" autocomplete="off" autocapitalize="none" spellcheck="false">
         <input class="auth-field" id="authEmail" type="email" placeholder="Email address" autocomplete="email">
         <input class="auth-field" id="authPassword" type="password" placeholder="Password (6+ chars)" autocomplete="current-password">
       </div>
@@ -1236,10 +1544,8 @@ svg { width: 1.15em; height: 1.15em; fill: none; stroke: currentColor; stroke-wi
     <!-- Header -->
     <header class="app-header">
       <div class="brand-badge" id="btnBrandMenu">
-        <div class="brand-logo-icon">
-          <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><circle cx="19" cy="12" r="2"/><circle cx="5" cy="12" r="2"/></svg>
-        </div>
-        <span class="brand-title">Chat</span>
+        <div class="brand-logo-icon"><img class="brand-logo" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB4sBVUR8Nz47PlRnmU7Mn9yBzGxjtHQbmswmVJ8g5JBLmgwhevUrlEWaiPvzu5NGe_l3mKI1oWJzedHAZUWp_1iqSxEfaynl9A6aduhVIbZY_4KOtC4c22tAzKQJYC1E7gQtuq_k0JbQTLEPWTB2buOrT_ts7cIa-kfTMx_dbvLkbqkM7D00p3E_VLcpHPW49Vuv8tc_TAMxQCZGc2hpKdGpIkXY9j6A6mDYHzquEG8yWXaVh_tMpOUw" alt="logo"></div>
+        <span class="brand-title">Yuki</span>
       </div>
       <div class="header-actions">
         
@@ -1278,7 +1584,7 @@ svg { width: 1.15em; height: 1.15em; fill: none; stroke: currentColor; stroke-wi
 
       <!-- Panes for Directs & Rooms -->
       <div class="panes-wrapper">
-        <div class="panes-track" id="panesTrack">
+        <div class="panes-track" id="panesTrack" data-active="0">
           <!-- Directs Pane -->
           <div class="pane-col" id="paneDirects">
             <div id="directsListContainer"></div>
@@ -1291,7 +1597,7 @@ svg { width: 1.15em; height: 1.15em; fill: none; stroke: currentColor; stroke-wi
                 <svg viewBox="0 0 24 24"><path d="M12 2a8 8 0 0 0-8 8c0 3.3 2 6.2 5 7.4V20a2 2 0 0 0 2 2h2a2 2 0 0 0 2-2v-2.6c3-1.2 5-4.1 5-7.4a8 8 0 0 0-8-8z"/><path d="M9 10h.01M15 10h.01"/></svg>
               </div>
               <div style="flex:1;min-width:0">
-                <div style="font-size:15px;font-weight:700;color:var(--text-main)">Yuki AI Companion</div>
+                <div style="font-size:15px;font-weight:600;color:var(--text-main)">Yuki AI Companion</div>
                 <div style="font-size:12.5px;color:var(--text-muted);margin-top:2px">Ask questions, debug code, or chat 24/7</div>
               </div>
               <svg viewBox="0 0 24 24" style="color:var(--primary-blue)"><path d="m9 18 6-6-6-6"/></svg>
@@ -1418,9 +1724,22 @@ svg { width: 1.15em; height: 1.15em; fill: none; stroke: currentColor; stroke-wi
     <div class="drawer-body">
       <!-- 1. MAIN DRAWER MENU -->
       <div id="drawerMainView">
-        <div class="settings-sec-label">View & Theme</div>
+        <div class="settings-sec-label">Account</div>
+        <div class="settings-card">
+          <div class="settings-row" id="rowOpenProfile">
+            <span class="settings-icon "><svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></span>
+            <div class="settings-info">
+              <span class="settings-main-title">Your Profile</span>
+              <span class="settings-sub-title">Display name, unique username & photo</span>
+            </div>
+            <svg class="settings-chevron" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></svg>
+          </div>
+        </div>
+
+        <div class="settings-sec-label">Appearance</div>
         <div class="settings-card">
           <div class="settings-row" id="rowToggleTheme">
+            <span class="settings-icon "><svg viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg></span>
             <div class="settings-info">
               <span class="settings-main-title">Dark Mode</span>
               <span class="settings-sub-title">Toggle between Light & Dark themes</span>
@@ -1432,18 +1751,24 @@ svg { width: 1.15em; height: 1.15em; fill: none; stroke: currentColor; stroke-wi
         <div class="settings-sec-label">Safety & Privacy</div>
         <div class="settings-card">
           <div class="settings-row" id="rowOpenBlockList">
+            <span class="settings-icon "><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="m4.9 4.9 14.2 14.2"/></svg></span>
             <div class="settings-info">
               <span class="settings-main-title">Block List</span>
               <span class="settings-sub-title">Manage accounts you have blocked</span>
             </div>
-            <svg viewBox="0 0 24 24" style="color:var(--text-muted)"><path d="m9 18 6-6-6-6"/></svg>
+            <svg class="settings-chevron" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></svg>
           </div>
-          <div class="settings-row" id="rowOpenProfile">
+        </div>
+
+        <div class="settings-sec-label">Danger Zone</div>
+        <div class="settings-card">
+          <div class="settings-row" id="rowDeleteAccount">
+            <span class="settings-icon danger"><svg viewBox="0 0 24 24"><path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m3 0v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/></svg></span>
             <div class="settings-info">
-              <span class="settings-main-title">Your Profile</span>
-              <span class="settings-sub-title">Display name, unique username & photo</span>
+              <span class="settings-main-title" style="color:#ef4444">Delete Account</span>
+              <span class="settings-sub-title">Permanently remove your account</span>
             </div>
-            <svg viewBox="0 0 24 24" style="color:var(--text-muted)"><path d="m9 18 6-6-6-6"/></svg>
+            <svg class="settings-chevron" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></svg>
           </div>
         </div>
 
@@ -1452,11 +1777,20 @@ svg { width: 1.15em; height: 1.15em; fill: none; stroke: currentColor; stroke-wi
           <div class="settings-sec-label">Chat Actions</div>
           <div class="settings-card">
             <div class="settings-row" id="btnContextBlock">
+              <span class="settings-icon danger"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="m4.9 4.9 14.2 14.2"/></svg></span>
               <div class="settings-info">
                 <span class="settings-main-title" style="color:#ef4444" id="labelBlockChatUser">Block User</span>
               </div>
             </div>
+            <div class="settings-row" id="btnContextClearChat">
+              <span class="settings-icon danger"><svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/><path d="m9 8 6 6M15 8l-6 6"/></svg></span>
+              <div class="settings-info">
+                <span class="settings-main-title" style="color:#ef4444">Clear Chats</span>
+                <span class="settings-sub-title">Delete all messages, keep the contact</span>
+              </div>
+            </div>
             <div class="settings-row" id="btnContextDeleteChat">
+              <span class="settings-icon danger"><svg viewBox="0 0 24 24"><path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m3 0v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/></svg></span>
               <div class="settings-info">
                 <span class="settings-main-title" style="color:#ef4444">Delete Conversation</span>
                 <span class="settings-sub-title">Hide this chat from your directs</span>
@@ -1516,46 +1850,40 @@ svg { width: 1.15em; height: 1.15em; fill: none; stroke: currentColor; stroke-wi
     <div class="modal-drag-pill"></div>
     <div style="text-align:center;margin-bottom:18px">
       <div class="chat-card-avatar" id="modalContactAvatar" style="width:76px;height:76px;margin:0 auto 10px;font-size:26px;background:#f59e0b">LA</div>
-      <h3 style="font-size:18px;font-weight:800;color:var(--text-main)" id="modalContactName">Leslie Alexander</h3>
+      <h3 style="font-size:18px;font-weight:600;color:var(--text-main)" id="modalContactName">Leslie Alexander</h3>
       <p style="font-size:13px;color:var(--text-muted);margin-top:2px" id="modalContactRole">Web Designer</p>
-      <div style="display:inline-flex;align-items:center;gap:4px;padding:4px 10px;border-radius:12px;background:rgba(245, 158, 11, 0.15);color:#d97706;font-size:12px;font-weight:700;margin-top:8px">
-        <span>★ 4.7 (Rating)</span>
       </div>
-    </div>
 
-    <div style="font-size:12px;font-weight:800;text-transform:uppercase;color:var(--text-muted);margin-bottom:10px;letter-spacing:0.6px">
-      Experience & Companies
+    <div style="font-size:12px;font-weight:600;text-transform:uppercase;color:var(--text-muted);margin-bottom:10px;letter-spacing:0.6px">
+      Details
     </div>
 
     <div class="settings-card" style="margin-bottom:0">
       <div class="settings-row">
-        <div>
-          <b style="font-size:14px;display:block">Acme Co.</b>
-          <span style="font-size:12px;color:var(--text-muted)">Viet Nam</span>
-        </div>
-        <span style="font-size:12px;color:var(--text-muted)">04:15 am</span>
+        <span style="font-size:14px;font-weight:600">Country</span>
+        <span style="font-size:13.5px;color:var(--text-muted)" id="modalContactCountry">&mdash;</span>
       </div>
       <div class="settings-row">
-        <div>
-          <b style="font-size:14px;display:block">Biffco Enterprises</b>
-          <span style="font-size:12px;color:var(--text-muted)">Greece</span>
-        </div>
-        <span style="font-size:12px;color:var(--text-muted)">06:41 pm</span>
+        <span style="font-size:14px;font-weight:600">Device</span>
+        <span style="font-size:13.5px;color:var(--text-muted)" id="modalContactDevice">&mdash;</span>
       </div>
-      <div class="settings-row">
-        <div>
-          <b style="font-size:14px;display:block">Binford Ltd.</b>
-          <span style="font-size:12px;color:var(--text-muted)">South Africa</span>
-        </div>
-        <span style="font-size:12px;color:var(--text-muted)">07:40 am</span>
-      </div>
-      <div class="settings-row">
-        <div>
-          <b style="font-size:14px;display:block">Big Kahuna Burger</b>
-          <span style="font-size:12px;color:var(--text-muted)">Palestine, State of</span>
-        </div>
-        <span style="font-size:12px;color:var(--text-muted)">01:34 pm</span>
-      </div>
+    </div>
+  </div>
+
+  <!-- Delete Account confirmation sheet -->
+  <div class="user-sheet-modal" id="deleteAccountModal">
+    <div class="modal-drag-pill"></div>
+    <div style="text-align:center;margin-bottom:14px">
+      <h3 style="font-size:18px;font-weight:600;color:#ef4444">Delete Account</h3>
+      <p style="font-size:13px;color:var(--text-muted);margin-top:6px;line-height:1.45">This is permanent. Your profile and username will be removed. Enter your password to confirm.</p>
+    </div>
+    <div class="profile-form-group">
+      <input class="profile-input" id="inputDeletePassword" type="password" placeholder="Password" autocomplete="current-password">
+    </div>
+    <div class="auth-msg-err" id="deleteAccountError" style="text-align:center"></div>
+    <div style="display:flex;gap:10px;margin-top:6px">
+      <button class="profile-pill-btn outline" id="btnDeleteCancel" style="flex:1;height:44px">Cancel</button>
+      <button class="profile-pill-btn danger" id="btnDeleteConfirm" style="flex:1">Delete</button>
     </div>
   </div>
 
@@ -1569,35 +1897,22 @@ svg { width: 1.15em; height: 1.15em; fill: none; stroke: currentColor; stroke-wi
 
 <!-- Firebase & Application Modules -->
 <script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-app.js";
-import { 
-  getAuth, 
-  createUserWithEmailAndPassword, 
-  signInWithEmailAndPassword, 
-  signOut, 
-  onAuthStateChanged, 
-  setPersistence, 
-  browserLocalPersistence, 
-  sendEmailVerification 
-} from "https://www.gstatic.com/firebasejs/12.19.0/firebase-auth.js";
-import { 
-  getFirestore, 
-  doc, 
-  getDoc, 
-  setDoc, 
-  updateDoc, 
-  addDoc, 
-  collection, 
-  query, 
-  where, 
-  orderBy, 
-  limit, 
-  onSnapshot, 
-  serverTimestamp, 
-  getDocs, 
-  increment, 
-  runTransaction 
-} from "https://www.gstatic.com/firebasejs/12.19.0/firebase-firestore.js";
+/* Firebase is loaded dynamically so a load failure shows a clear on-screen error instead of a dead page */
+let initializeApp, getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged, setPersistence, browserLocalPersistence, sendEmailVerification, getFirestore, doc, getDoc, setDoc, updateDoc, addDoc, collection, query, where, orderBy, limit, onSnapshot, serverTimestamp, getDocs, increment, runTransaction;
+try {
+  const [__A, __Au, __F] = await Promise.all([
+    import("https://www.gstatic.com/firebasejs/12.19.0/firebase-app.js"),
+    import("https://www.gstatic.com/firebasejs/12.19.0/firebase-auth.js"),
+    import("https://www.gstatic.com/firebasejs/12.19.0/firebase-firestore.js")
+  ]);
+  ({ initializeApp } = __A);
+  ({ getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged, setPersistence, browserLocalPersistence, sendEmailVerification } = __Au);
+  ({ getFirestore, doc, getDoc, setDoc, updateDoc, addDoc, collection, query, where, orderBy, limit, onSnapshot, serverTimestamp, getDocs, increment, runTransaction } = __F);
+} catch (err) {
+  window.__fbLoadError = (err && (err.name + ': ' + err.message)) || String(err);
+  window.dispatchEvent(new CustomEvent('fbloadfail'));
+  throw err;
+}
 
 /* Firebase Config from previous sessions */
 const firebaseConfig = {
@@ -1626,6 +1941,76 @@ const getInitials = (n = '?') => String(n).replace(/^[@]/,'').slice(0, 2).toUppe
 const getAvColor = (n = '') => AV_COLORS[[...n].reduce((a,c)=>a+c.charCodeAt(0),0) % AV_COLORS.length];
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 
+/* Avatar helper: photo if available, otherwise initials */
+const avatarInner = (p, fallbackName = '?') => (p && p.photoURL)
+  ? `<img src="${esc(p.photoURL)}" alt="" decoding="async">`
+  : esc(getInitials((p && (p.display || p.username)) || fallbackName));
+
+/* Live profile cache (so everybody's DP stays in sync everywhere) */
+const profileCache = new Map();
+const profileUnsubs = new Map();
+let rdRaf = 0;
+const scheduleRenderDirects = () => {
+  if (rdRaf) return;
+  rdRaf = requestAnimationFrame(() => { rdRaf = 0; renderDirectsList(); });
+};
+function watchProfile(uid) {
+  if (!uid || uid === YUKI_BOT_UID || profileUnsubs.has(uid)) return;
+  const unsub = onSnapshot(doc(db, 'users', uid), snap => {
+    if (!snap.exists()) return;
+    const p = snap.data();
+    profileCache.set(uid, p);
+    conversationList.forEach(it => { if (it.otherUid === uid) it.profile = p; });
+    if (activePeer && activePeer.uid === uid) applyPeerProfile(p);
+    scheduleRenderDirects();
+  }, () => {});
+  profileUnsubs.set(uid, unsub);
+}
+function unwatchProfiles() {
+  profileUnsubs.forEach(u => { try { u(); } catch(e) {} });
+  profileUnsubs.clear();
+  profileCache.clear();
+}
+
+/* Keyed list patching: only touches cards that really changed (no flicker) */
+function patchList(container, entries) {
+  const existing = new Map();
+  [...container.children].forEach(el => { if (el.dataset && el.dataset.uid) existing.set(el.dataset.uid, el); });
+  const seen = new Set();
+  const firstTops = new Map();
+  const finalEls = new Map();
+  try { existing.forEach((el, uid) => firstTops.set(uid, el.getBoundingClientRect().top)); } catch(e) {}
+  let prev = null;
+  entries.forEach(({ uid, html }) => {
+    seen.add(uid);
+    let el = existing.get(uid);
+    if (!el || el.__html !== html) {
+      const tpl = document.createElement('template');
+      tpl.innerHTML = html.trim();
+      const fresh = tpl.content.firstElementChild;
+      fresh.__html = html;
+      if (el) el.replaceWith(fresh); else fresh.classList.add('card-enter');
+      el = fresh;
+    }
+    const expected = prev ? prev.nextElementSibling : container.firstElementChild;
+    if (expected !== el) container.insertBefore(el, expected);
+    finalEls.set(uid, el);
+    prev = el;
+  });
+  existing.forEach((el, uid) => { if (!seen.has(uid)) el.remove(); });
+
+  // FLIP: rows glide to their new position instead of jumping
+  try { finalEls.forEach((el, uid) => {
+    const f = firstTops.get(uid);
+    if (f === undefined || !el.animate) return;
+    const d = f - el.getBoundingClientRect().top;
+    if (Math.abs(d) > 1 && Math.abs(d) < 900) {
+      el.animate([{ transform: `translateY(${d}px)` }, { transform: 'none' }],
+                 { duration: 340, easing: 'cubic-bezier(0.22, 1, 0.36, 1)' });
+    }
+  }); } catch(e) {}
+}
+
 /* App State */
 let currentUser = null;
 let currentProfile = null;
@@ -1649,9 +2034,16 @@ let currentTheme = localStorage.getItem(THEME_STORAGE_KEY) || 'light';
 
 function setTheme(theme) {
   currentTheme = theme;
-  document.documentElement.setAttribute('data-theme', theme);
-  localStorage.setItem(THEME_STORAGE_KEY, theme);
-  $('switchTheme')?.classList.toggle('on', theme === 'dark');
+  const root = document.documentElement;
+  const apply = () => {
+    root.setAttribute('data-theme', theme);
+    $('switchTheme')?.classList.toggle('on', theme === 'dark');
+  };
+  root.classList.add('no-theme-anim');
+  apply();
+  requestAnimationFrame(() => requestAnimationFrame(() => root.classList.remove('no-theme-anim')));
+  setTimeout(() => root.classList.remove('no-theme-anim'), 400);
+  try { localStorage.setItem(THEME_STORAGE_KEY, theme); } catch(e) {}
 }
 setTheme(currentTheme);
 
@@ -1709,15 +2101,15 @@ const restoreChat = (u, o) => {
    ========================================================================== */
 $('btnToggleAuthMode')?.addEventListener('click', () => {
   isSignUpMode = !isSignUpMode;
-  $('authHeading').textContent = isSignUpMode ? 'Create Account' : 'Chat App';
-  $('authDisplayName').style.display = isSignUpMode ? 'block' : 'none';
-  $('authUsername').style.display = isSignUpMode ? 'block' : 'none';
+  $('authHeading').textContent = isSignUpMode ? 'Create Account' : 'Yuki';
   $('authSub').textContent = isSignUpMode ? 'Sign up to start messaging' : 'Sign in to continue to your messages';
   $('authSubmitText').textContent = isSignUpMode ? 'Create account' : 'Sign in';
   $('btnToggleAuthMode').textContent = isSignUpMode ? 'Already registered? Sign in' : 'New here? Create account';
   $('authError').textContent = '';
   $('authInfo').textContent = '';
   $('btnResendVerification').style.display = 'none';
+  document.querySelectorAll('.auth-extra').forEach(el => el.classList.toggle('show', isSignUpMode));
+  $('authPassword').setAttribute('autocomplete', isSignUpMode ? 'new-password' : 'current-password');
 });
 
 $('btnAuthSubmit')?.addEventListener('click', handleAuthSubmit);
@@ -1732,10 +2124,8 @@ async function handleAuthSubmit() {
   infoEl.textContent = '';
   $('btnResendVerification').style.display = 'none';
 
-  const displayName = $('authDisplayName').value.trim();
-  const requestedHandle = $('authUsername').value.trim().toLowerCase().replace(/[^a-z0-9_]/g, '');
-  if (!email || !password || (isSignUpMode && (!displayName || requestedHandle.length < 3))) {
-    errEl.textContent = isSignUpMode ? 'Enter your name, a username (3-20 characters), email and password.' : 'Please enter both email and password.';
+  if (!email || !password) {
+    errEl.textContent = 'Please enter both email and password.';
     return;
   }
   if (password.length < 6) {
@@ -1743,31 +2133,43 @@ async function handleAuthSubmit() {
     return;
   }
 
+  let signName = '', signHandle = '';
+  if (isSignUpMode) {
+    signName = $('authName').value.trim().replace(/\s+/g, ' ');
+    signHandle = $('authUsername').value.trim().toLowerCase().replace(/^@/, '');
+    if (!signName) { errEl.textContent = 'Please enter your name.'; return; }
+    if (!/^[a-z0-9_]{3,20}$/.test(signHandle)) {
+      errEl.textContent = 'Username: 3-20 characters, only a-z, 0-9 and _';
+      return;
+    }
+  }
+
   const btn = $('btnAuthSubmit');
   btn.disabled = true;
 
   try {
     if (isSignUpMode) {
-      if (requestedHandle.length > 20) {
-        errEl.textContent = 'Username must be 3-20 characters.';
-        return;
-      }
-      const handleSnap = await getDoc(doc(db, 'usernames', requestedHandle));
-      if (handleSnap.exists()) {
-        errEl.textContent = 'That username is already taken. Choose another.';
+      const uniqueHandle = signHandle;
+      let handleTaken = false;
+      try {
+        const snap = await getDoc(doc(db, 'usernames', uniqueHandle));
+        handleTaken = snap.exists();
+      } catch(x) { console.warn(x); }
+      if (handleTaken) {
+        errEl.textContent = `@${uniqueHandle} is already taken. Please choose another username.`;
         return;
       }
 
       const cred = await createUserWithEmailAndPassword(auth, email, password);
       await setDoc(doc(db, 'users', cred.user.uid), {
-        username: requestedHandle,
-        display: displayName,
+        username: uniqueHandle,
+        display: signName,
         email,
         createdAt: serverTimestamp(),
         lastSeen: serverTimestamp(),
         emailVerified: false
       });
-      await setDoc(doc(db, 'usernames', requestedHandle), { uid: cred.user.uid });
+      await setDoc(doc(db, 'usernames', uniqueHandle), { uid: cred.user.uid });
 
       try { await sendEmailVerification(cred.user); } catch(x) { console.warn(x); }
       infoEl.textContent = 'Verification email sent! Check your inbox, then sign in.';
@@ -1816,6 +2218,8 @@ $('btnResendVerification')?.addEventListener('click', async () => {
 
 /* Auth State Listener (With resilient fallback to never lock out) */
 onAuthStateChanged(auth, async user => {
+  window.__chatBooted = true;
+  document.getElementById('bootDiag')?.remove();
   if (!user) {
     currentUser = null;
     currentProfile = null;
@@ -1823,6 +2227,9 @@ onAuthStateChanged(auth, async user => {
     activeChatId = null;
     conversationList = [];
     stopAllListeners();
+    unwatchProfiles();
+    msgCache.clear();
+    renderedChatId = null;
     appShell.classList.remove('in-chat');
     toggleDrawer(false);
     $('authScreen')?.classList.add('active');
@@ -1839,7 +2246,10 @@ onAuthStateChanged(auth, async user => {
 
   currentUser = user;
   try {
-    const uSnap = await getDoc(doc(db, 'users', user.uid));
+    const uSnap = await Promise.race([
+      getDoc(doc(db, 'users', user.uid)),
+      new Promise((_, rej) => setTimeout(() => rej(new Error('Firestore timeout')), 8000))
+    ]);
     if (uSnap.exists()) {
       currentProfile = uSnap.data();
     } else {
@@ -1858,6 +2268,7 @@ onAuthStateChanged(auth, async user => {
 
     // Non-blocking update
     updateDoc(doc(db, 'users', user.uid), { lastSeen: serverTimestamp(), emailVerified: true }).catch(()=>{});
+    syncDeviceInfo(user.uid);
 
     $('authScreen')?.classList.remove('active');
     $('authPassword').value = '';
@@ -1871,6 +2282,7 @@ onAuthStateChanged(auth, async user => {
     currentProfile = { username: h, display: h.toUpperCase(), email: user.email || '' };
     $('authScreen')?.classList.remove('active');
     updateProfileBadges();
+    try { initRosterListener(); renderDirectsList(); } catch(e2) { console.error(e2); }
   }
 });
 
@@ -1881,11 +2293,18 @@ function updateProfileBadges() {
 
   const avHtml = currentProfile.photoURL 
     ? `<img src="${esc(currentProfile.photoURL)}" alt="Avatar">` 
-    : `<div class="av" style="background:${color};width:100%;height:100%">${initial}</div>`;
+    : `<div class="av" style="background:${color};width:100%;height:100%;display:grid;place-items:center;font-weight:600;color:#fff">${initial}</div>`;
 
-  if ($('headerProfileAvatar')) $('headerProfileAvatar').innerHTML = currentProfile.photoURL ? `<img src="${esc(currentProfile.photoURL)}" alt="Avatar" style="width:100%;height:100%;object-fit:cover;border-radius:50%">` : initial;
-  if ($('headerProfileAvatar')) { $('headerProfileAvatar').style.background = color; $('headerProfileAvatar').style.width = '100%'; $('headerProfileAvatar').style.height = '100%'; }
-  if ($('subviewProfileAvatar')) $('subviewProfileAvatar').innerHTML = avHtml;
+  const _hSig = (currentProfile.photoURL || '') + '|' + color + initial;
+  const _hChanged = $('btnHeaderProfile') && $('btnHeaderProfile').__sig !== _hSig;
+  if (_hChanged) $('btnHeaderProfile').__sig = _hSig;
+  if (_hChanged) $('btnHeaderProfile').innerHTML = currentProfile.photoURL
+    ? `<img id="headerProfileAvatar" src="${esc(currentProfile.photoURL)}" alt="Avatar" decoding="async">`
+    : `<div class="av" id="headerProfileAvatar" style="background:${color};width:100%;height:100%">${initial}</div>`;
+  if ($('subviewProfileAvatar') && $('subviewProfileAvatar').__sig !== avHtml) {
+    $('subviewProfileAvatar').__sig = avHtml;
+    $('subviewProfileAvatar').innerHTML = avHtml;
+  }
   if ($('inputDisplayName')) $('inputDisplayName').value = currentProfile.display || '';
   if ($('inputUsername')) $('inputUsername').value = currentProfile.username || '';
   if ($('inputEmail')) $('inputEmail').value = currentUser?.email || currentProfile.email || '';
@@ -1910,13 +2329,17 @@ function initRosterListener() {
     });
 
     await Promise.all(list.map(async item => {
+      const cached = profileCache.get(item.otherUid);
+      if (cached) { item.profile = cached; return; }
       try {
         const u = await getDoc(doc(db, 'users', item.otherUid));
         item.profile = u.exists() ? u.data() : { username: 'operator', display: 'Operator' };
+        if (u.exists()) profileCache.set(item.otherUid, item.profile);
       } catch(e) {
         item.profile = { username: 'operator', display: 'Operator' };
       }
     }));
+    try { list.forEach(it => watchProfile(it.otherUid)); } catch(e) { console.error(e); }
 
     const getTimeMillis = it => {
       const t = it.data.lastMsgAt || it.data.touchAt;
@@ -1945,7 +2368,7 @@ function renderDirectsList() {
 
 
 
-  container.innerHTML = visible.map(c => {
+  const entries = visible.map(c => {
     const prof = c.profile || {};
     const name = esc(prof.display || prof.username || 'Operator');
     const preview = esc(c.data.lastMsg || 'No messages yet');
@@ -1959,7 +2382,7 @@ function renderDirectsList() {
       ? `<img src="${esc(prof.photoURL)}" alt="Avatar">` 
       : initial;
 
-    return `
+    return { uid: c.otherUid, html: `
       <div class="chat-card ${isSelected ? 'highlighted-blue' : ''}" data-uid="${esc(c.otherUid)}">
         <div class="chat-card-avatar" style="background:${color}">
           ${avHtml}
@@ -1972,8 +2395,10 @@ function renderDirectsList() {
           <div class="chat-card-preview">${preview}</div>
         </div>
         ${unread > 0 ? `<span class="tab-badge">${unread > 9 ? '9+' : unread}</span>` : ''}
-      </div>`;
-  }).join('');
+      </div>` };
+  });
+  try { patchList(container, entries); }
+  catch(e) { console.error(e); container.innerHTML = entries.map(x => x.html).join(''); }
 }
 
 /* ==========================================================================
@@ -2034,9 +2459,10 @@ async function executeSearch(queryStr) {
   container.innerHTML = `<div class="settings-sec-label">Search Results</div>` + [...results.entries()].map(([uid, u]) => {
     const name = esc(u.display || u.username || 'User');
     const color = getAvColor(u.username);
+    profileCache.set(uid, u);
     return `
       <div class="chat-card" data-uid="${esc(uid)}">
-        <div class="chat-card-avatar" style="background:${color}">${getInitials(name)}</div>
+        <div class="chat-card-avatar" style="background:${color}">${avatarInner(u, name)}</div>
         <div class="chat-card-body">
           <div class="chat-card-header"><span class="chat-card-name">${name}</span></div>
           <div class="chat-card-preview">@${esc(u.username)}</div>
@@ -2060,10 +2486,7 @@ function stopAllListeners() {
 
 function openChatView(peerUid, profile = null) {
   stopAllListeners();
-  activeChatId = null;
-  activePeer = null;
-  const openingMessages = $('messagesContainer');
-  if (openingMessages) openingMessages.innerHTML = '';
+  chatSettleAt = appShell.classList.contains('in-chat') ? 0 : Date.now() + 300;
   appShell.classList.add('in-chat');
 
   if (peerUid === 'demo_leslie' || peerUid === 'demo_marvin' || peerUid === 'demo_jacob') {
@@ -2085,7 +2508,7 @@ function openChatView(peerUid, profile = null) {
   if (currentUser) restoreChat(currentUser.uid, peerUid);
 
   const existingChannel = conversationList.find(c => c.otherUid === peerUid);
-  profile = profile || (existingChannel && existingChannel.profile) || {};
+  profile = profile || (existingChannel && existingChannel.profile) || profileCache.get(peerUid) || {};
 
   activePeer = {
     uid: peerUid,
@@ -2113,6 +2536,7 @@ function openChatView(peerUid, profile = null) {
   $('searchResultsView').classList.remove('active');
 
   subscribeToMessages(activeChatId);
+  if (!activePeer.isYuki) watchProfile(peerUid);
 
   // Mark unread as seen
   if (currentUser && !activePeer.isYuki) {
@@ -2139,9 +2563,153 @@ function openYukiBotChat() {
   });
 }
 
+/* Live update of the person you are chatting with (name / DP) */
+function applyPeerProfile(p) {
+  if (!activePeer || activePeer.isYuki || activePeer.isDemo || !p) return;
+  const oldPhoto = activePeer.photoURL || '';
+  const oldName = activePeer.display;
+  activePeer.username = p.username || activePeer.username;
+  activePeer.display = p.display || p.username || activePeer.display;
+  activePeer.photoURL = p.photoURL || '';
+
+  $('chatHeaderTitle').textContent = activePeer.display;
+  $('chatHeaderSubtitle').textContent = `@${activePeer.username}`;
+  const ha = $('chatHeaderAvatar');
+  if (activePeer.photoURL) {
+    if (oldPhoto !== activePeer.photoURL || !ha.querySelector('img')) {
+      ha.innerHTML = `<img src="${esc(activePeer.photoURL)}" alt="Avatar" decoding="async">`;
+    }
+  } else {
+    ha.textContent = getInitials(activePeer.display);
+    ha.style.background = getAvColor(activePeer.username);
+  }
+
+  if (oldPhoto !== activePeer.photoURL || oldName !== activePeer.display) {
+    const bg = getAvColor(activePeer.username || 'Peer');
+    $('messagesContainer').querySelectorAll('.chat-message-row:not(.is-mine)').forEach(row => {
+      const av = row.querySelector('.msg-avatar');
+      if (av) { av.innerHTML = avatarInner(activePeer, activePeer.display); av.style.background = bg; }
+      const nm = row.querySelector('.msg-sender-name');
+      if (nm) nm.textContent = activePeer.display;
+    });
+  }
+}
+
+/* ---- Flicker-free message renderer (diff based, only new bubbles animate) ---- */
+const msgCache = new Map();      // chatId -> [{id, msg}]
+let renderedRows = new Map();    // msgId -> element
+let renderedChatId = null;
+let chatLoaded = false;
+let chatSettleAt = 0;
+
+function scaffoldMessages(chatId) {
+  const box = $('messagesContainer');
+  if (renderedChatId === chatId && $('typingIndicator') && box.contains($('typingIndicator'))) return false;
+  renderedChatId = chatId;
+  renderedRows = new Map();
+  chatLoaded = false;
+  box.innerHTML = `
+    <div class="date-divider" id="msgDateDivider"><span class="date-pill">Today</span></div>
+    <div class="typing-bar" id="typingIndicator">
+      <div class="typing-dots"><span></span><span></span><span></span></div>
+      <span id="typingLabel">${esc(activePeer?.display || 'Someone')} is typing...</span>
+    </div>`;
+  return true;
+}
+
+function buildMessageRow(id, msg, animate) {
+  const isMine = msg.by === currentUser?.uid;
+  const senderName = isMine ? (currentProfile?.display || 'You') : (activePeer?.display || 'Operator');
+  const timeStr = formatClock(msg.at);
+  const avHtml = activePeer?.photoURL ? `<img src="${esc(activePeer.photoURL)}" alt="" decoding="async">` : esc(getInitials(senderName));
+  const avBg = getAvColor(activePeer?.username || 'Peer');
+
+  const row = document.createElement('div');
+  row.className = 'chat-message-row' + (isMine ? ' is-mine' : '') + (animate ? '' : ' no-anim');
+  row.dataset.id = id;
+  row.innerHTML = `
+    ${!isMine ? `<div class="msg-avatar" style="background:${avBg}">${avHtml}</div>` : ''}
+    <div class="msg-bubble-wrap">
+      ${!isMine ? `<div class="msg-sender-name">${esc(senderName)}</div>` : ''}
+      <div class="msg-bubble">${esc(msg.text)}</div>
+      <div class="msg-time">${esc(timeStr)}</div>
+    </div>`;
+  return row;
+}
+
+function renderMessages(chatId, items) {
+  if (activeChatId !== chatId) return;
+  const box = $('messagesContainer');
+  scaffoldMessages(chatId);
+  const divider = $('msgDateDivider');
+  const typing = $('typingIndicator');
+  const initial = !chatLoaded;
+  chatLoaded = true;
+
+  let hint = $('emptyMsgHint');
+  if (!items.length) {
+    renderedRows.forEach(r => r.remove());
+    renderedRows.clear();
+    if (!hint && !activePeer?.isDemo) {
+      hint = document.createElement('p');
+      hint.id = 'emptyMsgHint';
+      hint.style.cssText = 'text-align:center;color:var(--text-muted);padding:30px 10px;font-size:13.5px';
+      hint.textContent = activePeer?.isYuki ? 'Say hello to Yuki AI Companion.' : 'No messages yet. Send the first message below.';
+      typing.before(hint);
+    }
+    return;
+  }
+  if (hint) hint.remove();
+
+  const nearBottom = box.scrollHeight - box.scrollTop - box.clientHeight < 140;
+  const ids = new Set(items.map(i => i.id));
+  renderedRows.forEach((el, id) => { if (!ids.has(id)) { el.remove(); renderedRows.delete(id); } });
+
+  const frag = initial ? document.createDocumentFragment() : null;
+  let anchor = divider;
+  let addedNew = false;
+  let lastMine = false;
+
+  items.forEach(({ id, msg }) => {
+    const timeStr = formatClock(msg.at);
+    const sig = (msg.text || '') + '|' + timeStr;
+    let row = renderedRows.get(id);
+    if (!row) {
+      row = buildMessageRow(id, msg, !initial);
+      row.__sig = sig;
+      renderedRows.set(id, row);
+      addedNew = true;
+      if (initial) frag.appendChild(row); else anchor.after(row);
+    } else {
+      if (row.__sig !== sig) {
+        row.__sig = sig;
+        const b = row.querySelector('.msg-bubble'); if (b) b.textContent = msg.text;
+        const t = row.querySelector('.msg-time'); if (t) t.textContent = timeStr;
+      }
+      if (!initial && anchor.nextElementSibling !== row) anchor.after(row);
+    }
+    anchor = row;
+    lastMine = row.classList.contains('is-mine');
+  });
+  if (initial) typing.before(frag);
+
+  if (initial) {
+    box.scrollTop = box.scrollHeight;
+    requestAnimationFrame(() => { box.scrollTop = box.scrollHeight; });
+  } else if (addedNew && (nearBottom || lastMine)) {
+    requestAnimationFrame(() => box.scrollTo({ top: box.scrollHeight, behavior: 'smooth' }));
+  }
+}
+
 function subscribeToMessages(chatId) {
   if (!chatId) return;
-  const msgsContainer = $('messagesContainer');
+  const box = $('messagesContainer');
+
+  // Wipe the previous chat instantly (no old messages flash) and paint cached ones if we have them
+  const fresh = scaffoldMessages(chatId);
+  const cached = msgCache.get(chatId);
+  if (cached) renderMessages(chatId, cached);
+  else if (!fresh) box.scrollTop = box.scrollHeight;
 
   unsubscribeMessages = onSnapshot(query(
     collection(db, 'chats', chatId, 'messages'),
@@ -2149,56 +2717,20 @@ function subscribeToMessages(chatId) {
     limit(200)
   ), snap => {
     if (activeChatId !== chatId) return;
-    const isNearBottom = msgsContainer.scrollHeight - msgsContainer.scrollTop - msgsContainer.clientHeight < 120;
+    msgCache.set(chatId, snap.docs.map(d => ({ id: d.id, msg: d.data({ serverTimestamps: 'estimate' }) })));
 
-    // Filter out existing dynamic elements, keep base date divider if empty
-    msgsContainer.querySelectorAll('.chat-message-row').forEach(e => e.remove());
+    const run = () => { if (activeChatId === chatId) renderMessages(chatId, msgCache.get(chatId) || []); };
+    const wait = chatSettleAt - Date.now();
+    // don't build bubbles in the middle of the slide-in animation (keeps it 60fps)
+    if (wait > 0 && !chatLoaded) setTimeout(run, wait); else run();
 
-    if (snap.empty) {
-      if (!activePeer?.isDemo) {
-        msgsContainer.innerHTML = `
-          <div class="date-divider"><span class="date-pill">Today</span></div>
-          <p style="text-align:center;color:var(--text-muted);padding:30px 10px;font-size:13.5px">
-            ${activePeer?.isYuki ? 'Say hello to Yuki AI Companion.' : 'No messages yet. Send the first message below.'}
-          </p>`;
+    const last = snap.docs[snap.docs.length - 1];
+    if (last && currentUser && !activePeer?.isYuki && !activePeer?.isDemo && last.data().by !== currentUser.uid) {
+      const it = conversationList.find(c => c.chatId === chatId);
+      if (it && it.data.unread && it.data.unread[currentUser.uid] > 0) {
+        updateDoc(doc(db, 'chats', chatId), { [`unread.${currentUser.uid}`]: 0 }).catch(()=>{});
       }
-      return;
     }
-
-    let html = '<div class="date-divider"><span class="date-pill">Today</span></div>';
-    snap.docs.forEach(d => {
-      const msg = d.data({ serverTimestamps: 'estimate' });
-      const isMine = msg.by === currentUser?.uid;
-      const senderName = isMine ? (currentProfile?.display || 'You') : (activePeer?.display || 'Operator');
-      const timeStr = formatClock(msg.at);
-      const avHtml = isMine 
-        ? (currentProfile?.photoURL ? `<img src="${esc(currentProfile.photoURL)}">` : getInitials(senderName))
-        : (activePeer?.photoURL ? `<img src="${esc(activePeer.photoURL)}">` : getInitials(senderName));
-      const avBg = isMine ? getAvColor(currentProfile?.username || 'You') : getAvColor(activePeer?.username || 'Peer');
-
-      html += `
-        <div class="chat-message-row ${isMine ? 'is-mine' : ''}">
-          <div class="msg-avatar" style="background:${avBg}">${avHtml}</div>
-          <div class="msg-bubble-wrap">
-            ${!isMine ? `<div class="msg-sender-name">${esc(senderName)}</div>` : ''}
-            <div class="msg-bubble">${esc(msg.text)}</div>
-            <div class="msg-time">${esc(timeStr)}</div>
-          </div>
-        </div>`;
-    });
-
-    // Re-insert typing indicator
-    html += `
-      <div class="typing-bar" id="typingIndicator">
-        <div class="typing-dots"><span></span><span></span><span></span></div>
-        <span id="typingLabel">${esc(activePeer?.display || 'Someone')} is typing...</span>
-      </div>`;
-
-    msgsContainer.innerHTML = html;
-
-    requestAnimationFrame(() => {
-      msgsContainer.scrollTop = msgsContainer.scrollHeight;
-    });
   }, err => console.error('Messages sync error:', err));
 }
 
@@ -2340,341 +2872,4 @@ $('chatInputText')?.addEventListener('input', () => {
   input.style.height = '36px';
   input.style.height = Math.min(input.scrollHeight, 120) + 'px';
   const hasText = !!input.value.trim();
-  $('btnSendMessage')?.classList.toggle('can-send', hasText);
-
-  // Handle u/ mentions
-  const match = input.value.match(/(?:^|\s)u\/([\w]*)$/);
-  const mentionsBox = $('mentionsBox');
-  if (match) {
-    const term = match[1].toLowerCase();
-    const matches = conversationList
-      .map(c => c.profile?.username)
-      .filter(u => u && u.toLowerCase().includes(term));
-
-    if (matches.length > 0) {
-      mentionsBox.innerHTML = matches.slice(0, 5).map(u => `
-        <button class="mention-item" data-username="${esc(u)}">
-          <div class="chat-card-avatar" style="width:26px;height:26px;font-size:11px;background:${getAvColor(u)}">${getInitials(u)}</div>
-          <span>u/${esc(u)}</span>
-        </button>`).join('');
-      mentionsBox.classList.add('open');
-    } else {
-      mentionsBox.classList.remove('open');
-    }
-  } else {
-    mentionsBox?.classList.remove('open');
-  }
-});
-
-/* ==========================================================================
-   SETTINGS DRAWER & 3 CORE SECTIONS
-   ========================================================================== */
-function toggleDrawer(open, isChatContext = false) {
-  const drawer = $('settingsDrawer');
-  const scrim = $('masterScrim');
-  if (open) {
-    showDrawerSubView('main');
-    $('chatContextActions').style.display = isChatContext ? 'block' : 'none';
-    drawer?.classList.add('active');
-    scrim?.classList.add('active');
-    updateProfileBadges();
-  } else {
-    drawer?.classList.remove('active');
-    scrim?.classList.remove('active');
-  }
-}
-
-function showDrawerSubView(view) {
-  const main = $('drawerMainView');
-  const prof = $('drawerProfileView');
-  const blk = $('drawerBlockView');
-  const backBtn = $('btnDrawerBack');
-  const title = $('drawerTitle');
-
-  if (view === 'profile') {
-    main.classList.add('hidden');
-    prof.classList.add('active');
-    blk.classList.remove('active');
-    backBtn.style.display = 'grid';
-    title.textContent = 'Your Profile';
-    updateProfileBadges();
-  } else if (view === 'block') {
-    main.classList.add('hidden');
-    prof.classList.remove('active');
-    blk.classList.add('active');
-    backBtn.style.display = 'grid';
-    title.textContent = 'Blocked Accounts';
-    renderBlockedAccounts();
-  } else {
-    main.classList.remove('hidden');
-    prof.classList.remove('active');
-    blk.classList.remove('active');
-    backBtn.style.display = 'none';
-    title.textContent = 'Settings';
-  }
-}
-
-$('btnDrawerBack')?.addEventListener('click', () => showDrawerSubView('main'));
-$('btnOpenSettings')?.addEventListener('click', () => toggleDrawer(true, false));
-$('btnNavSettings')?.addEventListener('click', () => toggleDrawer(true, false));
-$('btnChatSettingsGear')?.addEventListener('click', () => toggleDrawer(true, true));
-$('btnDrawerClose')?.addEventListener('click', () => toggleDrawer(false));
-$('masterScrim')?.addEventListener('click', () => {
-  toggleDrawer(false);
-  $('contactDetailsModal')?.classList.remove('active');
-});
-
-$('rowOpenProfile')?.addEventListener('click', () => showDrawerSubView('profile'));
-$('btnHeaderProfile')?.addEventListener('click', () => {
-  toggleDrawer(true, false);
-  showDrawerSubView('profile');
-});
-$('rowOpenBlockList')?.addEventListener('click', () => showDrawerSubView('block'));
-
-/* Profile Saving Functions */
-$('btnSaveDisplayName')?.addEventListener('click', async () => {
-  const name = $('inputDisplayName').value.trim();
-  if (!name) return showToast('Please enter a valid name');
-  if (!currentUser) return showToast('Please sign in first');
-
-  try {
-    await updateDoc(doc(db, 'users', currentUser.uid), { display: name });
-    currentProfile.display = name;
-    updateProfileBadges();
-    renderDirectsList();
-    showToast('Display name saved');
-  } catch(e) {
-    showToast('Could not update display name');
-  }
-});
-
-$('btnSaveUsername')?.addEventListener('click', async () => {
-  const handle = $('inputUsername').value.trim().toLowerCase().replace(/[^a-z0-9_]/g, '');
-  if (!handle || handle.length < 3) return showToast('Username must be 3-20 characters');
-  if (handle === currentProfile?.username?.toLowerCase()) return showToast('This is already your username');
-  if (!currentUser) return showToast('Please sign in first');
-
-  const oldHandle = currentProfile.username ? currentProfile.username.toLowerCase() : '';
-
-  try {
-    await runTransaction(db, async txn => {
-      const newRef = doc(db, 'usernames', handle);
-      const snap = await txn.get(newRef);
-      if (snap.exists()) {
-        throw new Error('TAKEN');
-      }
-      txn.set(newRef, { uid: currentUser.uid, at: serverTimestamp() });
-      txn.update(doc(db, 'users', currentUser.uid), { username: handle });
-      if (oldHandle) {
-        txn.delete(doc(db, 'usernames', oldHandle));
-      }
-    });
-
-    currentProfile.username = handle;
-    updateProfileBadges();
-    renderDirectsList();
-    showToast(`Username updated to @${handle}`);
-  } catch(err) {
-    if (err.message === 'TAKEN') {
-      showToast(`@${handle} is already taken!`);
-    } else {
-      showToast('Could not update username');
-    }
-  }
-});
-
-/* Copy username ID */
-$('tipUsernameCopy')?.addEventListener('click', async () => {
-  const u = currentProfile?.username;
-  if (!u) return;
-  try {
-    await navigator.clipboard.writeText(u);
-    showToast(`Copied ID: @${u}`);
-  } catch(e) {
-    showToast(`ID: @${u}`);
-  }
-});
-
-/* Change Profile Photo */
-$('btnTriggerPhotoUpload')?.addEventListener('click', () => $('fileAvatarUpload').click());
-$('fileAvatarUpload')?.addEventListener('change', async e => {
-  const file = e.target.files?.[0];
-  if (!file || !currentUser) return;
-  if (!file.type.startsWith('image/')) return showToast('Please pick an image file');
-
-  try {
-    const dataUrl = await new Promise((res, rej) => {
-      const reader = new FileReader();
-      reader.onload = () => res(reader.result);
-      reader.onerror = rej;
-      reader.readAsDataURL(file);
-    });
-
-    const img = await new Promise((res, rej) => {
-      const im = new Image();
-      im.onload = () => res(im);
-      im.onerror = rej;
-      im.src = dataUrl;
-    });
-
-    const canvas = document.createElement('canvas');
-    const scale = Math.min(1, 320 / Math.max(img.width, img.height));
-    canvas.width = Math.max(1, Math.round(img.width * scale));
-    canvas.height = Math.max(1, Math.round(img.height * scale));
-    canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height);
-
-    const compressedPhoto = canvas.toDataURL('image/jpeg', 0.7);
-    await updateDoc(doc(db, 'users', currentUser.uid), { photoURL: compressedPhoto });
-    currentProfile.photoURL = compressedPhoto;
-    updateProfileBadges();
-    renderDirectsList();
-    showToast('Profile photo updated!');
-  } catch(err) {
-    showToast('Failed to update photo');
-  }
-});
-
-/* Logout */
-$('btnLogout')?.addEventListener('click', async () => {
-  toggleDrawer(false);
-  if (currentUser) {
-    updateDoc(doc(db, 'users', currentUser.uid), { lastSeen: serverTimestamp() }).catch(()=>{});
-  }
-  await signOut(auth);
-  showToast('Logged out');
-});
-
-/* Block List Rendering & Unblock */
-function renderBlockedAccounts() {
-  const container = $('blockedUsersContainer');
-  const blockedIds = currentProfile?.blockedUids || [];
-
-  if (!blockedIds.length) {
-    container.innerHTML = '<p style="text-align:center;color:var(--text-muted);padding:30px 10px;font-size:13.5px">No blocked accounts.</p>';
-    return;
-  }
-
-  container.innerHTML = blockedIds.map(uid => {
-    const ch = conversationList.find(c => c.otherUid === uid);
-    const prof = ch?.profile || {};
-    const name = esc(prof.display || prof.username || 'Blocked User');
-    return `
-      <div class="settings-row">
-        <div style="display:flex;align-items:center;gap:10px">
-          <div class="chat-card-avatar" style="width:34px;height:34px;font-size:12px;background:#cbd5e1">
-            ${getInitials(name)}
-          </div>
-          <div>
-            <b style="font-size:13.5px;display:block">${name}</b>
-            <span style="font-size:12px;color:var(--text-muted)">@${esc(prof.username || 'operator')}</span>
-          </div>
-        </div>
-        <button class="profile-pill-btn outline" data-unblock="${esc(uid)}" style="font-size:12px;padding:4px 12px">Unblock</button>
-      </div>`;
-  }).join('');
-}
-
-async function toggleBlockUser(targetUid, shouldBlock) {
-  if (!targetUid || !currentUser || targetUid === YUKI_BOT_UID) return;
-  const setIds = new Set(currentProfile?.blockedUids || []);
-  shouldBlock ? setIds.add(targetUid) : setIds.delete(targetUid);
-  const blockedUids = [...setIds];
-
-  try {
-    await updateDoc(doc(db, 'users', currentUser.uid), { blockedUids });
-    currentProfile.blockedUids = blockedUids;
-    renderDirectsList();
-    renderBlockedAccounts();
-    showToast(shouldBlock ? 'User blocked' : 'User unblocked');
-  } catch(e) {
-    showToast('Could not update block list');
-  }
-}
-
-/* ==========================================================================
-   NAVIGATION & CLICK DELEGATION
-   ========================================================================== */
-document.addEventListener('click', e => {
-  const unblockBtn = e.target.closest('[data-unblock]');
-  if (unblockBtn) {
-    toggleBlockUser(unblockBtn.dataset.unblock, false);
-    return;
-  }
-
-  const mentionBtn = e.target.closest('.mention-item');
-  if (mentionBtn) {
-    const input = $('chatInputText');
-    input.value = input.value.replace(/u\/[\w]*$/, 'u/' + mentionBtn.dataset.username + ' ');
-    input.focus();
-    $('mentionsBox')?.classList.remove('open');
-    return;
-  }
-
-  const chatRow = e.target.closest('.chat-card');
-  if (chatRow && chatRow.dataset.uid) {
-    selectedCardUid = chatRow.dataset.uid;
-    document.querySelectorAll('#directsListContainer .chat-card').forEach(el => {
-      el.classList.toggle('highlighted-blue', el === chatRow);
-    });
-    openChatView(chatRow.dataset.uid);
-    return;
-  }
-
-  const navTab = e.target.closest('.inbox-tab');
-  if (navTab) {
-    const tabIdx = +navTab.dataset.tab;
-    document.querySelectorAll('.inbox-tab').forEach((t, i) => t.classList.toggle('active', i === tabIdx));
-    $('panesTrack').style.transform = `translateX(${-50 * tabIdx}%)`;
-    $('tabIndicator').style.transform = `translateX(${100 * tabIdx}%)`;
-    return;
-  }
-
-  
-});
-
-$('btnChatBack')?.addEventListener('click', () => {
-  appShell.classList.remove('in-chat');
-  activePeer = null;
-  activeChatId = null;
-  stopAllListeners();
-  renderDirectsList();
-});
-
-$('btnOpenYukiRoom')?.addEventListener('click', openYukiBotChat);
-
-
-/* Contact details bottom sheet modal */
-$('btnOpenContactDetails')?.addEventListener('click', () => {
-  if (activePeer) {
-    $('modalContactName').textContent = activePeer.display;
-    $('modalContactRole').textContent = activePeer.isYuki ? 'AI Companion' : `@${activePeer.username}`;
-    $('modalContactAvatar').textContent = getInitials(activePeer.display);
-    $('modalContactAvatar').style.background = getAvColor(activePeer.display);
-    $('contactDetailsModal')?.classList.add('active');
-    $('masterScrim')?.classList.add('active');
-  }
-});
-
-/* Context actions in chat drawer */
-$('btnContextBlock')?.addEventListener('click', () => {
-  if (activePeer && !activePeer.isYuki) {
-    const isBlocked = (currentProfile?.blockedUids || []).includes(activePeer.uid);
-    toggleBlockUser(activePeer.uid, !isBlocked);
-    toggleDrawer(false);
-  }
-});
-
-$('btnContextDeleteChat')?.addEventListener('click', () => {
-  if (activePeer && currentUser) {
-    addDeletedChat(currentUser.uid, activePeer.uid);
-    conversationList = conversationList.filter(c => c.otherUid !== activePeer.uid);
-    toggleDrawer(false);
-    appShell.classList.remove('in-chat');
-    renderDirectsList();
-    showToast('Conversation hidden');
-  }
-});
-</script>
-
-</body>
-</html>
+  $('btnSendMessage')?.classList.
